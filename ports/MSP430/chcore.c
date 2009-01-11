@@ -17,40 +17,37 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-/**
- * @addtogroup MSP430_CORE
- * @{
- */
-
 #include <ch.h>
 
-/*
- * This file is a template of the system driver functions provided by a port.
- * Some of the following functions may be implemented as macros in chcore.h if
- * the implementer decides that there is an advantage in doing so, as example
- * because performance concerns.
- */
-
 /**
- * The default implementation of this function is void so no messages are
- * actually printed.
- * @note The function is declared as a weak symbol, it is possible to redefine
- *       it in your application code.
- * @param msg pointer to the message string
+ * This function implements the idle thread infinite loop. The function should
+ * put the processor in the lowest power mode capable to serve interrupts.
+ * The priority is internally set to the minimum system value so that this
+ * thread is executed only if there are no other ready threads in the system.
  */
-__attribute__((weak))
-void sys_puts(char *msg) {
+void _idle(void *p) {
+
+  while (TRUE)
+    ;
 }
 
 /**
- * Performs a context switch between two threads.
- * @param otp the thread to be switched out
- * @param ntp the thread to be switched in
- * @note The function is declared as a weak symbol, it is possible to redefine
- *       it in your application code.
+ * Abonormal system termination handler. Invoked by the ChibiOS/RT when an
+ * abnormal unrecoverable condition is met.
  */
-__attribute__((naked, weak))
-void sys_switch(Thread *otp, Thread *ntp) {
+void chSysHalt(void) {
+
+  chSysLock();
+
+  while (TRUE)
+    ;
+}
+
+/**
+ * Context switch.
+ */
+__attribute__((naked))
+void chSysSwitchI(Thread *otp, Thread *ntp) {
   register struct intctx *sp asm("r1");
 
   asm volatile ("push    r11                                    \n\t" \
@@ -75,22 +72,11 @@ void sys_switch(Thread *otp, Thread *ntp) {
 }
 
 /**
- * Disables the interrupts and halts the system.
- * @note The function is declared as a weak symbol, it is possible to redefine
- *       it in your application code.
+ * Prints a message on the system console (if any).
  */
-__attribute__((weak))
-void sys_halt(void) {
-
-  sys_disable();
-  while (TRUE) {
-  }
+void chSysPuts(char *msg) {
 }
 
-/**
- * Start a thread by invoking its work function.
- * If the work function returns @p chThdExit() is automatically invoked.
- */
 void threadstart(void) {
 
   asm volatile ("eint                                           \n\t" \
@@ -98,5 +84,3 @@ void threadstart(void) {
                 "call    r10                                    \n\t" \
                 "call    #chThdExit");
 }
-
-/** @} */

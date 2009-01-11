@@ -75,9 +75,7 @@ typedef struct {
  * thread should take no more space than those reserved
  * by @p INT_REQUIRED_STACK.
  */
-#ifndef IDLE_THREAD_STACK_SIZE
 #define IDLE_THREAD_STACK_SIZE 0
-#endif
 
 /**
  * Per-thread stack overhead for interrupts servicing, it is used in the
@@ -86,9 +84,7 @@ typedef struct {
  * interrupt stack and the stack space between @p intctx and @p extctx is
  * known to be zero.
  */
-#ifndef INT_REQUIRED_STACK
 #define INT_REQUIRED_STACK 0
-#endif
 
 /**
  * Enforces a correct alignment for a stack area size value.
@@ -101,7 +97,7 @@ typedef struct {
 #define THD_WA_SIZE(n) STACK_ALIGN(sizeof(Thread) +                     \
                                    sizeof(struct intctx) +              \
                                    sizeof(struct extctx) +              \
-                                  (n) + (INT_REQUIRED_STACK))
+                                   (n) + (INT_REQUIRED_STACK))
 
 /**
  * Macro used to allocate a thread working area aligned as both position and
@@ -110,33 +106,30 @@ typedef struct {
 #define WORKING_AREA(s, n) stkalign_t s[THD_WA_SIZE(n) / sizeof(stkalign_t)];
 
 /**
- * IRQ prologue code, inserted at the start of all IRQ handlers enabled to
- * invoke system APIs.
+ * IRQ handler enter code.
+ * @note Usually IRQ handlers functions are also declared naked.
+ * @note On some architectures this macro can be empty.
  */
-#define SYS_IRQ_PROLOGUE()
+#define chSysIRQEnterI()
 
 /**
- * IRQ epilogue code, inserted at the end of all IRQ handlers enabled to
- * invoke system APIs.
+ * IRQ handler exit code.
+ * @note Usually IRQ handlers function are also declared naked.
+ * @note This macro usually performs the final reschedulation by using
+ *       \p chSchRescRequiredI() and \p chSchDoRescheduleI().
  */
-#define SYS_IRQ_EPILOGUE()
-
-/**
- * IRQ handler function modifier.
- */
-#define SYS_IRQ_HANDLER
+#define chSysIRQExitI()
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-  void sys_puts(char *msg);
-  void sys_switch(Thread *otp, Thread *ntp);
-  void sys_enable(void);
-  void sys_disable(void);
-  void sys_disable_from_isr(void);
-  void sys_enable_from_isr(void);
-  void sys_wait_for_interrupt(void);
-  void sys_halt(void);
+  void _idle(void *p);
+  void chSysHalt(void);
+  void chSysEnable(void);
+  void chSysLock(void);
+  void chSysUnlock(void);
+  void chSysSwitchI(Thread *otp, Thread *ntp);
+  void chSysPuts(char *msg);
 #ifdef __cplusplus
 }
 #endif

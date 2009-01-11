@@ -17,38 +17,27 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <ch.h>
+.text
 
-#include "lpc214x.h"
+.p2align 4,,15
+.globl @chSysSwitchI@8
+@chSysSwitchI@8:
+        # Switch out
+        push    %ebp
+        push    %esi
+        push    %edi
+        push    %ebx
+        movl    %esp,16(%ecx)
+        # Switch in
+        movl    16(%edx),%esp
+        pop     %ebx
+        pop     %edi
+        pop     %esi
+        pop     %ebp
+        ret
 
-/*
- * System idle thread loop.
- */
-void _idle(void *p) {
-
-  while (TRUE) {
-// Note, it is disabled because it causes trouble with the JTAG probe.
-// Enable it in the final code only.
-//    PCON = 1;
-  }
-}
-
-/*
- * System console message (not implemented).
- */
-void chSysPuts(char *msg) {
-}
-
-/*
- * System halt.
- */
-__attribute__((naked, weak))
-void chSysHalt(void) {
-
-#ifdef THUMB
-  asm volatile ("ldr      r0, =_halt16");
-  asm volatile ("bx       r0");
-#else
-  asm volatile ("b        _halt32");
-#endif
-}
+.p2align 4,,15
+.globl @threadstart@0
+@threadstart@0:
+        push    %eax
+        call    _chThdExit

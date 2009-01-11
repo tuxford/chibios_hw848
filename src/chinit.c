@@ -18,29 +18,11 @@
 */
 
 /**
- * @addtogroup System
+ * @addtogroup Initialization
  * @{
  */
 
 #include <ch.h>
-
-static WORKING_AREA(idle_thread_wa, IDLE_THREAD_STACK_SIZE);
-
-/**
- * This function implements the idle thread infinite loop. The function should
- * put the processor in the lowest power mode capable to serve interrupts.
- * The priority is internally set to the minimum system value so that this
- * thread is executed only if there are no other ready threads in the system.
- * @param p the thread parameter, unused in this scenario
- * @note Implementation should declare this function as a weak symbol in order
- *       to allow applications to re-implement it.
- */
-static void idle_thread(void *p) {
-
-  while (TRUE) {
-    sys_wait_for_interrupt();
-  }
-}
 
 /**
  * ChibiOS/RT initialization. After executing this function the current
@@ -51,6 +33,7 @@ static void idle_thread(void *p) {
  */
 void chSysInit(void) {
   static Thread mainthread;
+  static WORKING_AREA(idle_wa, IDLE_THREAD_STACK_SIZE);
 
   chSchInit();
   chDbgInit();
@@ -71,8 +54,7 @@ void chSysInit(void) {
    * serve interrupts in its context while keeping the lowest energy saving
    * mode compatible with the system status.
    */
-  chThdCreateStatic(idle_thread_wa, sizeof(idle_thread_wa), IDLEPRIO,
-                    (tfunc_t)idle_thread, NULL);
+  chThdCreateStatic(idle_wa, sizeof(idle_wa), IDLEPRIO, (tfunc_t)_idle, NULL);
 }
 
 /**
@@ -93,38 +75,5 @@ void chSysTimerHandlerI(void) {
 #endif
   chVTDoTickI();
 }
-
-#if !defined(CH_OPTIMIZE_SPEED)
-/**
- * Enters the ChibiOS/RT system mutual exclusion zone.
- * @note The use of system mutual exclusion zone is not recommended in
- *       the user code, it is a better idea to use the semaphores or mutexes
- *       instead.
- * @note The code of this API is may be inlined or not depending on the
- *       @p CH_OPTIMIZE_SPEED setting.
- * @see CH_USE_NESTED_LOCKS, chSysLockInline()
- */
-void chSysLock(void) {
-
-  chSysLockInline();
-}
-
-/**
- * Leaves the ChibiOS/RT system mutual exclusion zone.
- * @note The use of system mutual exclusion zone is not recommended in
- *       the user code, it is a better idea to use the semaphores or mutexes
- *       instead.
- * @note The code of this API is may be inlined or not depending on the
- *       @p CH_OPTIMIZE_SPEED setting.
- * @see CH_USE_NESTED_LOCKS, chSysUnlockInline()
- */
-void chSysUnlock(void) {
-
-#ifdef CH_USE_NESTED_LOCKS
-  chDbgAssert(currp->p_locks > 0, "chinit.c, chSysUnlock()");
-#endif
-  chSysUnlockInline();
-}
-#endif /* !CH_OPTIMIZE_SPEED */
 
 /** @} */

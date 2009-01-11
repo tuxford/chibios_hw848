@@ -27,31 +27,31 @@
 
 extern void FiqHandler(void);
 
-CH_IRQ_HANDLER static void SpuriousHandler(void) {
+__attribute__((naked))
+static void SpuriousHandler(void) {
 
-  CH_IRQ_PROLOGUE();
+  chSysIRQEnterI();
 
   AT91C_BASE_AIC->AIC_EOICR = 0;
 
-  CH_IRQ_EPILOGUE();
+  chSysIRQExitI();
 }
 
 /*
  * SYS IRQ handling here.
  */
-CH_IRQ_HANDLER static void SYSIrqHandler(void) {
+__attribute__((naked))
+static void SYSIrqHandler(void) {
 
-  CH_IRQ_PROLOGUE();
+  chSysIRQEnterI();
 
   if (AT91C_BASE_PITC->PITC_PISR & AT91C_PITC_PITS) {
     (void) AT91C_BASE_PITC->PITC_PIVR;
-    chSysLockI();
     chSysTimerHandlerI();
-    chSysUnlockI();
   }
   AT91C_BASE_AIC->AIC_EOICR = 0;                                        \
 
-  CH_IRQ_EPILOGUE();
+  chSysIRQExitI();
 }
 
 /*

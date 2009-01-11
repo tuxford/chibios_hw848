@@ -17,11 +17,6 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-/**
- * @addtogroup ARMCM3_CORE
- * @{
- */
-
 #ifndef _CHCORE_H_
 #define _CHCORE_H_
 
@@ -40,30 +35,29 @@
 #define ENABLE_WFI_IDLE 0       /* Enables the use of the WFI ins.      */
 #endif
 
-/**
+/*
  * Macro defining the ARM Cortex-M3 architecture.
  */
 #define CH_ARCHITECTURE_ARMCM3
 
-/**
+/*
  * 32 bit stack alignment.
  */
 typedef uint32_t stkalign_t;
 
-/**
+/*
  * Generic ARM register.
  */
 typedef void *regarm_t;
 
-/**
+/*
  * Interrupt saved context, empty in this architecture.
  */
 struct extctx {
 };
 
-/**
+/*
  * System saved context.
- * This structure represents the inner stack frame during a context switching.
  */
 struct intctx {
   regarm_t      basepri;
@@ -88,17 +82,19 @@ struct intctx {
   regarm_t      xpsr;
 };
 
-/**
- * Cortex-M3 context structure.
+/*
+ * Port dependent part of the Thread structure, you may add fields in
+ * this structure.
  */
 typedef struct {
   struct intctx *r13;
 } Context;
 
-/**
- * Platform dependent part of the @p chThdInit() API.
- * This code usually setup the context switching frame represented by a
- * @p intctx structure.
+/*
+ * Platform dependent part of the \p chThdCreate() API.
+ *
+ * The top of the workspace is used for the intctx datastructure.
+ *
  */
 #define SETUP_CONTEXT(workspace, wsize, pf, arg) {                      \
   tp->p_ctx.r13 = (struct intctx *)((uint8_t *)workspace +              \
@@ -112,122 +108,61 @@ typedef struct {
   tp->p_ctx.r13->xpsr = (regarm_t)0x01000000;                           \
 }
 
-/**
- * The default idle thread implementation requires no extra stack space in
- * this port.
- */
-#ifndef IDLE_THREAD_STACK_SIZE
-#define IDLE_THREAD_STACK_SIZE 0
-#endif
-
-/**
- * This port requires no extra stack space for interrupt handling.
- */
-#ifndef INT_REQUIRED_STACK
-#define INT_REQUIRED_STACK 0
-#endif
-
-/**
- * Enforces a correct alignment for a stack area size value.
- */
-#define STACK_ALIGN(n) ((((n) - 1) | sizeof(stkalign_t)) + 1)
-
- /**
-  * Computes the thread working area global size.
-  */
-#define THD_WA_SIZE(n) STACK_ALIGN(sizeof(Thread) +                     \
-                                   sizeof(struct intctx) +              \
-                                   sizeof(struct extctx) +              \
-                                   (n) + (INT_REQUIRED_STACK))
-
-/**
- * Macro used to allocate a thread working area aligned as both position and
- * size.
- */
-#define WORKING_AREA(s, n) stkalign_t s[THD_WA_SIZE(n) / sizeof(stkalign_t)];
-
-/**
- * IRQ prologue code, inserted at the start of all IRQ handlers enabled to
- * invoke system APIs.
- */
-#define SYS_IRQ_PROLOGUE()
-
-/**
- * IRQ epilogue code, inserted at the end of all IRQ handlers enabled to
- * invoke system APIs.
- */
-#define SYS_IRQ_EPILOGUE() {                                            \
-  SCB_ICSR = ICSR_PENDSVSET;                                            \
-}
-
-/**
- * This port function is implemented as inlined code for performance reasons.
- */
-#define sys_disable() {                                                 \
+#define chSysLock() {                                                   \
   register uint32_t tmp asm ("r3") = BASEPRI_KERNEL;                    \
   asm volatile ("msr     BASEPRI, %0" : : "r" (tmp));                   \
 }
-
-/**
- * This port function is implemented as inlined code for performance reasons.
- */
-#define sys_enable() {                                                  \
+#define chSysUnlock() {                                                 \
   register uint32_t tmp asm ("r3") = BASEPRI_USER;                      \
   asm volatile ("msr     BASEPRI, %0" : : "r" (tmp));                   \
 }
-
-/**
- * This port function is implemented as inlined code for performance reasons.
- */
-#define sys_disable_from_isr() sys_disable()
-
-/**
- * This port function is implemented as inlined code for performance reasons.
- */
-#define sys_enable_from_isr() sys_enable()
-
-/**
- * Disables all the interrupt sources, even those having a priority higher
- * to the kernel.
- * In the Cortex-M3 it raises the priority mask to level 0.
- */
-#define sys_disable_all() asm volatile ("cpsid   i")
-
-#if ENABLE_WFI_IDLE != 0
-/**
- * This port function is implemented as inlined code for performance reasons.
- */
-#define sys_wait_for_interrupt() {                                      \
-  asm volatile ("wfi");                                                 \
+#define chSysEnable() {                                                 \
+  register uint32_t tmp asm ("r3") = BASEPRI_USER;                      \
+  asm volatile ("msr     BASEPRI, %0" : : "r" (tmp));                   \
 }
-#else
-#define sys_wait_for_interrupt()
-#endif
-
-/**
- * This port function is implemented as inlined code for performance reasons.
- */
-#define sys_switch(otp, ntp) {                                          \
+#define chSysSwitchI(otp, ntp) {                                        \
   register Thread *_otp asm ("r0") = (otp);                             \
   register Thread *_ntp asm ("r1") = (ntp);                             \
   asm volatile ("svc     #0" : : "r" (_otp), "r" (_ntp));               \
 }
 
-/**
- * IRQ handler function modifier.
+#ifndef INT_REQUIRED_STACK
+#define INT_REQUIRED_STACK 0            /* NOTE: Always safe for this port. */
+#endif
+
+/*
+ * Enforces a 32 bit alignment for a stack area size value.
  */
-#define SYS_IRQ_HANDLER
+#define STACK_ALIGN(n) ((((n) - 1) | sizeof(stkalign_t)) + 1)
+
+#define THD_WA_SIZE(n) STACK_ALIGN(sizeof(Thread) +                     \
+                                   sizeof(struct intctx) +              \
+                                   sizeof(struct extctx) +              \
+                                   (n) +                                \
+                                   INT_REQUIRED_STACK)
+
+#define WORKING_AREA(s, n) stkalign_t s[THD_WA_SIZE(n) / sizeof(stkalign_t)];
+
+/* called on each interrupt entry, currently nothing is done */
+#define chSysIRQEnterI()
+
+/* called on each interrupt exit, pends a supervisor handler for
+ * execution after all higher priority interrupts; PendSVVector() */
+#define chSysIRQExitI() {                                               \
+  SCB_ICSR = ICSR_PENDSVSET;                                            \
+}
+
+#define IDLE_THREAD_STACK_SIZE 0
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-  void sys_puts(char *msg);
-  void sys_halt(void);
+  void _idle(void *p) __attribute__((weak, noreturn));
+  void chSysHalt(void);
+  void chSysPuts(char *msg);
   void threadstart(void);
 #ifdef __cplusplus
 }
 #endif
 
 #endif /* _CHCORE_H_ */
-
-/** @} */

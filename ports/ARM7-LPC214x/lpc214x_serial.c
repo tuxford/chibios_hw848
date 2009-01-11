@@ -43,16 +43,13 @@ static void SetError(IOREG32 err, FullDuplexDriver *com) {
     sts |= SD_FRAMING_ERROR;
   if (err & LSR_BREAK)
     sts |= SD_BREAK_DETECTED;
-  chSysLockI();
   chFDDAddFlagsI(com, sts);
-  chSysUnlockI();
 }
 
 /*
  * Tries hard to clear all the pending interrupt sources, we dont want to
  * go through the whole ISR and have another interrupt soon after.
  */
-__attribute__((noinline))
 static void ServeInterrupt(UART *u, FullDuplexDriver *com) {
 
   while (TRUE) {
@@ -65,37 +62,26 @@ static void ServeInterrupt(UART *u, FullDuplexDriver *com) {
       break;
     case IIR_SRC_TIMEOUT:
     case IIR_SRC_RX:
-      while (u->UART_LSR & LSR_RBR_FULL) {
-        chSysLockI();
+      while (u->UART_LSR & LSR_RBR_FULL)
         if (chIQPutI(&com->sd_iqueue, u->UART_RBR) < Q_OK)
            chFDDAddFlagsI(com, SD_OVERRUN_ERROR);
-        chSysUnlockI();
-      }
-      chSysLockI();
       chEvtBroadcastI(&com->sd_ievent);
-      chSysUnlockI();
       break;
     case IIR_SRC_TX:
       {
 #ifdef FIFO_PRELOAD
         int i = FIFO_PRELOAD;
         do {
-          chSysLockI();
           msg_t b = chOQGetI(&com->sd_oqueue);
-          chSysUnlockI();
           if (b < Q_OK) {
             u->UART_IER &= ~IER_THRE;
-            chSysLockI();
             chEvtBroadcastI(&com->sd_oevent);
-            chSysUnlockI();
             break;
           }
           u->UART_THR = b;
         } while (--i);
 #else
-        chSysLockI();
         msg_t b = chFDDRequestDataI(com);
-        chSysUnlockI();
         if (b < Q_OK)
           u->UART_IER &= ~IER_THRE;
         else
@@ -109,24 +95,26 @@ static void ServeInterrupt(UART *u, FullDuplexDriver *com) {
   }
 }
 
-CH_IRQ_HANDLER void UART0IrqHandler(void) {
+__attribute__((naked, weak))
+void UART0IrqHandler(void) {
 
-  CH_IRQ_PROLOGUE();
+  chSysIRQEnterI();
 
   ServeInterrupt(U0Base, &COM1);
   VICVectAddr = 0;
 
-  CH_IRQ_EPILOGUE();
+  chSysIRQExitI();
 }
 
-CH_IRQ_HANDLER void UART1IrqHandler(void) {
+__attribute__((naked, weak))
+void UART1IrqHandler(void) {
 
-  CH_IRQ_PROLOGUE();
+  chSysIRQEnterI();
 
   ServeInterrupt(U1Base, &COM2);
   VICVectAddr = 0;
 
-  CH_IRQ_EPILOGUE();
+  chSysIRQExitI();
 }
 
 #ifdef FIFO_PRELOAD
@@ -135,13 +123,9 @@ static void preload(UART *u, FullDuplexDriver *com) {
   if (u->UART_LSR & LSR_THRE) {
     int i = FIFO_PRELOAD;
     do {
-      chSysLockI();
       msg_t b = chOQGetI(&com->sd_oqueue);
-      chSysUnlockI();
       if (b < Q_OK) {
-        chSysLockI();
         chEvtBroadcastI(&com->sd_oevent);
-        chSysUnlockI();
         return;
       }
       u->UART_THR = b;
@@ -162,11 +146,8 @@ static void OutNotify1(void) {
 #else
   UART *u = U0Base;
 
-  if (u->UART_LSR & LSR_THRE) {
-    chSysLockI();
+  if (u->UART_LSR & LSR_THRE)
     u->UART_THR = chOQGetI(&COM1.sd_oqueue);
-    chSysUnlockI();
-  }
   u->UART_IER |= IER_THRE;
 #endif
 }

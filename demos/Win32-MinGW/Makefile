@@ -65,7 +65,7 @@ SRC  = chcore.c main.c ../../ports/win32/simcom.c \
        ${TESTSRC}
 
 # List ASM source files here
-ASRC = 
+ASRC = chcore2.s
 
 # List all user directories here
 UINCDIR = ../../src/include
