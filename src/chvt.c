@@ -27,8 +27,7 @@
 VTList vtlist;
 
 /**
- * @brief Virtual Timers initialization.
- *
+ * Virtual Timers initialization.
  * @note Internal use only.
  */
 void chVTInit(void) {
@@ -39,16 +38,15 @@ void chVTInit(void) {
 }
 
 /**
- * @brief Enables a virtual timer.
- *
- * @param vtp the @p VirtualTimer structure pointer
+ * Enables a virtual timer.
+ * @param vtp the \p VirtualTimer structure pointer
  * @param time the number of time ticks, the value zero is not allowed
  * @param vtfunc the timer callback function. After invoking the callback
  *               the timer is disabled and the structure can be disposed or
  *               reused.
  * @param par a parameter that will be passed to the callback function
- * @note The associated function is invoked by an interrupt handler within
- *       the I-Locked state, see @ref system_states.
+ * @note Must be called with the interrupts disabled.
+ * @note The associated function is invoked by an interrupt handler.
  */
 void chVTSetI(VirtualTimer *vtp, systime_t time, vtfunc_t vtfunc, void *par) {
   VirtualTimer *p;
@@ -71,9 +69,9 @@ void chVTSetI(VirtualTimer *vtp, systime_t time, vtfunc_t vtfunc, void *par) {
 }
 
 /**
- * @brief Disables a Virtual Timer.
- *
- * @param vtp the @p VirtualTimer structure pointer
+ * Disables a Virtual Timer.
+ * @param vtp the \p VirtualTimer structure pointer
+ * @note It must be called with the interrupts disabled.
  * @note The timer MUST be active when this function is invoked.
  */
 void chVTResetI(VirtualTimer *vtp) {
@@ -86,8 +84,7 @@ void chVTResetI(VirtualTimer *vtp) {
 }
 
 /**
- * @brief Checks if the current system time is within the specified time window.
- *
+ * Checks if the current system time is within the specified time window.
  * @param start the start of the time window (inclusive)
  * @param end the end of the time window (non inclusive)
  */

@@ -25,10 +25,9 @@
 
 #ifdef CH_USE_EVENTS
 /**
- * @brief Registers an Event Listener on an Event Source.
- *
- * @param esp pointer to the  @p EventSource structure
- * @param elp pointer to the @p EventListener structure
+ * Registers an Event Listener on an Event Source.
+ * @param esp pointer to the  \p EventSource structure
+ * @param elp pointer to the \p EventListener structure
  * @param emask the mask of event flags to be pended to the thread when the
  *              event source is broadcasted
  * @note Multiple Event Listeners can specify the same bits to be pended.
@@ -46,10 +45,9 @@ void chEvtRegisterMask(EventSource *esp, EventListener *elp, eventmask_t emask) 
 }
 
 /**
- * @brief Unregisters an Event Listener from its Event Source.
- *
- * @param esp pointer to the  @p EventSource structure
- * @param elp pointer to the @p EventListener structure
+ * Unregisters an Event Listener from its Event Source.
+ * @param esp pointer to the  \p EventSource structure
+ * @param elp pointer to the \p EventListener structure
  * @note If the event listener is not registered on the specified event source
  *       then the function does nothing.
  * @note For optimal performance it is better to perform the unregister
@@ -73,8 +71,7 @@ void chEvtUnregister(EventSource *esp, EventListener *elp) {
 }
 
 /**
- * @brief Clears the pending events specified in the mask.
- *
+ * Clears the pending events specified in the mask.
  * @param mask the events to be cleared
  * @return The pending events that were cleared.
  */
@@ -91,9 +88,8 @@ eventmask_t chEvtClear(eventmask_t mask) {
 }
 
 /**
- * @brief Makes an events mask pending in the current thread, this is \b much
- * faster than using @p chEvtBroadcast().
- *
+ * Makes an events mask pending in the current thread, this is \b much faster than
+ * using \p chEvtBroadcast().
  * @param mask the events to be pended
  * @return The current pending events mask.
  */
@@ -108,10 +104,8 @@ eventmask_t chEvtPend(eventmask_t mask) {
 }
 
 /**
- * @brief Signals all the Event Listeners registered on the specified Event
- * Source.
- *
- * @param esp pointer to the @p EventSource structure
+ * Signals all the Event Listeners registered on the specified Event Source.
+ * @param esp pointer to the \p EventSource structure
  */
 void chEvtBroadcast(EventSource *esp) {
 
@@ -124,10 +118,9 @@ void chEvtBroadcast(EventSource *esp) {
 }
 
 /**
- * @brief Signals all the Event Listeners registered on the specified Event
- * Source.
- *
- * @param esp pointer to the @p EventSource structure
+ * Signals all the Event Listeners registered on the specified Event Source.
+ * @param esp pointer to the \p EventSource structure
+ * @note This function does not reschedule.
  */
 void chEvtBroadcastI(EventSource *esp) {
   EventListener *elp;
@@ -148,10 +141,9 @@ void chEvtBroadcastI(EventSource *esp) {
 }
 
 /**
- * @brief Invokes the event handlers associated with a mask.
- *
+ * Invokes the event handlers associated with a mask.
  * @param mask mask of the events to be dispatched
- * @param handlers an array of @p evhandler_t. The array must be
+ * @param handlers an array of \p evhandler_t. The array must be
  *                 have indexes from zero up the higher registered event
  *                 identifier.
  */
@@ -171,11 +163,10 @@ void chEvtDispatch(const evhandler_t handlers[], eventmask_t mask) {
 #if defined(CH_OPTIMIZE_SPEED) || !defined(CH_USE_EVENTS_TIMEOUT) || \
     defined(__DOXIGEN__)
 /**
- * @brief A pending event among those specified in @p ewmask is selected,
- * cleared and its mask returned.
- *
+ * A pending event among those specified in \p ewmask is selected, cleared and
+ * its mask returned.
  * @param ewmask mask of the events that the function should wait for,
- *               @p ALL_EVENTS enables all the events
+ *               \p ALL_EVENTS enables all the events
  * @return The mask of the lowest id served and cleared event.
  * @note One and only one event is served in the function, the one with the
  *       lowest event id. The function is meant to be invoked into a loop in
@@ -201,12 +192,11 @@ eventmask_t chEvtWaitOne(eventmask_t ewmask) {
 }
 
 /**
- * @brief Waits for any of the specified events.
- * @details The function waits for any event among those specified in
- * @p ewmask to become pending then the events are cleared and returned.
- *
+ * Waits for any of the specified events.
+ * The function waits for any event among those specified in \p ewmask to
+ * become pending then the events are cleared and returned.
  * @param ewmask mask of the events that the function should wait for,
- *               @p ALL_EVENTS enables all the events
+ *               \p ALL_EVENTS enables all the events
  * @return The mask of the served and cleared events.
  */
 eventmask_t chEvtWaitAny(eventmask_t ewmask) {
@@ -226,10 +216,9 @@ eventmask_t chEvtWaitAny(eventmask_t ewmask) {
 }
 
 /**
- * @brief Waits for all the specified event flags then clears them.
- * @details The function waits for all the events specified in @p ewmask to
- * become pending then the events are cleared and returned.
- *
+ * Waits for all the specified event flags then clears them.
+ * The function waits for all the events specified in \p ewmask to become
+ * pending then the events are cleared and returned.
  * @param ewmask mask of the event ids that the function should wait for
  * @return The mask of the served and cleared events.
  */
@@ -250,12 +239,11 @@ eventmask_t chEvtWaitAll(eventmask_t ewmask) {
 
 #ifdef CH_USE_EVENTS_TIMEOUT
 /**
- * @brief Waits for a single event.
- * @details A pending event among those specified in @p ewmask is selected,
- * cleared and its mask returned.
- *
+ * Waits for a single event.
+ * A pending event among those specified in \p ewmask is selected, cleared and
+ * its mask returned.
  * @param ewmask mask of the events that the function should wait for,
- *               @p ALL_EVENTS enables all the events
+ *               \p ALL_EVENTS enables all the events
  * @param time the number of ticks before the operation timouts
  * @return The mask of the lowest id served and cleared event.
  * @retval 0 if the specified timeout expired.
@@ -284,12 +272,11 @@ eventmask_t chEvtWaitOneTimeout(eventmask_t ewmask, systime_t time) {
 }
 
 /**
- * @brief Waits for any of the specified events.
- * @details The function waits for any event among those specified in @p ewmask
- * to become pending then the events are cleared and returned.
- *
+ * Waits for any of the specified events.
+ * The function waits for any event among those specified in \p ewmask to
+ * become pending then the events are cleared and returned.
  * @param ewmask mask of the events that the function should wait for,
- *               @p ALL_EVENTS enables all the events
+ *               \p ALL_EVENTS enables all the events
  * @param time the number of ticks before the operation timouts
  * @return The mask of the served and cleared events.
  * @retval 0 if the specified timeout expired.
@@ -312,10 +299,9 @@ eventmask_t chEvtWaitAnyTimeout(eventmask_t ewmask, systime_t time) {
 }
 
 /**
- * @brief Waits for all the specified event flags then clears them.
- * @details The function waits for all the events specified in @p ewmask to
- * become pending then the events are cleared and returned.
- *
+ * Waits for all the specified event flags then clears them.
+ * The function waits for all the events specified in \p ewmask to become
+ * pending then the events are cleared and returned.
  * @param ewmask mask of the event ids that the function should wait for
  * @param time the number of ticks before the operation timouts
  * @return The mask of the served and cleared events.

@@ -18,7 +18,7 @@
 */
 
 /**
- * @addtogroup Kernel
+ * @addtogroup Initialization
  * @{
  */
 
@@ -33,7 +33,7 @@
 /**
  * Kernel version string.
  */
-#define CH_KERNEL_VERSION       "1.1.0unstable"
+#define CH_KERNEL_VERSION       "1.0.0rc3"
 
 /**
  * Kernel version major number.
@@ -43,7 +43,7 @@
 /**
  * Kernel version minor number.
  */
-#define CH_KERNEL_MINOR         1
+#define CH_KERNEL_MINOR         0
 
 /**
  * Kernel version patch number.
@@ -54,7 +54,6 @@
 #include <chtypes.h>
 #include "lists.h"
 #include <chcore.h>
-#include "sys.h"
 #include "vt.h"
 #include "scheduler.h"
 #include "semaphores.h"
@@ -78,6 +77,15 @@
 #endif
 #ifndef TRUE
 #define TRUE        (!FALSE)
+#endif
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+  void chSysInit(void);
+  void chSysTimerHandlerI(void);
+#ifdef __cplusplus
+}
 #endif
 
 #endif /* _CH_H_ */

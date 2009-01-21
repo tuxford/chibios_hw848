@@ -17,19 +17,27 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef _WFI_H_
-#define _WFI_H_
+.text
 
-#include "lpc214x.h"
+.p2align 4,,15
+.globl @chSysSwitchI@8
+@chSysSwitchI@8:
+        # Switch out
+        push    %ebp
+        push    %esi
+        push    %edi
+        push    %ebx
+        movl    %esp,16(%ecx)
+        # Switch in
+        movl    16(%edx),%esp
+        pop     %ebx
+        pop     %edi
+        pop     %esi
+        pop     %ebp
+        ret
 
-#ifndef port_wait_for_interrupt
-#if ENABLE_WFI_IDLE != 0
-#define port_wait_for_interrupt() {                                     \
-  PCON = 1;                                                             \
-}
-#else
-#define port_wait_for_interrupt()
-#endif
-#endif
-
-#endif /* _WFI_H_ */
+.p2align 4,,15
+.globl @threadstart@0
+@threadstart@0:
+        push    %eax
+        call    _chThdExit

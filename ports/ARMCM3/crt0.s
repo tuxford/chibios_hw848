@@ -37,8 +37,6 @@
 .thumb_func
 .global ResetHandler
 ResetHandler:
-        /* Interrupts globally masked. */
-        cpsid   i
         /*
          * Stack pointers initialization.
          */
@@ -49,7 +47,9 @@ ResetHandler:
         msr     PSP, r0
 //        ldr     r1, =__process_stack_size__
 //        sub     r0, r0, r1
-        /* Early initialization. */
+        /*
+         * Early initialization.
+         */
         bl      hwinit0
         /*
          * Data initialization.
@@ -76,17 +76,26 @@ bloop:
         itt     lo
         strlo   r0, [r1], #4
         blo     bloop
-        /* Switches to the Process Stack. */
+        /*
+         * Switches to the Process Stack and disables the interrupts globally.
+         */
         movs    r0, #CONTROL_MODE_PRIVILEGED | CONTROL_USE_PSP
         msr     CONTROL, r0
         isb
-        /* Late initialization. */
+        movs    r0, #0x10
+        msr     BASEPRI, r0
+        cpsie   i
+        /*
+         * Late initialization.
+         */
         bl      hwinit1
-        /* main(0, NULL). */
+        /*
+         * main(0, NULL).
+         */
         movs    r0, #0
         mov     r1, r0
         bl      main
-        bl      port_halt
+        bl      chSysHalt
 
 /*
  * Default early initialization code. It is declared weak in order to be
@@ -99,7 +108,7 @@ bloop:
 .weak hwinit0
 hwinit0:
         bx      lr
-
+        
 /*
  * Default late initialization code. It is declared weak in order to be
  * replaced by the real initialization code.

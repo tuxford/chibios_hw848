@@ -34,6 +34,7 @@ static msg_t ConsoleThread(void *arg);
 
 msg_t TestThread(void *p);
 
+void InitCore(void);
 extern FullDuplexDriver COM1, COM2;
 
 #define cprint(msg) chMsgSend(cdtp, (msg_t)msg)
@@ -122,14 +123,14 @@ static msg_t HelloWorldThread(void *arg) {
   short c;
   FullDuplexDriver *sd = (FullDuplexDriver *)arg;
 
-  for (i = 0; i < 10; i++) {
+  for (i = 0; i < 100; i++) {
 
     PrintLineFDD(sd, "Hello World\r\n");
     c = chFDDGetTimeout(sd, 333);
     switch (c) {
-    case Q_TIMEOUT:
+    case -1:
       continue;
-    case Q_RESET:
+    case -2:
       return 1;
     case 3:
       PrintLineFDD(sd, "^C\r\n");
@@ -278,6 +279,8 @@ static evhandler_t fhandlers[2] = {
  *------------------------------------------------------------------------*/
 int main(void) {
   EventListener c1fel, c2fel;
+
+  InitCore();
 
   // Startup ChibiOS/RT.
   chSysInit();

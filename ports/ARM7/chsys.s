@@ -44,59 +44,51 @@
 .balign 16
 .code 16
 .thumb_func
-.global _port_disable_all_thumb
-_port_disable_all_thumb:
+.global _lock
+_lock:
         mov     r0, pc
         bx      r0
 .code 32
         mrs     r0, CPSR
-        orr     r0, #I_BIT
-        msr     CPSR_c, r0
-        orr     r0, #F_BIT
-        msr     CPSR_c, r0
-        bx      lr
-
-.balign 16
-.code 16
-.thumb_func
-.global _port_suspend_thumb
-_port_disable_thumb:
-.global _port_lock_thumb
-_port_lock_thumb:
-        mov     r0, pc
-        bx      r0
-.code 32
         msr     CPSR_c, #MODE_SYS | I_BIT
         bx      lr
 
 .balign 16
 .code 16
 .thumb_func
-.global _port_enable_thumb
-_port_enable_thumb:
-.global _port_unlock_thumb
-_port_unlock_thumb:
+.global _unlock
+_unlock:
+        mov     r1, pc
+        bx      r1
+.code 32
+        msr     CPSR_c, r0
+        bx      lr
+
+.balign 16
+.code 16
+.thumb_func
+.global _enable
+_enable:
         mov     r0, pc
         bx      r0
 .code 32
         msr     CPSR_c, #MODE_SYS
         bx      lr
-
 #endif
 
 .balign 16
 #ifdef THUMB_PRESENT
 .code 16
 .thumb_func
-.global _port_switch_thumb
-_port_switch_thumb:
+.global chSysSwitchI_thumb
+chSysSwitchI_thumb:
         mov     r2, pc
         bx      r2
-        // Jumps into _port_switch_arm in ARM mode
+        // Jumps into chSysSwitchI in ARM mode
 #endif
 .code 32
-.global _port_switch_arm
-_port_switch_arm:
+.global chSysSwitchI_arm
+chSysSwitchI_arm:
 #ifdef CH_CURRP_REGISTER_CACHE
         stmfd   sp!, {r4, r5, r6, r8, r9, r10, r11, lr}
         str     sp, [r0, #16]
@@ -150,16 +142,16 @@ _port_switch_arm:
 #ifdef THUMB_NO_INTERWORKING
 .code 16
 .thumb_func
-.globl _port_irq_common
-_port_irq_common:
+.globl IrqCommon
+IrqCommon:
         bl      chSchRescRequiredI
         mov     lr, pc
         bx      lr
 .code 32
 #else /* !THUMB_NO_INTERWORKING */
 .code 32
-.globl _port_irq_common
-_port_irq_common:
+.globl IrqCommon
+IrqCommon:
         bl      chSchRescRequiredI
 #endif /* !THUMB_NO_INTERWORKING */
         cmp     r0, #0                          // Simply returns if a
@@ -205,8 +197,8 @@ _port_irq_common:
  */
 .balign 16
 .code 32
-.globl _port_thread_start
-_port_thread_start:
+.globl threadstart
+threadstart:
         msr     CPSR_c, #MODE_SYS
 #ifndef THUMB_NO_INTERWORKING
         mov     r0, r5
@@ -223,3 +215,23 @@ _port_thread_start:
 jmpr4:
         bx      r4
 #endif /* !THUMB_NO_INTERWORKING */
+
+/*
+ * System stop code.
+ */
+.code 16
+.p2align 2,,
+.thumb_func
+.weak _halt16
+.globl _halt16
+_halt16:
+       mov      r0, pc
+       bx       r0
+.code 32
+.weak _halt32
+.globl _halt32
+_halt32:
+       mrs      r0, CPSR
+       orr      r0, #I_BIT | F_BIT
+       msr      CPSR_c, r0
+.loop: b        .loop

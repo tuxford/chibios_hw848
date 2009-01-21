@@ -19,6 +19,9 @@
 
 #include <ch.h>
 
+#include <avr/io.h>
+#include <avr/interrupt.h>
+
 #include "avr_serial.h"
 
 static void SetError(uint8_t sra, FullDuplexDriver *com) {
@@ -30,9 +33,7 @@ static void SetError(uint8_t sra, FullDuplexDriver *com) {
     sts |= SD_PARITY_ERROR;
   if (sra & (1 << FE))
     sts |= SD_FRAMING_ERROR;
-  chSysLockI();
   chFDDAddFlagsI(com, sts);
-  chSysUnlockI();
 }
 
 #ifdef USE_AVR_USART0
@@ -40,35 +41,30 @@ FullDuplexDriver SER1;
 static uint8_t ib1[SERIAL_BUFFERS_SIZE];
 static uint8_t ob1[SERIAL_BUFFERS_SIZE];
 
-CH_IRQ_HANDLER(USART0_RX_vect) {
-  uint8_t sra;
+ISR(USART0_RX_vect) {
+  uint8_t sra = UCSR0A;
 
-  CH_IRQ_PROLOGUE();
+  chSysIRQEnterI();
 
-  sra = UCSR0A;
   if (sra & ((1 << DOR) | (1 << UPE) | (1 << FE)))
     SetError(sra, &SER1);
-  chSysLockI();
   chFDDIncomingDataI(&SER1, UDR0);
-  chSysUnlockI();
 
-  CH_IRQ_EPILOGUE();
+  chSysIRQExitI();
 }
 
-CH_IRQ_HANDLER(USART0_UDRE_vect) {
+ISR(USART0_UDRE_vect) {
   msg_t b;
 
-  CH_IRQ_PROLOGUE();
+  chSysIRQEnterI();
 
-  chSysLockI();
   b = chFDDRequestDataI(&SER1);
-  chSysUnlockI();
   if (b < Q_OK)
     UCSR0B &= ~(1 << UDRIE);
   else
     UDR0 = b;
 
-  CH_IRQ_EPILOGUE();
+  chSysIRQExitI();
 }
 
 /*
@@ -99,35 +95,31 @@ FullDuplexDriver SER2;
 static uint8_t ib2[SERIAL_BUFFERS_SIZE];
 static uint8_t ob2[SERIAL_BUFFERS_SIZE];
 
-CH_IRQ_HANDLER(USART1_RX_vect) {
-  uint8_t sra;
+ISR(USART1_RX_vect) {
 
-  CH_IRQ_PROLOGUE();
+  uint8_t sra = UCSR1A;
 
-  sra = UCSR1A;
+  chSysIRQEnterI();
+
   if (sra & ((1 << DOR) | (1 << UPE) | (1 << FE)))
     SetError(sra, &SER2);
-  chSysLockI();
   chFDDIncomingDataI(&SER2, UDR1);
-  chSysUnlockI();
 
-  CH_IRQ_EPILOGUE();
+  chSysIRQExitI();
 }
 
-CH_IRQ_HANDLER(USART1_UDRE_vect) {
+ISR(USART1_UDRE_vect) {
   msg_t b;
 
-  CH_IRQ_PROLOGUE();
+  chSysIRQEnterI();
 
-  chSysLockI();
   b = chFDDRequestDataI(&SER2);
-  chSysUnlockI();
   if (b < Q_OK)
     UCSR1B &= ~(1 << UDRIE);
   else
     UDR1 = b;
 
-  CH_IRQ_EPILOGUE();
+  chSysIRQExitI();
 }
 
 /*

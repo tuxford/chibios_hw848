@@ -34,9 +34,7 @@ static void SetError(uint8_t urctl, FullDuplexDriver *com) {
     sts |= SD_FRAMING_ERROR;
   if (urctl & BRK)
     sts |= SD_BREAK_DETECTED;
-  chSysLockI();
   chFDDAddFlagsI(com, sts);
-  chSysUnlockI();
 }
 
 #ifdef USE_MSP430_USART0
@@ -44,34 +42,30 @@ FullDuplexDriver COM1;
 static uint8_t ib1[SERIAL_BUFFERS_SIZE];
 static uint8_t ob1[SERIAL_BUFFERS_SIZE];
 
-CH_IRQ_HANDLER(USART0TX_VECTOR) {
+interrupt(USART0TX_VECTOR) u0txirq(void) {
   msg_t b;
 
-  CH_IRQ_PROLOGUE();
+  chSysIRQEnterI();
 
-  chSysLockI();
   b = chFDDRequestDataI(&COM1);
-  chSysUnlockI();
   if (b < Q_OK)
     U0IE &= ~UTXIE0;
   else
     U0TXBUF = b;
 
-  CH_IRQ_EPILOGUE();
+  chSysIRQExitI();
 }
 
-CH_IRQ_HANDLER(USART0RX_VECTOR) {
+interrupt(USART0RX_VECTOR) u0rxirq(void) {
   uint8_t urctl;
 
-  CH_IRQ_PROLOGUE();
+  chSysIRQEnterI();
 
   if ((urctl = U0RCTL) & RXERR)
     SetError(urctl, &COM1);
-  chSysLockI();
   chFDDIncomingDataI(&COM1, U0RXBUF);
-  chSysUnlockI();
 
-  CH_IRQ_EPILOGUE();
+  chSysIRQExitI();
 }
 
 /*
@@ -81,9 +75,7 @@ CH_IRQ_HANDLER(USART0RX_VECTOR) {
 static void OutNotify1(void) {
 
   if (!(U0IE & UTXIE0)) {
-    chSysLockI();
     U0TXBUF = (uint8_t)chFDDRequestDataI(&COM1);
-    chSysUnlockI();
     U0IE |= UTXIE0;
   }
 }
@@ -116,35 +108,32 @@ FullDuplexDriver COM2;
 static uint8_t ib2[SERIAL_BUFFERS_SIZE];
 static uint8_t ob2[SERIAL_BUFFERS_SIZE];
 
-CH_IRQ_HANDLER(USART1TX_VECTOR) {
+interrupt(USART1TX_VECTOR) u1txirq(void) {
   msg_t b;
 
-  CH_IRQ_PROLOGUE();
+  chSysIRQEnterI();
 
-  chSysLockI();
   b = chFDDRequestDataI(&COM2);
-  chSysUnlockI();
   if (b < Q_OK)
     U1IE &= ~UTXIE1;
   else
     U1TXBUF = b;
 
-  CH_IRQ_EPILOGUE();
+  chSysIRQExitI();
 }
 
-CH_IRQ_HANDLER(USART1RX_VECTOR) {
+interrupt(USART1RX_VECTOR) u1rxirq(void) {
   uint8_t urctl;
 
-  CH_IRQ_PROLOGUE();
+  chSysIRQEnterI();
 
   if ((urctl = U1RCTL) & RXERR)
     SetError(urctl, &COM2);
-  chSysLockI();
   chFDDIncomingDataI(&COM2, U1RXBUF);
-  chSysUnlockI();
 
-  CH_IRQ_EPILOGUE();
+  chSysIRQExitI();
 }
+
 
 /*
  * Invoked by the high driver when one or more bytes are inserted in the

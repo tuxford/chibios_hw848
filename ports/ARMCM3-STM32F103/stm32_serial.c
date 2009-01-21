@@ -55,9 +55,9 @@ static void SetError(uint16_t sr, FullDuplexDriver *com) {
     sts |= SD_FRAMING_ERROR;
   if (sr & SR_LBD)
     sts |= SD_BREAK_DETECTED;
-  chSysLockI();
+  chSysLock();
   chFDDAddFlagsI(com, sts);
-  chSysUnlockI();
+  chSysUnlock();
 }
 
 static void ServeInterrupt(USART_TypeDef *u, FullDuplexDriver *com) {
@@ -66,14 +66,14 @@ static void ServeInterrupt(USART_TypeDef *u, FullDuplexDriver *com) {
   if (sr & (SR_ORE | SR_FE | SR_PE | SR_LBD))
     SetError(sr, com);
   if (sr & SR_RXNE) {
-    chSysLockI();
+    chSysLock();
     chFDDIncomingDataI(com, u->DR);
-    chSysUnlockI();
+    chSysUnlock();
   }
   if (sr & SR_TXE) {
-    chSysLockI();
+    chSysLock();
     msg_t b = chFDDRequestDataI(com);
-    chSysUnlockI();
+    chSysUnlock();
     if (b < Q_OK)
       u->CR1 &= ~CR1_TXEIE;
     else
@@ -85,13 +85,11 @@ static void ServeInterrupt(USART_TypeDef *u, FullDuplexDriver *com) {
 /*
  * USART1 IRQ service routine.
  */
-CH_IRQ_HANDLER(VectorD4) {
+void VectorD4(void) {
 
-  CH_IRQ_PROLOGUE();
-
+  chSysIRQEnterI();
   ServeInterrupt(USART1, &COM1);
-
-  CH_IRQ_EPILOGUE();
+  chSysIRQExitI();
 }
 
 /*
@@ -108,13 +106,11 @@ static void OutNotify1(void) {
 /*
  * USART2 IRQ service routine.
  */
-CH_IRQ_HANDLER(VectorD8) {
+void VectorD8(void) {
 
-  CH_IRQ_PROLOGUE();
-
+  chSysIRQEnterI();
   ServeInterrupt(USART2, &COM2);
-
-  CH_IRQ_EPILOGUE();
+  chSysIRQExitI();
 }
 
 /*
@@ -131,13 +127,11 @@ static void OutNotify2(void) {
 /*
  * USART3 IRQ service routine.
  */
-CH_IRQ_HANDLER(VectorDC) {
+void VectorDC(void) {
 
-  CH_IRQ_PROLOGUE();
-
+  chSysIRQEnterI();
   ServeInterrupt(USART3, &COM3);
-
-  CH_IRQ_EPILOGUE();
+  chSysIRQExitI();
 }
 
 /*

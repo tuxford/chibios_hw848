@@ -90,13 +90,12 @@ void hwinit1(void) {
    * NVIC/SCB initialization.
    */
   SCB_AIRCR = AIRCR_VECTKEY | AIRCR_PRIGROUP(0x3); // PRIGROUP 4:0 (4:4).
-  NVICSetSystemHandlerPriority(HANDLER_SVCALL, PRIORITY_SVCALL);
-  NVICSetSystemHandlerPriority(HANDLER_SYSTICK, PRIORITY_SYSTICK);
-  NVICSetSystemHandlerPriority(HANDLER_PENDSV, PRIORITY_PENDSV);
+  SCB_SHPR(2) = 0xF0 << 16;     // PendSV at lowest priority.
 
   /*
    * SysTick initialization.
    */
+  SCB_SHPR(2) |= 0x40 << 24;    // SysTick at priority 4:0.
   ST_RVR = SYSCLK / (8000000 / CH_FREQUENCY) - 1;
   ST_CVR = 0;
   ST_CSR = ENABLE_ON_BITS | TICKINT_ENABLED_BITS | CLKSOURCE_EXT_BITS;
@@ -104,7 +103,7 @@ void hwinit1(void) {
   /*
    * Other subsystems initialization.
    */
-  InitSerial(0xC0, 0xC0, 0xC0);
+  InitSerial(0x80, 0x80, 0x80);
 
   /*
    * ChibiOS/RT initialization.

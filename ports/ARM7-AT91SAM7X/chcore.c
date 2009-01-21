@@ -17,34 +17,38 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-/**
- * @addtogroup ARM7_CORE
- * @{
- */
-
 #include <ch.h>
 
-/**
- * Prints a message on the system console.
- * @param msg pointer to the message
- */
-/** @cond never */
-__attribute__((weak))
-/** @endcond */
-void port_puts(char *msg) {
-}
+#include "at91lib/AT91SAM7X256.h"
 
-/**
- * Halts the system.
+/*
+ * System idle thread loop.
  */
-/** @cond never */
-__attribute__((weak))
-/** @endcond */
-void port_halt(void) {
+void _idle(void *p) {
 
-  port_disable();
   while (TRUE) {
+// Note, it is disabled because it causes trouble with the JTAG probe.
+// Enable it in the final code only.
+//    PCON = 1;
   }
 }
 
-/** @} */
+/*
+ * System console message (not implemented).
+ */
+void chSysPuts(char *msg) {
+}
+
+/*
+ * System halt.
+ */
+__attribute__((naked, weak))
+void chSysHalt(void) {
+
+#ifdef THUMB
+  asm volatile ("ldr      r0, =_halt16");
+  asm volatile ("bx       r0");
+#else
+  asm("b        _halt32");
+#endif
+}

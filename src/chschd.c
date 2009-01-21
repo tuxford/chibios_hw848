@@ -29,8 +29,8 @@ ReadyList rlist;
 /** @endcond */
 
 /**
- * @brief Scheduler initialization.
- * @note Internally invoked by the @p chSysInit().
+ * Scheduler initialization.
+ * @note Internally invoked by the \p chSysInit().
  */
 void chSchInit(void) {
 
@@ -42,12 +42,12 @@ void chSchInit(void) {
 }
 
 /**
- * @brief Inserts a thread in the Ready List.
+ * Inserts a thread in the Ready List.
  *
  * @param tp the Thread to be made ready
  * @return The Thread pointer.
  * @note The function must be called in the system mutex zone.
- * @note The function does not reschedule, the @p chSchRescheduleS() should
+ * @note The function does not reschedule, the \p chSchRescheduleS() should
  *       be called soon after.
  * @note The function is not meant to be used in the user code directly.
  */
@@ -70,10 +70,9 @@ Thread *chSchReadyI(Thread *tp) {
 }
 
 /**
- * @brief Puts the current thread to sleep into the specified state.
- * @details The next highest priority thread becomes running. The threads
- * states are described into @p threads.h.
- *
+ * Puts the current thread to sleep into the specified state, the next highest
+ * priority thread becomes running. The threads states are described into
+ * \p threads.h
  * @param newstate the new thread state
  * @note The function must be called in the system mutex zone.
  * @note The function is not meant to be used in the user code directly.
@@ -115,13 +114,15 @@ static void wakeup(void *p) {
 }
 
 /**
- * @brief Puts the current thread to sleep into the specified state.
- * @details The next highest priority thread becomes running. The thread put
- * to sleep is awakened after the specified time has elapsed.
+ * Puts the current thread to sleep.
+ *
+ * Puts the current thread to sleep into the specified state. The next highest
+ * priority thread becomes running. The thread put to sleep is awakened after
+ * the specified time has elapsed.
  *
  * @param newstate the new thread state
  * @param time the number of ticks before the operation timeouts. the value
- *             zero (@p TIME_INFINITE) is allowed.
+ *             zero (\p TIME_INFINITE) is allowed.
  * @return The wakeup message.
  * @retval RDY_TIMEOUT if a timeout occurs.
  * @note The function must be called in the system mutex zone.
@@ -143,16 +144,16 @@ msg_t chSchGoSleepTimeoutS(tstate_t newstate, systime_t time) {
 }
 
 /**
- * @brief Wakes up a thread.
- * @details The thread is inserted into the ready list or immediately made
- * running depending on its relative priority compared to the current thread.
+ * Wakes up a thread.
  *
+ * The thread is inserted into the ready list or immediately made running
+ * depending on its relative priority compared to the current thread.
  * @param ntp the Thread to be made ready
  * @param msg message to the awakened thread
  * @note The function must be called in the system mutex zone.
  * @note The function is not meant to be used in the user code directly.
- * @note It is equivalent to a @p chSchReadyI() followed by a
- *       @p chSchRescheduleS() but much more efficient.
+ * @note It is equivalent to a \p chSchReadyI() followed by a
+ *       \p chSchRescheduleS() but much more efficient.
  */
 void chSchWakeupS(Thread *ntp, msg_t msg) {
   ntp->p_rdymsg = msg;
@@ -179,9 +180,9 @@ void chSchWakeupS(Thread *ntp, msg_t msg) {
 }
 
 /**
- * @brief Switches to the first thread on the runnable queue.
+ * Switch to the first thread on the runnable queue.
  *
- * @note It is intended to be called if @p chSchRescRequiredI() evaluates to @p TRUE.
+ * @note It is intended to be called if \p chSchRescRequiredI() evaluates to \p TRUE.
  */
 void chSchDoRescheduleI(void) {
 
@@ -199,9 +200,10 @@ void chSchDoRescheduleI(void) {
 }
 
 /**
- * @brief Performs a reschedulation if a higher priority thread is runnable.
- * @details If a thread with a higher priority than the current thread is in
- * the ready list then make the higher priority thread running.
+ * Reschedule only if a higher priority thread is runnable.
+ *
+ * If a thread with a higher priority than the current thread is in the
+ * ready list then make the higher priority thread running.
  *
  * @note The function must be called in the system mutex zone.
  */
@@ -213,7 +215,7 @@ void chSchRescheduleS(void) {
 }
 
 /**
- * @brief Evaluates if a reschedulation is required.
+ * Evaluates if rescheduling is required.
  *
  * @retval TRUE if there is a thread that should go in running state.
  * @retval FALSE if a reschedulation is not required.

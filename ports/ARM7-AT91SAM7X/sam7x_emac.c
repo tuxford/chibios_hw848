@@ -106,31 +106,25 @@ static void ServeInterrupt(void) {
   if ((isr & AT91C_EMAC_RCOMP) || (rsr & RSR_BITS)) {
     if (rsr & AT91C_EMAC_REC) {
 //      received++;
-      chSysLockI();
       chEvtBroadcastI(&EMACFrameReceived);
-      chSysUnlockI();
     }
     AT91C_BASE_EMAC->EMAC_RSR = RSR_BITS;
   }
 
   if ((isr & AT91C_EMAC_TCOMP) || (tsr & TSR_BITS)) {
-    if (tsr & AT91C_EMAC_COMP) {
-      chSysLockI();
+    if (tsr & AT91C_EMAC_COMP)
       chEvtBroadcastI(&EMACFrameTransmitted);
-      chSysUnlockI();
-    }
     AT91C_BASE_EMAC->EMAC_TSR = TSR_BITS;
   }
   AT91C_BASE_AIC->AIC_EOICR = 0;
 }
 
-CH_IRQ_HANDLER(EMACIrqHandler) {
+__attribute__((naked))
+void EMACIrqHandler(void) {
 
-  CH_IRQ_PROLOGUE();
-
+  chSysIRQEnterI();
   ServeInterrupt();
-
-  CH_IRQ_EPILOGUE();
+  chSysIRQExitI();
 }
 
 /*

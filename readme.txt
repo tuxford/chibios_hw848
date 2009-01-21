@@ -57,6 +57,10 @@ Win32-MinGW            - ChibiOS/RT simulator and demo into a WIN32 process,
 *** Plans                                                                 ***
 *****************************************************************************
 
+- We are looking into adding an exception clause to the ChibiOS/RT license in
+  order to allow linking with non-GLP code under certain conditions.
+  The license change will happen before the 1.0.0 release, we are almost
+  there, everything looks very stable now.
 - Evaluate other architectures for a possible ChibiOS/RT port. An important
   selection parameter will be the availability of FOSS toolchains. Currently
   we are evaluating the MicroBlaze.
@@ -70,24 +74,16 @@ Win32-MinGW            - ChibiOS/RT simulator and demo into a WIN32 process,
 *** Releases                                                              ***
 *****************************************************************************
 
-*** 1.1.0unstable ***
-- NEW: Better separation between the port code and the system APIs, now an
-  architecture-specific "driver" contains all the port related code.
-  Port functions/macros are no more directly exposed as APIs to the user code.
-- NEW: Added a configuration option to enable nested system locks/unlocks.
-- NEW: Improved the interrupt handlers related code. Now interrupts are
-  handled in a very similar way in every architecture.
-- CHANGE: Renamed the macros chSysIRQEnter() and chSysIRQExit() in
-  CH_IRQ_PROLOGUE() and CH_IRQ_EPILOGUE() in order to make very clear that
-  those are not functions but inlined code. Also introduced a new macro
-  CH_IRQ_HANDLER that should be used when declaring an interrupt handler.
-- Improved ARM7 and Cortex-M3 support.
-- Introduced the concept of interrupt classes, see the documentation.
-- Introduced the concept of system states, see the documentation.
-- Huge improvements to the ports documentation.
-- Articles and notes previously in the wiki now merged in the general
-  documentation, the wiki entries are obsolete and will be removed.
-- New application notes and articles added.
+*** 1.0.0rc3 ***
+- FIX: Fixed a nasty regression to the timeout unified code that affected
+  some APIs since version 0.5.3. See the bug tracker for more details.
+  Added a test case about this.
+- FIX: Removed the API chThdSuspend() there was a conceptual flaw and I want
+  to think about the whole concept again before introducing something similar
+  in future. Anyway, it is possible to replicate the functionality using
+  chSchGoSleepS().
+- Fixed typos here and there.
+- Updated the states diagram in the documentation.
 
 *** 1.0.0rc2 ***
 - FIX: Removed unused variable "retaddr" from the Cortex-M3 port.

@@ -27,9 +27,8 @@
 #ifdef CH_USE_MEMPOOLS
 
 /**
- * @brief Initializes an empty memory pool.
- *
- * @param mp pointer to a @p MemoryPool structure
+ * Initializes an empty memory pool.
+ * @param mp pointer to a \p MemoryPool structure
  * @param size the size of the objects contained in this memory pool
  */
 void chPoolInit(MemoryPool *mp, size_t size) {
@@ -42,9 +41,8 @@ void chPoolInit(MemoryPool *mp, size_t size) {
 }
 
 /**
- * @brief Allocates an object from a memory pool.
- *
- * @param mp pointer to a @p MemoryPool structure
+ * Allocates an object from a memory pool.
+ * @param mp pointer to a \p MemoryPool structure
  * @return The pointer to the allocated object.
  * @retval NULL if pool is empty.
  */
@@ -60,9 +58,8 @@ void *chPoolAllocI(MemoryPool *mp) {
 }
 
 /**
- * @brief Allocates an object from a memory pool.
- *
- * @param mp pointer to a @p MemoryPool structure
+ * Allocates an object from a memory pool.
+ * @param mp pointer to a \p MemoryPool structure
  * @return The pointer to the allocated object.
  * @retval NULL if pool is empty.
  */
@@ -76,9 +73,8 @@ void *chPoolAlloc(MemoryPool *mp) {
 }
 
 /**
- * @brief Releases (or adds) an object into (to) a memory pool.
- *
- * @param mp pointer to a @p MemoryPool structure
+ * Releases (or adds) an object into (to) a memory pool.
+ * @param mp pointer to a \p MemoryPool structure
  * @param objp the pointer to the object to be released or added
  * @note the object is assumed to be of the right size for the specified
  *       memory pool.
@@ -94,9 +90,8 @@ void chPoolFreeI(MemoryPool *mp, void *objp) {
 }
 
 /**
- * @brief Releases (or adds) an object into (to) a memory pool.
- *
- * @param mp pointer to a @p MemoryPool structure
+ * Releases (or adds) an object into (to) a memory pool.
+ * @param mp pointer to a \p MemoryPool structure
  * @param objp the pointer to the object to be released or added
  * @note the object is assumed to be of the right size for the specified
  *       memory pool.

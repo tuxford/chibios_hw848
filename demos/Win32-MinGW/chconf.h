@@ -30,15 +30,6 @@
  *  that this is not related to the compiler optimization options.*/
 #define CH_OPTIMIZE_SPEED
 
-/** Configuration option: If enabled then the used of nested @p chSysLock() /
- *  @p chSysUnlock() operations is allowed.<br>
- *  For performance and code size reasons the recommended setting is leave
- *  this option disabled.<br>
- *  You can use this option if you need to merge ChibiOS/RT with external
- *  libraries that require nested lock/unlock operations.
- */
-//#define CH_USE_NESTED_LOCKS
-
 /** Configuration option: if specified then the kernel performs the round
  *  robin scheduling algorithm on threads of equal priority. */
 #define CH_USE_ROUNDROBIN
@@ -129,7 +120,7 @@
  *       provide the \p __heap_base__ and \p __heap_end__ symbols.
  * @note requires \p CH_USE_HEAP.
  */
-#define CH_HEAP_SIZE 0x20000
+#define CH_HEAP_SIZE 16384
 
 /** Configuration option: enforces the use of the C-runtime \p malloc() and
  *  \p free() functions as backend for the system heap allocator.*/
