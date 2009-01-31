@@ -1,5 +1,5 @@
 /*
-    ChibiOS/RT - Copyright (C) 2006-2007 Giovanni Di Sirio.
+    ChibiOS/RT - Copyright (C) 2009 Giovanni Di Sirio.
 
     This file is part of ChibiOS/RT.
 
@@ -15,6 +15,13 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+                                      ---
+
+    A special exception to the GPL can be applied should you wish to distribute
+    a combined work that includes ChibiOS/RT, without being obliged to provide
+    the source code for any proprietary components. See the file exception.txt
+    for full details of how and when the exception can be applied.
 */
 
 #include <ch.h>
@@ -42,26 +49,18 @@ static void SetError(AT91_REG csr, FullDuplexDriver *com) {
     sts |= SD_FRAMING_ERROR;
   if (csr & AT91C_US_RXBRK)
     sts |= SD_BREAK_DETECTED;
-  chSysLockFromIsr();
   chFDDAddFlagsI(com, sts);
-  chSysUnlockFromIsr();
 }
 
 /*
  * Serves the pending sources on the USART.
  */
-__attribute__((noinline))
 static void ServeInterrupt(AT91PS_USART u, FullDuplexDriver *com) {
 
-  if (u->US_CSR & AT91C_US_RXRDY) {
-    chSysLockFromIsr();
+  if (u->US_CSR & AT91C_US_RXRDY)
     chFDDIncomingDataI(com, u->US_RHR);
-    chSysUnlockFromIsr();
-  }
   if (u->US_CSR & AT91C_US_TXRDY) {
-    chSysLockFromIsr();
     msg_t b = chFDDRequestDataI(com);
-    chSysUnlockFromIsr();
     if (b < Q_OK)
       u->US_IDR = AT91C_US_TXRDY;
     else
@@ -74,22 +73,24 @@ static void ServeInterrupt(AT91PS_USART u, FullDuplexDriver *com) {
   AT91C_BASE_AIC->AIC_EOICR = 0;
 }
 
-CH_IRQ_HANDLER(USART0IrqHandler) {
+__attribute__((naked, weak))
+void USART0IrqHandler(void) {
 
-  CH_IRQ_PROLOGUE();
+  chSysIRQEnterI();
 
   ServeInterrupt(AT91C_BASE_US0, &COM1);
 
-  CH_IRQ_EPILOGUE();
+  chSysIRQExitI();
 }
 
-CH_IRQ_HANDLER(USART1IrqHandler) {
+__attribute__((naked, weak))
+void USART1IrqHandler(void) {
 
-  CH_IRQ_PROLOGUE();
+  chSysIRQEnterI();
 
   ServeInterrupt(AT91C_BASE_US1, &COM2);
 
-  CH_IRQ_EPILOGUE();
+  chSysIRQExitI();
 }
 
 /*
@@ -114,7 +115,7 @@ static void OutNotify2(void) {
  * USART setup, must be invoked with interrupts disabled.
  * NOTE: Does not reset I/O queues.
  */
-void SetUSART(AT91PS_USART u, int speed, int mode) {
+void SetUSARTI(AT91PS_USART u, int speed, int mode) {
 
   /* Disables IRQ sources and stop operations.*/
   u->US_IDR = 0xFFFFFFFF;
@@ -169,14 +170,14 @@ void InitSerial(int prio0, int prio1) {
                   USART1IrqHandler);
   AIC_EnableIT(AT91C_ID_US1);
 
-  SetUSART(AT91C_BASE_US0, 38400, AT91C_US_USMODE_NORMAL |
-                                  AT91C_US_CLKS_CLOCK |
-                                  AT91C_US_CHRL_8_BITS |
-                                  AT91C_US_PAR_NONE |
-                                  AT91C_US_NBSTOP_1_BIT);
-  SetUSART(AT91C_BASE_US1, 38400, AT91C_US_USMODE_NORMAL |
-                                  AT91C_US_CLKS_CLOCK |
-                                  AT91C_US_CHRL_8_BITS |
-                                  AT91C_US_PAR_NONE |
-                                  AT91C_US_NBSTOP_1_BIT);
+  SetUSARTI(AT91C_BASE_US0, 38400, AT91C_US_USMODE_NORMAL |
+                                   AT91C_US_CLKS_CLOCK |
+                                   AT91C_US_CHRL_8_BITS |
+                                   AT91C_US_PAR_NONE |
+                                   AT91C_US_NBSTOP_1_BIT);
+  SetUSARTI(AT91C_BASE_US1, 38400, AT91C_US_USMODE_NORMAL |
+                                   AT91C_US_CLKS_CLOCK |
+                                   AT91C_US_CHRL_8_BITS |
+                                   AT91C_US_PAR_NONE |
+                                   AT91C_US_NBSTOP_1_BIT);
 }

@@ -18,12 +18,10 @@
 ./ext/                 - External libraries or other code not part of
                          ChibiOS/RT but used in the demo applications.
 ./test/                - Test code, used by some demos.
-./docs/src             - Documentation sources.
 ./docs/Doxyfile        - Doxygen project file.
 ./docs/html/index.html - ChibiOS/RT documentation.
                          The documentation is also available on the project
                          web page: http://chibios.sourceforge.net/
-./docs/reports         - Test reports on the various targets.
 
 *****************************************************************************
 *** Current ports/demos                                                   ***
@@ -71,31 +69,6 @@ Win32-MinGW            - ChibiOS/RT simulator and demo into a WIN32 process,
 *****************************************************************************
 *** Releases                                                              ***
 *****************************************************************************
-
-*** 1.1.0unstable ***
-- NEW: Better separation between the port code and the system APIs, now an
-  architecture-specific "driver" contains all the port related code.
-  Port functions/macros are no more directly exposed as APIs to the user code.
-- NEW: Added a configuration option to enable nested system locks/unlocks.
-- NEW: Improved the interrupt handlers related code. Now interrupts are
-  handled in a very similar way in every architecture. See the "Concepts"
-  section and the "Writing interrupt handlers under ChibiOS/RT" article in the
-  documentation.
-- OPT: Improved ARM7 thumb port code, thanks to some GCC tricks involving
-  registers usage now the kernel is much smaller, faster and most OS APIs
-  use less RAM in stack frames (note, this is an ARM7 thumb mode specific
-  optimization).
-- CHANGE: Renamed the macros chSysIRQEnter() and chSysIRQExit() in
-  CH_IRQ_PROLOGUE() and CH_IRQ_EPILOGUE() in order to make very clear that
-  those are not functions but inlined code. Also introduced a new macro
-  CH_IRQ_HANDLER that should be used when declaring an interrupt handler.
-- Improved ARM7 and Cortex-M3 support, new configuration options.
-- Introduced the concept of interrupt classes, see the documentation.
-- Introduced the concept of system states, see the documentation.
-- Huge improvements to the ports documentation.
-- Articles and notes previously in the wiki now merged in the general
-  documentation and updated, the wiki entries are obsolete and will be removed.
-- New application notes and articles added.
 
 *** 1.0.0 ***
 - License switch, added GPL exception, see exception.txt.
@@ -382,7 +355,7 @@ Win32-MinGW            - ChibiOS/RT simulator and demo into a WIN32 process,
 - OPT: Removed an unrequired initialization and made other small optimizations
   to the chThdCreate().
 - OPT: Improvements to the test framework, now a virtual timer is used instead
-  of software loops into the benchmarks in order to have more stable results.
+  of software loops into the bechmarks in order to have more stable results.
 - New benchmark added to the test suite.
 - Added the C++ wrapper entries to the documentation.
 - Fixed the documentation entry for the chThdCreate() API.
@@ -459,7 +432,7 @@ Win32-MinGW            - ChibiOS/RT simulator and demo into a WIN32 process,
 - Fixes in various headers to make some macros compatible with both C and C++.
 - Fixed a regression in the LPC214x minimal demo that broke interrupt
   handling.
-- Some fixes to the doxygen documentation.
+- Some fixes to the doxigen documentation.
 - More work done on the ARM-CM3 port but it is still not complete.
 
 *** 0.6.1 ***
@@ -477,7 +450,7 @@ Win32-MinGW            - ChibiOS/RT simulator and demo into a WIN32 process,
 - Started work on ARM Cortex-M3 architecture. The target chip is the STM32F103
   on a Olimex STM32-P103 board.
 - Added a threads state diagram to the documentation.
-- Various fixes to the doxygen documentation.
+- Various fixes to the doxigen documentation.
 
 *** 0.6.0 ***
 - Code refactory, all the old sized-integer definitions like LONG32, UWORD16
@@ -514,9 +487,9 @@ Win32-MinGW            - ChibiOS/RT simulator and demo into a WIN32 process,
   the new demo were added.
 
 *** 0.5.4 ***
-- Port for Atmel AT91SAM7X256 introduced, the port should be usable also on
+- Port for Atmel AT91SAM7X256 introduced, the port should be useable also on
   SAM7S and SAM7XC but no tests were performed. Other SAM7 processors should
-  also be usable with limited changes.
+  also be useable with limited changes.
   The demo currently just performs basic operations, will be enhanced in next
   ChibiOS/RT releases, see the demo readme.txt file.
 - Small fix to the thumb mode IRQ code on the LPC214x port, removed some extra
@@ -549,12 +522,12 @@ Win32-MinGW            - ChibiOS/RT simulator and demo into a WIN32 process,
   the P_MSGBYPRIO option when creating a message server thread.
   This change allows the implementation of a priority ceiling protocol into
   message servers threads. Threads serving messages by priority and threads
-  serving messages in FIFO order can exist at the same time in the system.
+  serving messages in FIFO orded can exist at the same time in the system.
   This feature can be enabled or disabled by toggling the option
   CH_USE_MESSAGES_PRIORITY into the chconf.h file (disabled by default, old
   behavior).
   Note: This option brings a small overhead when sending a message regardless
-  if in FIFO or priority order, if you don't need priority ordering for your
+  if in FIFO or priority order, if you dont need priority ordering for your
   messages it is better to keep the feature disabled in chconf.h.
 - Added to the ARM demos load scripts the capability to load code in RAM
   instead flash, the function must be marked as:
@@ -562,7 +535,7 @@ Win32-MinGW            - ChibiOS/RT simulator and demo into a WIN32 process,
   The option -mlong-calls should be specified in the makefile too or the
   function declared with the "long-call" attribute.
 - Fixed the MSVC demo project files.
-- Fixed some syntax incompatibilities between GCC and MSVC into chmtx.c.
+- Fixed some syntax incompatibilites between GCC and MSVC into chmtx.c.
 
 *** 0.5.0 ***
 - NEW: Mutexes, the new mechanism provides a complete implementation of the
@@ -691,7 +664,7 @@ Win32-MinGW            - ChibiOS/RT simulator and demo into a WIN32 process,
 - Added a spreadsheet in the documentation that describes the advantages
   and disadvantages of the various optimization options (both GCC options and
   ChibiOS/RT options), very interesting read IMO.
-- The GCC option -falign-functions=16 is now default in the Makefile, it is
+- The GCC option +falign-functions=16 is now default in the Makefile, it is
   required because of the MAM unit into the LPC chips, without this option
   the code performance is less predictable and can change of some % points
   depending on how the code is aligned in the flash memory, unpredictability
@@ -737,7 +710,7 @@ Win32-MinGW            - ChibiOS/RT simulator and demo into a WIN32 process,
 - Added experimental MMC/SD block driver to the LPC2148 demo in order to
   support file systems. The driver features also events generation on card
   insert/remove, hot plugging supported.
-- Added missing chThdSuspend() declaration in threads.h.
+- Added missing chThdSuspend() declararion in threads.h.
 
 *** 0.3.5 ***
 - Space optimization in events code.
@@ -775,7 +748,7 @@ Win32-MinGW            - ChibiOS/RT simulator and demo into a WIN32 process,
   is done in order to ensure that the initializations performed into the
   main() procedure are finished before any thread starts.
 - Added chThdSetPriority() new API.
-- Added a generic events generator timer module to the library code.
+- Added a generic events generator timer modulee to the library code.
 - Modified the ARM7-LPC214x-GCC demo to show the use of the event timer.
 - Added the "#ifdef __cplusplus" stuff to the header files.
 - Removed an obsolete definition in ./src/templates/chtypes.h.
@@ -819,7 +792,7 @@ Win32-MinGW            - ChibiOS/RT simulator and demo into a WIN32 process,
 - Thread Local Storage implemented as a single API: chThdLS().
   The API simply returns a pointer into the thread working area, see the
   documentation on the web site.
-- Moved some documentation and images from the web site into the Doxygen
+- Moved some documentation and images from the web site into the Doxigen
   generated HTMLs.
 
 *** 0.2.1 ***

@@ -1,5 +1,5 @@
 /*
-    ChibiOS/RT - Copyright (C) 2006-2007 Giovanni Di Sirio.
+    ChibiOS/RT - Copyright (C) 2009 Giovanni Di Sirio.
 
     This file is part of ChibiOS/RT.
 
@@ -15,6 +15,13 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+                                      ---
+
+    A special exception to the GPL can be applied should you wish to distribute
+    a combined work that includes ChibiOS/RT, without being obliged to provide
+    the source code for any proprietary components. See the file exception.txt
+    for full details of how and when the exception can be applied.
 */
 
 /**
@@ -29,15 +36,6 @@
  *  efficient code is used when two possible implementations exist, note
  *  that this is not related to the compiler optimization options.*/
 //#define CH_OPTIMIZE_SPEED
-
-/** Configuration option: If enabled then the used of nested @p chSysLock() /
- *  @p chSysUnlock() operations is allowed.<br>
- *  For performance and code size reasons the recommended setting is leave
- *  this option disabled.<br>
- *  You can use this option if you need to merge ChibiOS/RT with external
- *  libraries that require nested lock/unlock operations.
- */
-//#define CH_USE_NESTED_LOCKS
 
 /** Configuration option: if specified then the kernel performs the round
  *  robin scheduling algorithm on threads of equal priority. */

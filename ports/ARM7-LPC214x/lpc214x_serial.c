@@ -1,5 +1,5 @@
 /*
-    ChibiOS/RT - Copyright (C) 2006-2007 Giovanni Di Sirio.
+    ChibiOS/RT - Copyright (C) 2009 Giovanni Di Sirio.
 
     This file is part of ChibiOS/RT.
 
@@ -15,6 +15,13 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+                                      ---
+
+    A special exception to the GPL can be applied should you wish to distribute
+    a combined work that includes ChibiOS/RT, without being obliged to provide
+    the source code for any proprietary components. See the file exception.txt
+    for full details of how and when the exception can be applied.
 */
 
 #include <ch.h>
@@ -43,16 +50,13 @@ static void SetError(IOREG32 err, FullDuplexDriver *com) {
     sts |= SD_FRAMING_ERROR;
   if (err & LSR_BREAK)
     sts |= SD_BREAK_DETECTED;
-  chSysLockFromIsr();
   chFDDAddFlagsI(com, sts);
-  chSysUnlockFromIsr();
 }
 
 /*
  * Tries hard to clear all the pending interrupt sources, we dont want to
  * go through the whole ISR and have another interrupt soon after.
  */
-__attribute__((noinline))
 static void ServeInterrupt(UART *u, FullDuplexDriver *com) {
 
   while (TRUE) {
@@ -65,37 +69,26 @@ static void ServeInterrupt(UART *u, FullDuplexDriver *com) {
       break;
     case IIR_SRC_TIMEOUT:
     case IIR_SRC_RX:
-      while (u->UART_LSR & LSR_RBR_FULL) {
-        chSysLockFromIsr();
+      while (u->UART_LSR & LSR_RBR_FULL)
         if (chIQPutI(&com->sd_iqueue, u->UART_RBR) < Q_OK)
            chFDDAddFlagsI(com, SD_OVERRUN_ERROR);
-        chSysUnlockFromIsr();
-      }
-      chSysLockFromIsr();
       chEvtBroadcastI(&com->sd_ievent);
-      chSysUnlockFromIsr();
       break;
     case IIR_SRC_TX:
       {
 #ifdef FIFO_PRELOAD
         int i = FIFO_PRELOAD;
         do {
-          chSysLockFromIsr();
           msg_t b = chOQGetI(&com->sd_oqueue);
-          chSysUnlockFromIsr();
           if (b < Q_OK) {
             u->UART_IER &= ~IER_THRE;
-            chSysLockFromIsr();
             chEvtBroadcastI(&com->sd_oevent);
-            chSysUnlockFromIsr();
             break;
           }
           u->UART_THR = b;
         } while (--i);
 #else
-        chSysLockFromIsr();
         msg_t b = chFDDRequestDataI(com);
-        chSysUnlockFromIsr();
         if (b < Q_OK)
           u->UART_IER &= ~IER_THRE;
         else
@@ -109,24 +102,26 @@ static void ServeInterrupt(UART *u, FullDuplexDriver *com) {
   }
 }
 
-CH_IRQ_HANDLER(UART0IrqHandler) {
+__attribute__((naked, weak))
+void UART0IrqHandler(void) {
 
-  CH_IRQ_PROLOGUE();
+  chSysIRQEnterI();
 
   ServeInterrupt(U0Base, &COM1);
   VICVectAddr = 0;
 
-  CH_IRQ_EPILOGUE();
+  chSysIRQExitI();
 }
 
-CH_IRQ_HANDLER(UART1IrqHandler) {
+__attribute__((naked, weak))
+void UART1IrqHandler(void) {
 
-  CH_IRQ_PROLOGUE();
+  chSysIRQEnterI();
 
   ServeInterrupt(U1Base, &COM2);
   VICVectAddr = 0;
 
-  CH_IRQ_EPILOGUE();
+  chSysIRQExitI();
 }
 
 #ifdef FIFO_PRELOAD
@@ -135,13 +130,9 @@ static void preload(UART *u, FullDuplexDriver *com) {
   if (u->UART_LSR & LSR_THRE) {
     int i = FIFO_PRELOAD;
     do {
-      chSysLockFromIsr();
       msg_t b = chOQGetI(&com->sd_oqueue);
-      chSysUnlockFromIsr();
       if (b < Q_OK) {
-        chSysLockFromIsr();
         chEvtBroadcastI(&com->sd_oevent);
-        chSysUnlockFromIsr();
         return;
       }
       u->UART_THR = b;
@@ -162,11 +153,8 @@ static void OutNotify1(void) {
 #else
   UART *u = U0Base;
 
-  if (u->UART_LSR & LSR_THRE) {
-    chSysLockFromIsr();
+  if (u->UART_LSR & LSR_THRE)
     u->UART_THR = chOQGetI(&COM1.sd_oqueue);
-    chSysUnlockFromIsr();
-  }
   u->UART_IER |= IER_THRE;
 #endif
 }
@@ -191,7 +179,7 @@ static void OutNotify2(void) {
 /*
  * UART setup, must be invoked with interrupts disabled.
  */
-void SetUART(UART *u, int speed, int lcr, int fcr) {
+void SetUARTI(UART *u, int speed, int lcr, int fcr) {
 
   int div = PCLK / (speed << 4);
   u->UART_LCR = lcr | LCR_DLAB;
@@ -216,10 +204,10 @@ void InitSerial(int vector1, int vector2) {
   PCONP = (PCONP & PCALL) | PCUART0 | PCUART1;
 
   chFDDInit(&COM1, ib1, sizeof ib1, NULL, ob1, sizeof ob1, OutNotify1);
-  SetUART(U0Base, 38400, LCR_WL8 | LCR_STOP1 | LCR_NOPARITY, FCR_TRIGGER0);
+  SetUARTI(U0Base, 38400, LCR_WL8 | LCR_STOP1 | LCR_NOPARITY, FCR_TRIGGER0);
 
   chFDDInit(&COM2, ib2, sizeof ib2, NULL, ob2, sizeof ob2, OutNotify2);
-  SetUART(U1Base, 38400, LCR_WL8 | LCR_STOP1 | LCR_NOPARITY, FCR_TRIGGER0);
+  SetUARTI(U1Base, 38400, LCR_WL8 | LCR_STOP1 | LCR_NOPARITY, FCR_TRIGGER0);
 
   VICIntEnable = INTMASK(SOURCE_UART0) | INTMASK(SOURCE_UART1);
 }

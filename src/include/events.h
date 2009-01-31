@@ -1,5 +1,5 @@
 /*
-    ChibiOS/RT - Copyright (C) 2006-2007 Giovanni Di Sirio.
+    ChibiOS/RT - Copyright (C) 2009 Giovanni Di Sirio.
 
     This file is part of ChibiOS/RT.
 
@@ -15,6 +15,13 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+                                      ---
+
+    A special exception to the GPL can be applied should you wish to distribute
+    a combined work that includes ChibiOS/RT, without being obliged to provide
+    the source code for any proprietary components. See the file exception.txt
+    for full details of how and when the exception can be applied.
 */
 
 /**
@@ -33,7 +40,7 @@
 typedef struct EventListener EventListener;
 
 /**
- * @brief Event Listener structure.
+ * Event Listener structure.
  */
 struct EventListener {
   /** Next Event Listener registered on the Event Source.*/
@@ -45,7 +52,7 @@ struct EventListener {
 };
 
 /**
- * @brief Event Source structure.
+ * Event Source structure.
  */
 typedef struct EventSource {
   /** First Event Listener registered on the Event Source.*/
@@ -57,16 +64,16 @@ typedef struct EventSource {
 
 /**
  * Initializes an Event Source.
- * @param esp pointer to the @p EventSource structure
+ * @param esp pointer to the \p EventSource structure
  * @note Can be called with interrupts disabled or enabled.
  */
 #define chEvtInit(esp) \
         ((esp)->es_next = (EventListener *)(void *)(esp))
 
 /**
- * Verifies if there is at least one @p EventListener registered on the
- * @p EventSource.
- * @param esp pointer to the @p EventSource structure
+ * Verifies if there is at least one \p EventListener registered on the
+ * \p EventSource.
+ * @param esp pointer to the \p EventSource structure
  * @note Can be called with interrupts disabled or enabled.
  */
 #define chEvtIsListening(esp) \
@@ -101,12 +108,12 @@ extern "C" {
 
 /**
  * Registers an Event Listener on an Event Source.
- * @param esp pointer to the  @p EventSource structure
- * @param elp pointer to the @p EventListener structure
+ * @param esp pointer to the  \p EventSource structure
+ * @param elp pointer to the \p EventListener structure
  * @param eid numeric identifier assigned to the Event Listener. The identifier
  *            is used as index for the event callback function.
  *            The value must range between zero and the size, in bit, of the
- *            @p eventid_t type minus one.
+ *            \p eventid_t type minus one.
  * @note Multiple Event Listeners can use the same event identifier, the
  *       listener will share the callback function.
  */

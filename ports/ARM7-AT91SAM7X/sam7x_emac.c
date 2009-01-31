@@ -1,5 +1,5 @@
 /*
-    ChibiOS/RT - Copyright (C) 2006-2007 Giovanni Di Sirio.
+    ChibiOS/RT - Copyright (C) 2009 Giovanni Di Sirio.
 
     This file is part of ChibiOS/RT.
 
@@ -15,6 +15,13 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+                                      ---
+
+    A special exception to the GPL can be applied should you wish to distribute
+    a combined work that includes ChibiOS/RT, without being obliged to provide
+    the source code for any proprietary components. See the file exception.txt
+    for full details of how and when the exception can be applied.
 */
 
 #include <string.h>
@@ -106,31 +113,25 @@ static void ServeInterrupt(void) {
   if ((isr & AT91C_EMAC_RCOMP) || (rsr & RSR_BITS)) {
     if (rsr & AT91C_EMAC_REC) {
 //      received++;
-      chSysLockFromIsr();
       chEvtBroadcastI(&EMACFrameReceived);
-      chSysUnlockFromIsr();
     }
     AT91C_BASE_EMAC->EMAC_RSR = RSR_BITS;
   }
 
   if ((isr & AT91C_EMAC_TCOMP) || (tsr & TSR_BITS)) {
-    if (tsr & AT91C_EMAC_COMP) {
-      chSysLockFromIsr();
+    if (tsr & AT91C_EMAC_COMP)
       chEvtBroadcastI(&EMACFrameTransmitted);
-      chSysUnlockFromIsr();
-    }
     AT91C_BASE_EMAC->EMAC_TSR = TSR_BITS;
   }
   AT91C_BASE_AIC->AIC_EOICR = 0;
 }
 
-CH_IRQ_HANDLER(EMACIrqHandler) {
+__attribute__((naked))
+void EMACIrqHandler(void) {
 
-  CH_IRQ_PROLOGUE();
-
+  chSysIRQEnterI();
   ServeInterrupt();
-
-  CH_IRQ_EPILOGUE();
+  chSysIRQExitI();
 }
 
 /*

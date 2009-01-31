@@ -1,5 +1,5 @@
 /*
-    ChibiOS/RT - Copyright (C) 2006-2007 Giovanni Di Sirio.
+    ChibiOS/RT - Copyright (C) 2009 Giovanni Di Sirio.
 
     This file is part of ChibiOS/RT.
 
@@ -15,6 +15,13 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+                                      ---
+
+    A special exception to the GPL can be applied should you wish to distribute
+    a combined work that includes ChibiOS/RT, without being obliged to provide
+    the source code for any proprietary components. See the file exception.txt
+    for full details of how and when the exception can be applied.
 */
 
 /**
@@ -48,7 +55,7 @@ typedef void (*vtfunc_t)(void *);
 typedef struct VirtualTimer VirtualTimer;
 
 /**
- * @brief Virtual Timer descriptor structure.
+ * Virtual Timer descriptor structure.
  * @extends DeltaList
  */
 struct VirtualTimer {
@@ -66,7 +73,7 @@ struct VirtualTimer {
 };
 
 /**
- * @brief Virtual timers list header.
+ * Delta List header.
  * @note The delta list is implemented as a double link bidirectional list in
  *       order to make the unlink time constant, the reset of a virtual timer
  *       is often used in the code.
@@ -117,10 +124,10 @@ extern "C" {
 #define chVTIsArmedI(vtp) ((vtp)->vt_func != NULL)
 
 /**
- * Returns the number of system ticks since the @p chSysInit() invocation.
+ * Returns the number of system ticks since the \p chSysInit() invocation.
  * @return the system ticks number
  * @note The counter can reach its maximum and then returns to zero.
- * @note This function is designed to work with the @p chThdSleepUntil().
+ * @note This function is designed to work with the \p chThdSleepUntil().
  */
 #define chSysGetTime() (vtlist.vt_systime)
 

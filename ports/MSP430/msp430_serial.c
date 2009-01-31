@@ -1,5 +1,5 @@
 /*
-    ChibiOS/RT - Copyright (C) 2006-2007 Giovanni Di Sirio.
+    ChibiOS/RT - Copyright (C) 2009 Giovanni Di Sirio.
 
     This file is part of ChibiOS/RT.
 
@@ -15,6 +15,13 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+                                      ---
+
+    A special exception to the GPL can be applied should you wish to distribute
+    a combined work that includes ChibiOS/RT, without being obliged to provide
+    the source code for any proprietary components. See the file exception.txt
+    for full details of how and when the exception can be applied.
 */
 
 #include <ch.h>
@@ -34,9 +41,7 @@ static void SetError(uint8_t urctl, FullDuplexDriver *com) {
     sts |= SD_FRAMING_ERROR;
   if (urctl & BRK)
     sts |= SD_BREAK_DETECTED;
-  chSysLockFromIsr();
   chFDDAddFlagsI(com, sts);
-  chSysUnlockFromIsr();
 }
 
 #ifdef USE_MSP430_USART0
@@ -44,34 +49,30 @@ FullDuplexDriver COM1;
 static uint8_t ib1[SERIAL_BUFFERS_SIZE];
 static uint8_t ob1[SERIAL_BUFFERS_SIZE];
 
-CH_IRQ_HANDLER(USART0TX_VECTOR) {
+interrupt(USART0TX_VECTOR) u0txirq(void) {
   msg_t b;
 
-  CH_IRQ_PROLOGUE();
+  chSysIRQEnterI();
 
-  chSysLockFromIsr();
   b = chFDDRequestDataI(&COM1);
-  chSysUnlockFromIsr();
   if (b < Q_OK)
     U0IE &= ~UTXIE0;
   else
     U0TXBUF = b;
 
-  CH_IRQ_EPILOGUE();
+  chSysIRQExitI();
 }
 
-CH_IRQ_HANDLER(USART0RX_VECTOR) {
+interrupt(USART0RX_VECTOR) u0rxirq(void) {
   uint8_t urctl;
 
-  CH_IRQ_PROLOGUE();
+  chSysIRQEnterI();
 
   if ((urctl = U0RCTL) & RXERR)
     SetError(urctl, &COM1);
-  chSysLockFromIsr();
   chFDDIncomingDataI(&COM1, U0RXBUF);
-  chSysUnlockFromIsr();
 
-  CH_IRQ_EPILOGUE();
+  chSysIRQExitI();
 }
 
 /*
@@ -81,9 +82,7 @@ CH_IRQ_HANDLER(USART0RX_VECTOR) {
 static void OutNotify1(void) {
 
   if (!(U0IE & UTXIE0)) {
-    chSysLockFromIsr();
     U0TXBUF = (uint8_t)chFDDRequestDataI(&COM1);
-    chSysUnlockFromIsr();
     U0IE |= UTXIE0;
   }
 }
@@ -92,7 +91,7 @@ static void OutNotify1(void) {
  * USART setup, must be invoked with interrupts disabled.
  * NOTE: Does not reset I/O queues.
  */
-void SetUSART0(uint16_t div, uint8_t mod, uint8_t ctl) {
+void SetUSART0I(uint16_t div, uint8_t mod, uint8_t ctl) {
 
   U0CTL = SWRST;                /* Resets the USART, it should already be */
   /* USART init */
@@ -116,35 +115,32 @@ FullDuplexDriver COM2;
 static uint8_t ib2[SERIAL_BUFFERS_SIZE];
 static uint8_t ob2[SERIAL_BUFFERS_SIZE];
 
-CH_IRQ_HANDLER(USART1TX_VECTOR) {
+interrupt(USART1TX_VECTOR) u1txirq(void) {
   msg_t b;
 
-  CH_IRQ_PROLOGUE();
+  chSysIRQEnterI();
 
-  chSysLockFromIsr();
   b = chFDDRequestDataI(&COM2);
-  chSysUnlockFromIsr();
   if (b < Q_OK)
     U1IE &= ~UTXIE1;
   else
     U1TXBUF = b;
 
-  CH_IRQ_EPILOGUE();
+  chSysIRQExitI();
 }
 
-CH_IRQ_HANDLER(USART1RX_VECTOR) {
+interrupt(USART1RX_VECTOR) u1rxirq(void) {
   uint8_t urctl;
 
-  CH_IRQ_PROLOGUE();
+  chSysIRQEnterI();
 
   if ((urctl = U1RCTL) & RXERR)
     SetError(urctl, &COM2);
-  chSysLockFromIsr();
   chFDDIncomingDataI(&COM2, U1RXBUF);
-  chSysUnlockFromIsr();
 
-  CH_IRQ_EPILOGUE();
+  chSysIRQExitI();
 }
+
 
 /*
  * Invoked by the high driver when one or more bytes are inserted in the
@@ -162,7 +158,7 @@ static void OutNotify2(void) {
  * USART setup, must be invoked with interrupts disabled.
  * NOTE: Does not reset I/O queues.
  */
-void SetUSART1(uint16_t div, uint8_t mod, uint8_t ctl) {
+void SetUSART1I(uint16_t div, uint8_t mod, uint8_t ctl) {
 
   U1CTL = SWRST;                /* Resets the USART, it should already be */
   /* USART init */
@@ -186,11 +182,11 @@ void InitSerial(void) {
   /* I/O queues setup.*/
 #ifdef USE_MSP430_USART0
   chFDDInit(&COM1, ib1, sizeof ib1, NULL, ob1, sizeof ob1, OutNotify1);
-  SetUSART0(UBR(38400), 0, CHAR);
+  SetUSART0I(UBR(38400), 0, CHAR);
 #endif
 
 #ifdef USE_MSP430_USART1
   chFDDInit(&COM2, ib2, sizeof ib2, NULL, ob2, sizeof ob2, OutNotify2);
-  SetUSART1(UBR(38400), 0, CHAR);
+  SetUSART1I(UBR(38400), 0, CHAR);
 #endif
 }
