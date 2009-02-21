@@ -1,5 +1,5 @@
 /*
-    ChibiOS/RT - Copyright (C) 2006-2007 Giovanni Di Sirio.
+    ChibiOS/RT - Copyright (C) 2009 Giovanni Di Sirio.
 
     This file is part of ChibiOS/RT.
 
@@ -15,6 +15,13 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+                                      ---
+
+    A special exception to the GPL can be applied should you wish to distribute
+    a combined work that includes ChibiOS/RT, without being obliged to provide
+    the source code for any proprietary components. See the file exception.txt
+    for full details of how and when the exception can be applied.
 */
 
 #include <ch.h>
@@ -22,6 +29,8 @@
 #include "test.h"
 
 static Semaphore sem1;
+
+static void empty(void) {}
 
 static msg_t thread1(void *p) {
   msg_t msg;
@@ -70,8 +79,8 @@ static void bmk1_execute(void) {
 
 const struct testcase testbmk1 = {
   bmk1_gettest,
-  NULL,
-  NULL,
+  empty,
+  empty,
   bmk1_execute
 };
 
@@ -96,8 +105,8 @@ static void bmk2_execute(void) {
 
 const struct testcase testbmk2 = {
   bmk2_gettest,
-  NULL,
-  NULL,
+  empty,
+  empty,
   bmk2_execute
 };
 
@@ -131,8 +140,8 @@ static void bmk3_execute(void) {
 
 const struct testcase testbmk3 = {
   bmk3_gettest,
-  NULL,
-  NULL,
+  empty,
+  empty,
   bmk3_execute
 };
 
@@ -162,8 +171,8 @@ static void bmk4_execute(void) {
 
 const struct testcase testbmk4 = {
   bmk4_gettest,
-  NULL,
-  NULL,
+  empty,
+  empty,
   bmk4_execute
 };
 
@@ -193,8 +202,8 @@ static void bmk5_execute(void) {
 
 const struct testcase testbmk5 = {
   bmk5_gettest,
-  NULL,
-  NULL,
+  empty,
+  empty,
   bmk5_execute
 };
 
@@ -248,7 +257,7 @@ static void bmk6_execute(void) {
 const struct testcase testbmk6 = {
   bmk6_gettest,
   bmk6_setup,
-  NULL,
+  empty,
   bmk6_execute
 };
 
@@ -286,8 +295,8 @@ static void bmk7_execute(void) {
 
 const struct testcase testbmk7 = {
   bmk7_gettest,
-  NULL,
-  NULL,
+  empty,
+  empty,
   bmk7_execute
 };
 
@@ -323,24 +332,7 @@ static void bmk8_execute(void) {
 
 const struct testcase testbmk8 = {
   bmk8_gettest,
-  NULL,
-  NULL,
+  empty,
+  empty,
   bmk8_execute
-};
-
-/*
- * Test sequence for benchmarks pattern.
- */
-const struct testcase *patternbmk[] = {
-#if !TEST_NO_BENCHMARKS
-  &testbmk1,
-  &testbmk2,
-  &testbmk3,
-  &testbmk4,
-  &testbmk5,
-  &testbmk6,
-  &testbmk7,
-  &testbmk8,
-#endif
-  NULL
 };
