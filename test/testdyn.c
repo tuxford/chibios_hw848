@@ -1,5 +1,5 @@
 /*
-    ChibiOS/RT - Copyright (C) 2006-2007 Giovanni Di Sirio.
+    ChibiOS/RT - Copyright (C) 2009 Giovanni Di Sirio.
 
     This file is part of ChibiOS/RT.
 
@@ -15,6 +15,13 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+                                      ---
+
+    A special exception to the GPL can be applied should you wish to distribute
+    a combined work that includes ChibiOS/RT, without being obliged to provide
+    the source code for any proprietary components. See the file exception.txt
+    for full details of how and when the exception can be applied.
 */
 
 #include <ch.h>
@@ -46,8 +53,6 @@ static void dyn1_execute(void) {
                                      prio-1, thread, "A");
     threads[1] = chThdCreateFromHeap(THD_WA_SIZE(THREADS_STACK_SIZE),
                                      prio-2, thread, "B");
-    threads[2] = chThdCreateFromHeap(THD_WA_SIZE(0x10000000),
-                                     prio-3, thread, "C");
 
     test_assert((threads[0] != NULL) &&
                 (threads[1] != NULL) &&
@@ -92,7 +97,7 @@ static void dyn2_execute(void) {
   tprio_t prio = chThdGetPriority();
 
   /* Adding the WAs to the pool. */
-  for (i = 0; i < 4; i++)
+  for (i = 0; i < 5; i++)
     chPoolFree(&mp1, wa[i]);
 
   /* Starting threads from the memory pool. */
@@ -106,15 +111,15 @@ static void dyn2_execute(void) {
               (threads[1] != NULL) &&
               (threads[2] != NULL) &&
               (threads[3] != NULL) &&
-              (threads[4] == NULL),
+              (threads[4] != NULL),
               "#1"); /* Thread creation failed.*/
 
   /* Claiming the memory from terminated threads. */
   test_wait_threads();
-  test_assert_sequence("ABCD");
+  test_assert_sequence("ABCDE");
 
   /* Now the pool must be full again. */
-  for (i = 0; i < 4; i++)
+  for (i = 0; i < 5; i++)
     test_assert(chPoolAlloc(&mp1) != NULL, "#2"); /* Pool list empty.*/
   test_assert(chPoolAlloc(&mp1) == NULL, "#3"); /* Pool list not empty.*/
 }

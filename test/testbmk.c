@@ -1,5 +1,5 @@
 /*
-    ChibiOS/RT - Copyright (C) 2006-2007 Giovanni Di Sirio.
+    ChibiOS/RT - Copyright (C) 2009 Giovanni Di Sirio.
 
     This file is part of ChibiOS/RT.
 
@@ -15,6 +15,13 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+                                      ---
+
+    A special exception to the GPL can be applied should you wish to distribute
+    a combined work that includes ChibiOS/RT, without being obliged to provide
+    the source code for any proprietary components. See the file exception.txt
+    for full details of how and when the exception can be applied.
 */
 
 #include <ch.h>
@@ -141,66 +148,10 @@ const struct testcase testbmk3 = {
 
 static char *bmk4_gettest(void) {
 
-  return "Benchmark, context switch #4, naked";
-}
-
-msg_t thread4(void *p) {
-  msg_t msg;
-  Thread *self = chThdSelf();
-
-  chSysLock();
-  do {
-    chSchGoSleepS(PRSUSPENDED);
-    msg = self->p_rdymsg;
-  } while (msg == RDY_OK);
-  chSysUnlock();
-  return 0;
-}
-
-static void bmk4_execute(void) {
-  Thread *tp;
-
-  tp = threads[0] = chThdCreateStatic(wa[0], WA_SIZE, chThdGetPriority()+1, thread4, NULL);
-  uint32_t n = 0;
-  test_wait_tick();
-  test_start_timer(1000);
-  do {
-    chSysLock();
-    chSchWakeupS(tp, RDY_OK);
-    chSchWakeupS(tp, RDY_OK);
-    chSchWakeupS(tp, RDY_OK);
-    chSchWakeupS(tp, RDY_OK);
-    chSysUnlock();
-    n += 4;
-#if defined(WIN32)
-    ChkIntSources();
-#endif
-  } while (!test_timer_done);
-  chSysLock();
-  chSchWakeupS(tp, RDY_TIMEOUT);
-  chSysUnlock();
-
-  test_wait_threads();
-  test_print("--- Score : ");
-  test_printn(n);
-  test_print(" msgs/S, ");
-  test_printn(n << 1);
-  test_println(" ctxswc/S");
-}
-
-const struct testcase testbmk4 = {
-  bmk4_gettest,
-  NULL,
-  NULL,
-  bmk4_execute
-};
-
-static char *bmk5_gettest(void) {
-
   return "Benchmark, threads creation/termination, worst case";
 }
 
-static void bmk5_execute(void) {
+static void bmk4_execute(void) {
 
   uint32_t n = 0;
   void *wap = wa[0];
@@ -219,19 +170,19 @@ static void bmk5_execute(void) {
   test_println(" threads/S");
 }
 
-const struct testcase testbmk5 = {
-  bmk5_gettest,
+const struct testcase testbmk4 = {
+  bmk4_gettest,
   NULL,
   NULL,
-  bmk5_execute
+  bmk4_execute
 };
 
-static char *bmk6_gettest(void) {
+static char *bmk5_gettest(void) {
 
   return "Benchmark, threads creation/termination, optimal";
 }
 
-static void bmk6_execute(void) {
+static void bmk5_execute(void) {
 
   uint32_t n = 0;
   void *wap = wa[0];
@@ -250,11 +201,11 @@ static void bmk6_execute(void) {
   test_println(" threads/S");
 }
 
-const struct testcase testbmk6 = {
-  bmk6_gettest,
+const struct testcase testbmk5 = {
+  bmk5_gettest,
   NULL,
   NULL,
-  bmk6_execute
+  bmk5_execute
 };
 
 static msg_t thread3(void *p) {
@@ -264,17 +215,17 @@ static msg_t thread3(void *p) {
   return 0;
 }
 
-static char *bmk7_gettest(void) {
+static char *bmk6_gettest(void) {
 
   return "Benchmark, mass reschedulation, 5 threads";
 }
 
-static void bmk7_setup(void) {
+static void bmk6_setup(void) {
 
   chSemInit(&sem1, 0);
 }
 
-static void bmk7_execute(void) {
+static void bmk6_execute(void) {
   uint32_t n;
 
   threads[0] = chThdCreateStatic(wa[0], WA_SIZE, chThdGetPriority()+1, thread3, NULL);
@@ -304,19 +255,19 @@ static void bmk7_execute(void) {
   test_println(" ctxswc/S");
 }
 
-const struct testcase testbmk7 = {
-  bmk7_gettest,
-  bmk7_setup,
+const struct testcase testbmk6 = {
+  bmk6_gettest,
+  bmk6_setup,
   NULL,
-  bmk7_execute
+  bmk6_execute
 };
 
-static char *bmk8_gettest(void) {
+static char *bmk7_gettest(void) {
 
   return "Benchmark, I/O Queues throughput";
 }
 
-static void bmk8_execute(void) {
+static void bmk7_execute(void) {
   static uint8_t ib[16];
   static Queue iq;
 
@@ -343,21 +294,21 @@ static void bmk8_execute(void) {
   test_println(" bytes/S");
 }
 
-const struct testcase testbmk8 = {
-  bmk8_gettest,
+const struct testcase testbmk7 = {
+  bmk7_gettest,
   NULL,
   NULL,
-  bmk8_execute
+  bmk7_execute
 };
 
-static char *bmk9_gettest(void) {
+static char *bmk8_gettest(void) {
 
   return "Benchmark, virtual timers set/reset";
 }
 
 static void tmo(void *param) {}
 
-static void bmk9_execute(void) {
+static void bmk8_execute(void) {
   static VirtualTimer vt1, vt2;
   uint32_t n = 0;
 
@@ -380,24 +331,24 @@ static void bmk9_execute(void) {
   test_println(" timers/S");
 }
 
-const struct testcase testbmk9 = {
-  bmk9_gettest,
+const struct testcase testbmk8 = {
+  bmk8_gettest,
   NULL,
   NULL,
-  bmk9_execute
+  bmk8_execute
 };
 
-static char *bmk10_gettest(void) {
+static char *bmk9_gettest(void) {
 
   return "Benchmark, semaphores wait/signal";
 }
 
-static void bmk10_setup(void) {
+static void bmk9_setup(void) {
 
   chSemInit(&sem1, 1);
 }
 
-static void bmk10_execute(void) {
+static void bmk9_execute(void) {
   uint32_t n = 0;
 
   test_wait_tick();
@@ -421,25 +372,25 @@ static void bmk10_execute(void) {
   test_println(" wait+signal/S");
 }
 
-const struct testcase testbmk10 = {
-  bmk10_gettest,
-  bmk10_setup,
+const struct testcase testbmk9 = {
+  bmk9_gettest,
+  bmk9_setup,
   NULL,
-  bmk10_execute
+  bmk9_execute
 };
 
 #if CH_USE_MUTEXES
-static char *bmk11_gettest(void) {
+static char *bmk10_gettest(void) {
 
   return "Benchmark, mutexes lock/unlock";
 }
 
-static void bmk11_setup(void) {
+static void bmk10_setup(void) {
 
   chMtxInit(&mtx1);
 }
 
-static void bmk11_execute(void) {
+static void bmk10_execute(void) {
   uint32_t n = 0;
 
   test_wait_tick();
@@ -463,11 +414,11 @@ static void bmk11_execute(void) {
   test_println(" lock+unlock/S");
 }
 
-const struct testcase testbmk11 = {
-  bmk11_gettest,
-  bmk11_setup,
+const struct testcase testbmk10 = {
+  bmk10_gettest,
+  bmk10_setup,
   NULL,
-  bmk11_execute
+  bmk10_execute
 };
 #endif
 
@@ -485,9 +436,8 @@ const struct testcase * const patternbmk[] = {
   &testbmk7,
   &testbmk8,
   &testbmk9,
-  &testbmk10,
 #if CH_USE_MUTEXES
-  &testbmk11,
+  &testbmk10,
 #endif
 #endif
   NULL

@@ -1,5 +1,5 @@
 /*
-    ChibiOS/RT - Copyright (C) 2006-2007 Giovanni Di Sirio.
+    ChibiOS/RT - Copyright (C) 2009 Giovanni Di Sirio.
 
     This file is part of ChibiOS/RT.
 
@@ -15,6 +15,13 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+                                      ---
+
+    A special exception to the GPL can be applied should you wish to distribute
+    a combined work that includes ChibiOS/RT, without being obliged to provide
+    the source code for any proprietary components. See the file exception.txt
+    for full details of how and when the exception can be applied.
 */
 
 #include <ch.h>
@@ -214,131 +221,13 @@ const struct testcase testmtx3 = {
   mtx3_execute
 };
 
-static char *mtx4_gettest(void) {
-
-  return "Mutexes, priority return";
-}
-
-static void mtx4_setup(void) {
-
-  chMtxInit(&m1);
-  chMtxInit(&m2);
-}
-
-static msg_t thread13(void *p) {
-
-  chThdSleepMilliseconds(50);
-  chMtxLock(&m2);
-  chMtxUnlock();
-  return 0;
-}
-
-static msg_t thread14(void *p) {
-
-  chThdSleepMilliseconds(150);
-  chMtxLock(&m1);
-  chMtxUnlock();
-  return 0;
-}
-
-static void mtx4_execute(void) {
-  tprio_t p, p1, p2;
-
-  p = chThdGetPriority();
-  p1 = p + 1;
-  p2 = p + 2;
-  threads[0] = chThdCreateStatic(wa[0], WA_SIZE, p1, thread13, "B");
-  threads[1] = chThdCreateStatic(wa[1], WA_SIZE, p2, thread14, "A");
-  chMtxLock(&m2);
-  test_assert(chThdGetPriority() == p, "#1");
-  chThdSleepMilliseconds(100);
-  test_assert(chThdGetPriority() == p1, "#2");
-  chMtxLock(&m1);
-  test_assert(chThdGetPriority() == p1, "#3");
-  chThdSleepMilliseconds(100);
-  test_assert(chThdGetPriority() == p2, "#4");
-  chMtxUnlock();
-  test_assert(chThdGetPriority() == p1, "#5");
-  chThdSleepMilliseconds(100);
-  test_assert(chThdGetPriority() == p1, "#6");
-  chMtxUnlockAll();
-  test_assert(chThdGetPriority() == p, "#7");
-  test_wait_threads();
-
-  /* Test repeated in order to cover chMtxUnlockS().*/
-  threads[0] = chThdCreateStatic(wa[0], WA_SIZE, p1, thread13, "D");
-  threads[1] = chThdCreateStatic(wa[1], WA_SIZE, p2, thread14, "C");
-  chMtxLock(&m2);
-  test_assert(chThdGetPriority() == p, "#8");
-  chThdSleepMilliseconds(100);
-  test_assert(chThdGetPriority() == p1, "#9");
-  chMtxLock(&m1);
-  test_assert(chThdGetPriority() == p1, "#10");
-  chThdSleepMilliseconds(100);
-  test_assert(chThdGetPriority() == p2, "#11");
-  chSysLock();
-  chMtxUnlockS();
-  chSysUnlock();
-  test_assert(chThdGetPriority() == p1, "#12");
-  chThdSleepMilliseconds(100);
-  test_assert(chThdGetPriority() == p1, "#13");
-  chMtxUnlockAll();
-  test_assert(chThdGetPriority() == p, "#14");
-  test_wait_threads();
-}
-
-const struct testcase testmtx4 = {
-  mtx4_gettest,
-  mtx4_setup,
-  NULL,
-  mtx4_execute
-};
-
-static char *mtx5_gettest(void) {
-
-  return "Mutexes, coverage";
-}
-
-static void mtx5_setup(void) {
-
-  chMtxInit(&m1);
-}
-
-static void mtx5_execute(void) {
-  bool_t b;
-  tprio_t prio;
-
-  prio = chThdGetPriority();
-
-  b = chMtxTryLock(&m1);
-  test_assert(b, "#1");
-
-  b = chMtxTryLock(&m1);
-  test_assert(!b, "#2");
-
-  chSysLock();
-  chMtxUnlockS();
-  chSysUnlock();
-
-  test_assert(isempty(&m1.m_queue), "#3");            /* Queue not empty */
-  test_assert(m1.m_owner == NULL, "#4");              /* Owned */
-  test_assert(chThdGetPriority() == prio, "#5");
-}
-
-const struct testcase testmtx5 = {
-  mtx5_gettest,
-  mtx5_setup,
-  NULL,
-  mtx5_execute
-};
-
 #if CH_USE_CONDVARS
-static char *mtx6_gettest(void) {
+static char *mtx4_gettest(void) {
 
   return "CondVar, signal test";
 }
 
-static void mtx6_setup(void) {
+static void mtx4_setup(void) {
 
   chCondInit(&c1);
   chMtxInit(&m1);
@@ -353,7 +242,7 @@ static msg_t thread10(void *p) {
   return 0;
 }
 
-static void mtx6_execute(void) {
+static void mtx4_execute(void) {
 
   tprio_t prio = chThdGetPriority();
   threads[0] = chThdCreateStatic(wa[0], WA_SIZE, prio+1, thread10, "E");
@@ -361,37 +250,34 @@ static void mtx6_execute(void) {
   threads[2] = chThdCreateStatic(wa[2], WA_SIZE, prio+3, thread10, "C");
   threads[3] = chThdCreateStatic(wa[3], WA_SIZE, prio+4, thread10, "B");
   threads[4] = chThdCreateStatic(wa[4], WA_SIZE, prio+5, thread10, "A");
-  chSysLock();
-  chCondSignalI(&c1);
-  chCondSignalI(&c1);
-  chCondSignalI(&c1);
-  chCondSignalI(&c1);
-  chCondSignalI(&c1);
-  chSchRescheduleS();
-  chSysUnlock();
+  chCondSignal(&c1);
+  chCondSignal(&c1);
+  chCondSignal(&c1);
+  chCondSignal(&c1);
+  chCondSignal(&c1);
   test_wait_threads();
   test_assert_sequence("ABCDE");
 }
 
-const struct testcase testmtx6 = {
-  mtx6_gettest,
-  mtx6_setup,
+const struct testcase testmtx4 = {
+  mtx4_gettest,
+  mtx4_setup,
   NULL,
-  mtx6_execute
+  mtx4_execute
 };
 
-static char *mtx7_gettest(void) {
+static char *mtx5_gettest(void) {
 
   return "CondVar, broadcast test";
 }
 
-static void mtx7_setup(void) {
+static void mtx5_setup(void) {
 
   chCondInit(&c1);
   chMtxInit(&m1);
 }
 
-static void mtx7_execute(void) {
+static void mtx5_execute(void) {
 
   // Bacause priority inheritance.
   tprio_t prio = chThdGetPriority();
@@ -405,19 +291,19 @@ static void mtx7_execute(void) {
   test_assert_sequence("ABCDE");
 }
 
-const struct testcase testmtx7 = {
-  mtx7_gettest,
-  mtx7_setup,
+const struct testcase testmtx5 = {
+  mtx5_gettest,
+  mtx5_setup,
   NULL,
-  mtx7_execute
+  mtx5_execute
 };
 
-static char *mtx8_gettest(void) {
+static char *mtx6_gettest(void) {
 
   return "CondVar, inheritance boost test";
 }
 
-static void mtx8_setup(void) {
+static void mtx6_setup(void) {
 
   chCondInit(&c1);
   chMtxInit(&m1);
@@ -428,7 +314,7 @@ static msg_t thread11(void *p) {
 
   chMtxLock(&m2);
   chMtxLock(&m1);
-  chCondWaitTimeout(&c1, TIME_INFINITE);
+  chCondWait(&c1);
   test_emit_token(*(char *)p);
   chMtxUnlock();
   chMtxUnlock();
@@ -443,7 +329,7 @@ static msg_t thread12(void *p) {
   return 0;
 }
 
-static void mtx8_execute(void) {
+static void mtx6_execute(void) {
 
   tprio_t prio = chThdGetPriority();
   threads[0] = chThdCreateStatic(wa[0], WA_SIZE, prio+1, thread11, "A");
@@ -455,11 +341,11 @@ static void mtx8_execute(void) {
   test_assert_sequence("ABC");
 }
 
-const struct testcase testmtx8 = {
-  mtx8_gettest,
-  mtx8_setup,
+const struct testcase testmtx6 = {
+  mtx6_gettest,
+  mtx6_setup,
   NULL,
-  mtx8_execute
+  mtx6_execute
 };
 #endif /* CH_USE_CONDVARS */
 #endif /* CH_USE_MUTEXES */
@@ -472,12 +358,10 @@ const struct testcase * const patternmtx[] = {
   &testmtx1,
   &testmtx2,
   &testmtx3,
+#if CH_USE_CONDVARS
   &testmtx4,
   &testmtx5,
-#if CH_USE_CONDVARS
   &testmtx6,
-  &testmtx7,
-  &testmtx8,
 #endif
 #endif
   NULL
