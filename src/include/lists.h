@@ -1,5 +1,5 @@
 /*
-    ChibiOS/RT - Copyright (C) 2006-2007 Giovanni Di Sirio.
+    ChibiOS/RT - Copyright (C) 2009 Giovanni Di Sirio.
 
     This file is part of ChibiOS/RT.
 
@@ -15,6 +15,13 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+                                      ---
+
+    A special exception to the GPL can be applied should you wish to distribute
+    a combined work that includes ChibiOS/RT, without being obliged to provide
+    the source code for any proprietary components. See the file exception.txt
+    for full details of how and when the exception can be applied.
 */
 
 /**
@@ -34,7 +41,7 @@ typedef struct Thread Thread;
 #define notempty(p)     ((p)->p_next != (Thread *)(p))
 
 /**
- * @brief Generic threads bidirectional linked list header and element.
+ * @brief Generic threads queue header and element.
  * @extends ThreadsList
  */
 typedef struct {
@@ -45,7 +52,7 @@ typedef struct {
 } ThreadsQueue;
 
 /**
- * @brief Generic threads single linked list.
+ * @brief Generic threads single link list.
  * @details This list behaves like a stack.
  */
 typedef struct {
