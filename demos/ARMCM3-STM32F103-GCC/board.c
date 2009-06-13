@@ -1,5 +1,5 @@
 /*
-    ChibiOS/RT - Copyright (C) 2006-2007 Giovanni Di Sirio.
+    ChibiOS/RT - Copyright (C) 2009 Giovanni Di Sirio.
 
     This file is part of ChibiOS/RT.
 
@@ -15,10 +15,16 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+                                      ---
+
+    A special exception to the GPL can be applied should you wish to distribute
+    a combined work that includes ChibiOS/RT, without being obliged to provide
+    the source code for any proprietary components. See the file exception.txt
+    for full details of how and when the exception can be applied.
 */
 
 #include <ch.h>
-#include <pal.h>
 #include <nvic.h>
 
 #include "board.h"
@@ -62,19 +68,22 @@ void hwinit0(void) {
   /*
    * I/O ports initialization as specified in board.h.
    */
-  palInit();
+  RCC->APB2ENR = 0x0000003D;    // Ports A-D enabled, AFIO enabled.
+  GPIOA->CRL = VAL_GPIOACRL;
+  GPIOA->CRH = VAL_GPIOACRH;
+  GPIOA->ODR = VAL_GPIOAODR;
 
-  pal_lld_stm32_setup(IOPORT_A, VAL_GPIOACRH, VAL_GPIOACRL);
-  palWritePort(IOPORT_A, VAL_GPIOAODR);
+  GPIOB->CRL = VAL_GPIOBCRL;
+  GPIOB->CRH = VAL_GPIOBCRH;
+  GPIOB->ODR = VAL_GPIOBODR;
 
-  pal_lld_stm32_setup(IOPORT_B, VAL_GPIOBCRH, VAL_GPIOBCRL);
-  palWritePort(IOPORT_B, VAL_GPIOBODR);
+  GPIOC->CRL = VAL_GPIOCCRL;
+  GPIOC->CRH = VAL_GPIOCCRH;
+  GPIOC->ODR = VAL_GPIOCODR;
 
-  pal_lld_stm32_setup(IOPORT_C, VAL_GPIOCCRH, VAL_GPIOCCRL);
-  palWritePort(IOPORT_C, VAL_GPIOCODR);
-
-  pal_lld_stm32_setup(IOPORT_D, VAL_GPIODCRH, VAL_GPIODCRL);
-  palWritePort(IOPORT_D, VAL_GPIODODR);
+  GPIOD->CRL = VAL_GPIODCRL;
+  GPIOD->CRH = VAL_GPIODCRH;
+  GPIOD->ODR = VAL_GPIODODR;
 }
 
 /*

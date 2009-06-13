@@ -1,5 +1,5 @@
 /*
-    ChibiOS/RT - Copyright (C) 2006-2007 Giovanni Di Sirio.
+    ChibiOS/RT - Copyright (C) 2009 Giovanni Di Sirio.
 
     This file is part of ChibiOS/RT.
 
@@ -15,42 +15,34 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+                                      ---
+
+    A special exception to the GPL can be applied should you wish to distribute
+    a combined work that includes ChibiOS/RT, without being obliged to provide
+    the source code for any proprietary components. See the file exception.txt
+    for full details of how and when the exception can be applied.
 */
 
 /**
  * @defgroup STM32F103 STM32F103 Support
+ * @{
  * @brief STM32F103 specific support.
  * @details The STM32F103 support includes:
- * - I/O ports driver.
  * - Buffered, interrupt driven, serial driver.
  * - A demo supporting the kernel test suite.
- * .
+ *
  * @ingroup ARMCM3
  */
-
-/**
- * @defgroup STM32F103_PAL I/O Ports Support
- * @brief I/O Ports peripherals support.
- * @details This module supports the STM32F103 GPIO controller. The STM32
- * controller is very flexible and allows to implement all the recommended
- * behaviors for the I/O port driver. It supports the following features (see
- * @ref PAL):
- * - 16 bits wide ports.
- * - Atomic set/reset functions.
- * - Atomic set+reset function (atomic bus operations).
- * - Output latched regardless of the pad setting.
- * - Direct read of input pads regardless of the pad setting.
- * .
- * The only non atomic operation is bit toggling.
- * @ingroup STM32F103
- */
+/** @} */
 
 /**
  * @defgroup STM32F103_SERIAL USART Support
+ * @{
  * @brief USART peripherals support.
  * @details The serial driver supports the STM32F103 USARTs in asynchronous
  * mode.
  *
  * @ingroup STM32F103
  */
- 
+/** @} */

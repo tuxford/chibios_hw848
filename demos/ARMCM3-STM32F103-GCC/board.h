@@ -1,5 +1,5 @@
 /*
-    ChibiOS/RT - Copyright (C) 2006-2007 Giovanni Di Sirio.
+    ChibiOS/RT - Copyright (C) 2009 Giovanni Di Sirio.
 
     This file is part of ChibiOS/RT.
 
@@ -15,6 +15,13 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+                                      ---
+
+    A special exception to the GPL can be applied should you wish to distribute
+    a combined work that includes ChibiOS/RT, without being obliged to provide
+    the source code for any proprietary components. See the file exception.txt
+    for full details of how and when the exception can be applied.
 */
 
 #ifndef _BOARD_H_
@@ -24,13 +31,15 @@
  * Tricks required to make the TRUE/FALSE declaration inside the library
  * compatible.
  */
-#ifndef __STM32F10x_MAP_H
 #undef FALSE
 #undef TRUE
+#ifndef __STM32F10x_MAP_H
 #include "stm32f10x_map.h"
+#endif
 #define FALSE 0
 #define TRUE (!FALSE)
-#endif
+
+#define BOARD_OLIMEX_STM32_P103
 
 /*
  * Uncomment this if you want a 48MHz system clock, else it will be 72MHz.
@@ -121,13 +130,13 @@
 /*
  * IO pins assignments.
  */
-#define GPIOA_BUTTON    0
+#define GPIOA_BUTTON    (1 << 0)
 
-#define GPIOC_MMCWP     6
-#define GPIOC_MMCCP     7
-#define GPIOC_CANCNTL   10
-#define GPIOC_DISC      11
-#define GPIOC_LED       12
+#define GPIOC_MMCWP     (1 << 6)
+#define GPIOC_MMCCP     (1 << 7)
+#define GPIOC_CANCNTL   (1 << 10)
+#define GPIOC_DISC      (1 << 11)
+#define GPIOC_LED       (1 << 12)
 
 /*
  * All inputs with pullups unless otherwise specified.

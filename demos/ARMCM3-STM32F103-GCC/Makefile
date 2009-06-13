@@ -66,7 +66,6 @@ CSRC = ../../ports/ARMCM3/chcore.c \
        ../../ports/ARMCM3-STM32F103/stm32_serial.c \
        ${KERNSRC} \
        ${TESTSRC} \
-       ../../src/lib/pal.c \
        ../../src/lib/evtimer.c \
        board.c main.c
 
