@@ -56,22 +56,18 @@ PROJECT = ch
 LDSCRIPT= ch.ld
 
 # Imported source files
-include ../../os/ports/GCC/ARMCM3/port.mk
-include ../../os/kernel/kernel.mk
+include ../../src/kernel.mk
 include ../../test/test.mk
 
 # C sources that can be compiled in ARM or THUMB mode depending on the global
 # setting.
-CSRC = ${PORTSRC} \
+CSRC = ../../ports/ARMCM3/chcore.c \
+       ../../ports/ARMCM3/nvic.c \
+       ../../ports/ARMCM3-STM32F103/stm32_serial.c \
        ${KERNSRC} \
        ${TESTSRC} \
-       ../../os/io/pal.c \
-       ../../os/io/serial.c \
-       ../../os/io/platforms/STM32F103/pal_lld.c \
-       ../../os/io/platforms/STM32F103/serial_lld.c \
-       ../../os/various/evtimer.c \
+       ../../src/lib/evtimer.c \
        board.c main.c
-
 
 # C++ sources that can be compiled in ARM or THUMB mode depending on the global
 # setting.
@@ -98,13 +94,13 @@ TCSRC =
 TCPPSRC =
 
 # List ASM source files here
-ASMSRC = $(PORTASM) \
-         ../../ports/ARMCM3-STM32F103/vectors.s
+ASMSRC =  ../../ports/ARMCM3/crt0.s \
+          ../../ports/ARMCM3-STM32F103/vectors.s
 
-INCDIR = $(PORTINC) $(KERNINC) $(TESTINC) \
-         ../../os/io \
-         ../../os/io/platforms/STM32F103 \
-         ../../os/various \
+INCDIR = $(KERNINC) $(TESTINC) \
+         ../../src/lib \
+         ../../ports/ARMCM3 \
+         ../../ports/ARMCM3-STM32F103 \
          ./stm32lib/inc
 
 #
@@ -196,7 +192,9 @@ ULIBS =
 ifeq ($(USE_FWLIB),yes)
   include ./stm32lib/stm32lib.mk
   CSRC += ${STM32SRC}
-  USE_OPT += -DUSE_STDPERIPH_DRIVER
+  # The thing generates a lot of aliasing warnings, this disables an
+  # optimization and the warning disappears, the code is a bit larger however.
+  USE_OPT += -fno-strict-aliasing
 endif
 
-include ../../os/ports/GCC/ARM/rules.mk
+include ../../ports/ARM/rules.mk

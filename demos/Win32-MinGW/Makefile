@@ -47,7 +47,7 @@ DLIBS = -lws2_32
 PROJECT = ch
 
 # Define linker script file here
-LDSCRIPT =
+LDSCRIPT=
 
 # List all user C define here, like -D_DEBUG=1
 UDEFS =
@@ -56,21 +56,19 @@ UDEFS =
 UADEFS =
 
 # Imported source files
-include ../../os/kernel/kernel.mk
+include ../../src/kernel.mk
 include ../../test/test.mk
 
 # List C source files here
-SRC  = ${KERNSRC} \
-       ${TESTSRC} \
-       chcore.c \
-       ../../os/ports/GCC/win32/simcom.c \
-       main.c
+SRC  = chcore.c main.c ../../ports/win32/simcom.c \
+       ${KERNSRC} \
+       ${TESTSRC}
 
 # List ASM source files here
-ASRC =
+ASRC = 
 
 # List all user directories here
-UINCDIR = $(KERNINC) $(TESTINC)
+UINCDIR = ../../src/include
 
 # List the user directory to look for the libraries here
 ULIBDIR =
@@ -95,7 +93,7 @@ LIBS    = $(DLIBS) $(ULIBS)
 
 LDFLAGS = -Wl,-Map=$(PROJECT).map,--cref,--no-warn-mismatch $(LIBDIR)
 ASFLAGS = -Wa,-amhls=$(<:.s=.lst) $(ADEFS)
-CPFLAGS = $(OPT) -Wall -Wstrict-prototypes -fverbose-asm -Wa,-alms=$(<:.c=.lst) $(DEFS)
+CPFLAGS = $(OPT) -Wall -Wstrict-prototypes -fverbose-asm -Wa,-ahlms=$(<:.c=.lst) $(DEFS)
 
 # Generate dependency information
 CPFLAGS += -MD -MP -MF .dep/$(@F).d
@@ -114,11 +112,6 @@ all: $(OBJS) $(PROJECT).exe
 
 %exe: $(OBJS)
 	$(CC) $(OBJS) $(LDFLAGS) $(LIBS) -o $@
-
-gcov:
-	-mkdir gcov
-	$(COV) -u $(subst /,\,$(SRC))
-	-mv *.gcov ./gcov
 
 clean:
 	-rm -f $(OBJS)

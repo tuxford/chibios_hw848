@@ -36,34 +36,29 @@ endif
 PROJECT = ch
 
 # Define linker script file here
-LDSCRIPT = mspgcc/msp430x1611.x
+LDSCRIPT= mspgcc/msp430x1611.x
 
 # Imported source files
-include ../../os/ports/GCC/MSP430/port.mk
-include ../../os/kernel/kernel.mk
+include ../../src/kernel.mk
 include ../../test/test.mk
 
 # C sources here.
-CSRC = ${PORTSRC} \
+CSRC = ../../ports/MSP430/chcore.c \
+       ../../ports/MSP430/msp430_serial.c \
        ${KERNSRC} \
        ${TESTSRC} \
-       ../../os/io/pal.c \
-       ../../os/io/serial.c \
-       ../../os/io/platforms/MSP430/pal_lld.c \
-       ../../os/io/platforms/MSP430/serial_lld.c \
-       ../../os/various/evtimer.c \
+       ../../src/lib/evtimer.c \
        board.c main.c
 
 # C++ sources here.
 CPPSRC =
 
 # List ASM source files here
-ASMSRC = $(PORTASM)
+ASMSRC =
 
-INCDIR = $(PORTINC) $(KERNINC) $(TESTINC) \
-         ../../os/io \
-         ../../os/io/platforms/MSP430 \
-         ../../os/various
+INCDIR = $(KERNINC) $(TESTINC) \
+         ../../src/lib \
+         ../../ports/MSP430
 
 #
 # Project, sources and paths

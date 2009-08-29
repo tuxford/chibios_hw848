@@ -43,20 +43,16 @@ PROJECT = ch
 LDSCRIPT= ch.ld
 
 # Imported source files
-include ../../os/ports/GCC/ARM7/port.mk
-include ../../os/kernel/kernel.mk
+include ../../src/kernel.mk
 include ../../test/test.mk
 
 # C sources that can be compiled in ARM or THUMB mode depending on the global
 # setting.
-CSRC = ${PORTSRC} \
+CSRC = ../../ports/ARM7/chcore.c \
+       ../../ports/ARM7-AT91SAM7X/sam7x_serial.c \
        ${KERNSRC} \
        ${TESTSRC} \
-       ../../os/io/pal.c \
-       ../../os/io/serial.c \
-       ../../os/io/platforms/AT91SAM7X/pal_lld.c \
-       ../../os/io/platforms/AT91SAM7X/serial_lld.c \
-       ../../os/io/platforms/AT91SAM7X/at91lib/aic.c \
+       at91lib/aic.c \
        board.c main.c
 
 # C++ sources that can be compiled in ARM or THUMB mode depending on the global
@@ -84,14 +80,14 @@ TCSRC =
 TCPPSRC =
 
 # List ASM source files here
-ASMSRC = $(PORTASM) \
-         ../../os/ports/GCC/ARM7/AT91SAM7X/vectors.s
+ASMSRC = ../../ports/ARM7/crt0.s \
+         ../../ports/ARM7-AT91SAM7X/vectors.s \
+         ../../ports/ARM7/chcoreasm.s
 
-INCDIR = $(PORTINC) $(KERNINC) $(TESTINC) \
-         ../../os/io \
-         ../../os/io/platforms/AT91SAM7X \
-         ../../os/various \
-         ../../os/ports/GCC/ARM7/AT91SAM7X
+INCDIR = $(KERNINC) $(TESTINC) \
+         ../../src/lib \
+         ../../ports/ARM7 \
+         ../../ports/ARM7-AT91SAM7X
 
 #
 # Project, sources and paths
@@ -179,4 +175,4 @@ ULIBS =
 # End of user defines
 ##############################################################################
 
-include ../../os/ports/GCC/ARM/rules.mk
+include ../../ports/ARM/rules.mk

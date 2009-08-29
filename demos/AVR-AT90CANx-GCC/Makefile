@@ -80,18 +80,15 @@ OBJDIR = .
 
 
 # Imported source files
-include ../../os/ports/GCC/AVR/port.mk
-include ../../os/kernel/kernel.mk
+include ../../src/kernel.mk
 include ../../test/test.mk
 
 
 # List C source files here. (C dependencies are automatically generated.)
-SRC = ${PORTSRC} \
-      ${KERNSRC} \
-      ${TESTSRC} \
-      ../../os/io/serial.c \
-      ../../os/io/platforms/AVR/serial_lld.c \
-      ../../os/various/evtimer.c \
+SRC = ../../ports/AVR/chcore.c ../../ports/AVR/avr_serial.c \
+       ${KERNSRC} \
+       ${TESTSRC} \
+      ../../src/lib/evtimer.c \
       board.c main.c
 
 
@@ -126,10 +123,7 @@ DEBUG = dwarf-2
 #     Each directory must be seperated by a space.
 #     Use forward slashes for directory separators.
 #     For a directory that has spaces, enclose it in quotes.
-EXTRAINCDIRS = $(PORTINC) $(KERNINC) $(TESTINC) \
-               ../../os/io \
-               ../../os/io/platforms/AVR \
-               ../../os/various
+EXTRAINCDIRS = ../../src/include ../../src/lib ../../ports/AVR
 
 
 # Compiler flag to set the C Standard level.
