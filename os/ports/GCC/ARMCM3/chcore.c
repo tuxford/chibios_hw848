@@ -1,5 +1,5 @@
 /*
-    ChibiOS/RT - Copyright (C) 2006,2007,2008,2009,2010 Giovanni Di Sirio.
+    ChibiOS/RT - Copyright (C) 2010 Giovanni Di Sirio.
 
     This file is part of ChibiOS/RT.
 
@@ -10,17 +10,23 @@
 
     ChibiOS/RT is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+    along with this program. If not, see <http://www.gnu.org/licenses/>.
+
+                                      ---
+
+    A special exception to the GPL can be applied should you wish to distribute
+    a combined work that includes ChibiOS/RT, without being obliged to provide
+    the source code for any proprietary components. See the file exception.txt
+    for full details of how and when the exception can be applied.
 */
 
 /**
- * @file    ARMCM3/chcore.c
- * @brief   ARM Cortex-M3 architecture port code.
- *
+ * @file ARMCM3/chcore.c
+ * @brief ARM Cortex-M3 architecture port code.
  * @addtogroup ARMCM3_CORE
  * @{
  */
@@ -29,13 +35,13 @@
 #include "nvic.h"
 
 /**
- * @brief   Halts the system.
- * @note    The function is declared as a weak symbol, it is possible
- *          to redefine it in your application code.
+ * @brief Halts the system.
+ * @note The function is declared as a weak symbol, it is possible to redefine
+ *       it in your application code.
  */
-#if !defined(__DOXYGEN__)
+/** @cond never */
 __attribute__((weak))
-#endif
+/** @endcond */
 void port_halt(void) {
 
   port_disable();
@@ -56,9 +62,9 @@ void _port_unlock(void) {
 #endif
 
 /**
- * @brief   System Timer vector.
+ * @brief System Timer vector.
  * @details This interrupt is used as system tick.
- * @note    The timer must be initialized in the startup code.
+ * @note The timer is initialized in the board setup code.
  */
 void SysTickVector(void) {
 
@@ -70,26 +76,33 @@ void SysTickVector(void) {
 }
 
 /**
- * @brief   SVC vector.
- * @details The SVC vector is used for commanded context switch. Structures
- *          @p intctx are saved and restored from the process stacks of the
- *          switched threads.
+ * @brief SVC vector.
+ * @details The SVC vector is used for commanded context switch.
  *
- * @param[in] ntp       the thread to be switched it
- * @param[in] otp       the thread to be switched out
+ * @param otp the thread to be switched out
+ * @param ntp the thread to be switched it
  */
-#if !defined(__DOXYGEN__)
+/** @cond never */
 __attribute__((naked))
-#endif
-void SVCallVector(Thread *ntp, Thread *otp) {
+/** @endcond */
+void SVCallVector(Thread *otp, Thread *ntp) {
+  /* { r0 = otp, r1 = ntp } */
+  /* get the BASEPRI in r3 */
+  /* get the PSP in r12 */
+  /* push the registers on the PSP stack */
+  /* stores the modified PSP into the thread context */
+  /* fetches the PSP position from the new thread context */
+  /* pop the registers from the PSP stack */
+  /* set the PSP from r12 */
+  /* set the BASEPRI from R3 */
   (void)otp;
   (void)ntp;
 #ifdef CH_CURRP_REGISTER_CACHE
   asm volatile ("mrs     r3, BASEPRI                            \n\t" \
                 "mrs     r12, PSP                               \n\t" \
                 "stmdb   r12!, {r3-r6,r8-r11, lr}               \n\t" \
-                "str     r12, [r1, #12]                         \n\t" \
-                "ldr     r12, [r0, #12]                         \n\t" \
+                "str     r12, [r0, #16]                         \n\t" \
+                "ldr     r12, [r1, #16]                         \n\t" \
                 "ldmia   r12!, {r3-r6,r8-r11, lr}               \n\t" \
                 "msr     PSP, r12                               \n\t" \
                 "msr     BASEPRI, r3                            \n\t" \
@@ -98,8 +111,8 @@ void SVCallVector(Thread *ntp, Thread *otp) {
   asm volatile ("mrs     r3, BASEPRI                            \n\t" \
                 "mrs     r12, PSP                               \n\t" \
                 "stmdb   r12!, {r3-r11, lr}                     \n\t" \
-                "str     r12, [r1, #12]                         \n\t" \
-                "ldr     r12, [r0, #12]                         \n\t" \
+                "str     r12, [r0, #16]                         \n\t" \
+                "ldr     r12, [r1, #16]                         \n\t" \
                 "ldmia   r12!, {r3-r11, lr}                     \n\t" \
                 "msr     PSP, r12                               \n\t" \
                 "msr     BASEPRI, r3                            \n\t" \
@@ -138,13 +151,13 @@ void SVCallVector(Thread *ntp, Thread *otp) {
 #endif
 
 /**
- * @brief   Preemption code.
+ * @brief Preemption code.
  */
-#if !defined(__DOXYGEN__)
+/** @cond never */
 __attribute__((naked))
-#endif
+/** @endcond */
 void PendSVVector(void) {
-  Thread *otp, *ntp;
+  Thread *otp;
   register struct intctx *sp_thd asm("r12");
 
   chSysLockFromIsr();
@@ -152,16 +165,14 @@ void PendSVVector(void) {
   PUSH_CONTEXT(sp_thd);
 
   (otp = currp)->p_ctx.r13 = sp_thd;
-  ntp = fifo_remove(&rlist.r_queue);
-  setcurrp(ntp);
-  ntp->p_state = THD_STATE_CURRENT;
+  (currp = fifo_remove(&rlist.r_queue))->p_state = PRCURR;
   chSchReadyI(otp);
 #if CH_TIME_QUANTUM > 0
-  /* Set the round-robin time quantum.*/
+  /* set the round-robin time quantum */
   rlist.r_preempt = CH_TIME_QUANTUM;
 #endif
-  chDbgTrace(otp);
-  sp_thd = ntp->p_ctx.r13;
+  chDbgTrace(otp, currp);
+  sp_thd = currp->p_ctx.r13;
 
   POP_CONTEXT(sp_thd);
 }
