@@ -1,5 +1,5 @@
 /*
-    ChibiOS/RT - Copyright (C) 2006,2007,2008,2009,2010 Giovanni Di Sirio.
+    ChibiOS/RT - Copyright (C) 2010 Giovanni Di Sirio.
 
     This file is part of ChibiOS/RT.
 
@@ -10,17 +10,23 @@
 
     ChibiOS/RT is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+    along with this program. If not, see <http://www.gnu.org/licenses/>.
+
+                                      ---
+
+    A special exception to the GPL can be applied should you wish to distribute
+    a combined work that includes ChibiOS/RT, without being obliged to provide
+    the source code for any proprietary components. See the file exception.txt
+    for full details of how and when the exception can be applied.
 */
 
 /**
- * @file    LPC214x/serial_lld.c
- * @brief   LPC214x low level serial driver code.
- *
+ * @file LPC214x/serial_lld.c
+ * @brief LPC214x low level serial driver code.
  * @addtogroup LPC214x_SERIAL
  * @{
  */
@@ -48,7 +54,7 @@ SerialDriver SD2;
 /* Driver local variables.                                                   */
 /*===========================================================================*/
 
-/** @brief  Driver default configuration.*/
+/** @brief Driver default configuration.*/
 static const SerialConfig default_config = {
   SERIAL_DEFAULT_BITRATE,
   LCR_WL8 | LCR_STOP1 | LCR_NOPARITY,
@@ -60,20 +66,19 @@ static const SerialConfig default_config = {
 /*===========================================================================*/
 
 /**
- * @brief   UART initialization.
+ * @brief UART initialization.
  *
- * @param[in] sdp       communication channel associated to the UART
- * @param[in] config    the architecture-dependent serial driver configuration
+ * @param[in] sdp communication channel associated to the UART
  */
-static void uart_init(SerialDriver *sdp, const SerialConfig *config) {
-  UART *u = sdp->uart;
+static void uart_init(SerialDriver *sdp) {
+  UART *u = sdp->sd.uart;
 
-  uint32_t div = PCLK / (config->sc_speed << 4);
-  u->UART_LCR = config->sc_lcr | LCR_DLAB;
+  uint32_t div = PCLK / (sdp->sd.config->sc_speed << 4);
+  u->UART_LCR = sdp->sd.config->sc_lcr | LCR_DLAB;
   u->UART_DLL = div;
   u->UART_DLM = div >> 8;
-  u->UART_LCR = config->sc_lcr;
-  u->UART_FCR = FCR_ENABLE | FCR_RXRESET | FCR_TXRESET | config->sc_fcr;
+  u->UART_LCR = sdp->sd.config->sc_lcr;
+  u->UART_FCR = FCR_ENABLE | FCR_RXRESET | FCR_TXRESET | sdp->sd.config->sc_fcr;
   u->UART_ACR = 0;
   u->UART_FDR = 0x10;
   u->UART_TER = TER_ENABLE;
@@ -81,9 +86,9 @@ static void uart_init(SerialDriver *sdp, const SerialConfig *config) {
 }
 
 /**
- * @brief   UART de-initialization.
+ * @brief UART de-initialization.
  *
- * @param[in] u         pointer to an UART I/O block
+ * @param[in] u pointer to an UART I/O block
  */
 static void uart_deinit(UART *u) {
 
@@ -99,10 +104,10 @@ static void uart_deinit(UART *u) {
 }
 
 /**
- * @brief   Error handling routine.
+ * @brief Error handling routine.
  *
- * @param[in] sdp       communication channel associated to the UART
- * @param[in] err       UART LSR register value
+ * @param[in] sdp communication channel associated to the UART
+ * @param[in] err UART LSR register value
  */
 static void set_error(SerialDriver *sdp, IOREG32 err) {
   sdflags_t sts = 0;
@@ -124,15 +129,14 @@ static void set_error(SerialDriver *sdp, IOREG32 err) {
 __attribute__((noinline))
 #endif
 /**
- * @brief   Common IRQ handler.
- * @note    Tries hard to clear all the pending interrupt sources, we dont want
- *          to go through the whole ISR and have another interrupt soon after.
- *
- * @param[in] u         pointer to an UART I/O block
- * @param[in] sdp       communication channel associated to the UART
+ * @brief Common IRQ handler.
+ * @param[in] u pointer to an UART I/O block
+ * @param[in] sdp communication channel associated to the UART
+ * @note Tries hard to clear all the pending interrupt sources, we dont want to
+ *       go through the whole ISR and have another interrupt soon after.
  */
 static void serve_interrupt(SerialDriver *sdp) {
-  UART *u = sdp->uart;
+  UART *u = sdp->sd.uart;
 
   while (TRUE) {
     switch (u->UART_IIR & IIR_SRC_MASK) {
@@ -144,12 +148,12 @@ static void serve_interrupt(SerialDriver *sdp) {
     case IIR_SRC_TIMEOUT:
     case IIR_SRC_RX:
       chSysLockFromIsr();
-      if (chIQIsEmpty(&sdp->iqueue))
-        chEvtBroadcastI(&sdp->ievent);
+      if (chIQIsEmpty(&sdp->sd.iqueue))
+        chEvtBroadcastI(&sdp->bac.ievent);
       chSysUnlockFromIsr();
       while (u->UART_LSR & LSR_RBR_FULL) {
         chSysLockFromIsr();
-        if (chIQPutI(&sdp->iqueue, u->UART_RBR) < Q_OK)
+        if (chIQPutI(&sdp->sd.iqueue, u->UART_RBR) < Q_OK)
            sdAddFlagsI(sdp, SD_OVERRUN_ERROR);
         chSysUnlockFromIsr();
       }
@@ -161,12 +165,12 @@ static void serve_interrupt(SerialDriver *sdp) {
           msg_t b;
 
           chSysLockFromIsr();
-          b = chOQGetI(&sdp->oqueue);
+          b = chOQGetI(&sdp->sd.oqueue);
           chSysUnlockFromIsr();
           if (b < Q_OK) {
             u->UART_IER &= ~IER_THRE;
             chSysLockFromIsr();
-            chEvtBroadcastI(&sdp->oevent);
+            chEvtBroadcastI(&sdp->bac.oevent);
             chSysUnlockFromIsr();
             break;
           }
@@ -182,17 +186,17 @@ static void serve_interrupt(SerialDriver *sdp) {
 }
 
 /**
- * @brief   Attempts a TX FIFO preload.
+ * @brief Attempts a TX FIFO preload.
  */
 static void preload(SerialDriver *sdp) {
-  UART *u = sdp->uart;
+  UART *u = sdp->sd.uart;
 
   if (u->UART_LSR & LSR_THRE) {
     int i = LPC214x_UART_FIFO_PRELOAD;
     do {
-      msg_t b = chOQGetI(&sdp->oqueue);
+      msg_t b = chOQGetI(&sdp->sd.oqueue);
       if (b < Q_OK) {
-        chEvtBroadcastI(&sdp->oevent);
+        chEvtBroadcastI(&sdp->bac.oevent);
         return;
       }
       u->UART_THR = b;
@@ -202,7 +206,7 @@ static void preload(SerialDriver *sdp) {
 }
 
 /**
- * @brief   Driver SD1 output notification.
+ * @brief Driver SD1 output notification.
  */
 #if USE_LPC214x_UART0 || defined(__DOXYGEN__)
 static void notify1(void) {
@@ -211,8 +215,9 @@ static void notify1(void) {
 }
 #endif
 
+
 /**
- * @brief   Driver SD2 output notification.
+ * @brief Driver SD2 output notification.
  */
 #if USE_LPC214x_UART1 || defined(__DOXYGEN__)
 static void notify2(void) {
@@ -226,7 +231,7 @@ static void notify2(void) {
 /*===========================================================================*/
 
 /**
- * @brief   UART0 IRQ handler.
+ * @brief UART0 IRQ handler.
  */
 #if USE_LPC214x_UART0 || defined(__DOXYGEN__)
 CH_IRQ_HANDLER(UART0IrqHandler) {
@@ -240,8 +245,9 @@ CH_IRQ_HANDLER(UART0IrqHandler) {
 }
 #endif
 
+
 /**
- * @brief   UART1 IRQ handler.
+ * @brief UART1 IRQ handler.
  */
 #if USE_LPC214x_UART1 || defined(__DOXYGEN__)
 CH_IRQ_HANDLER(UART1IrqHandler) {
@@ -255,41 +261,39 @@ CH_IRQ_HANDLER(UART1IrqHandler) {
 }
 #endif
 
+
 /*===========================================================================*/
 /* Driver exported functions.                                                */
 /*===========================================================================*/
 
 /**
- * @brief   Low level serial driver initialization.
+ * Low level serial driver initialization.
  */
 void sd_lld_init(void) {
 
 #if USE_LPC214x_UART0
   sdObjectInit(&SD1, NULL, notify1);
-  SD1.uart = U0Base;
+  SD1.sd.uart = U0Base;
   SetVICVector(UART0IrqHandler, LPC214x_UART0_PRIORITY, SOURCE_UART0);
 #endif
 #if USE_LPC214x_UART1
   sdObjectInit(&SD2, NULL, notify2);
-  SD2.uart = U1Base;
+  SD2.sd.uart = U1Base;
   SetVICVector(UART1IrqHandler, LPC214x_UART1_PRIORITY, SOURCE_UART1);
 #endif
 }
 
 /**
- * @brief   Low level serial driver configuration and (re)start.
+ * @brief Low level serial driver configuration and (re)start.
  *
- * @param[in] sdp       pointer to a @p SerialDriver object
- * @param[in] config    the architecture-dependent serial driver configuration.
- *                      If this parameter is set to @p NULL then a default
- *                      configuration is used.
+ * @param[in] sdp pointer to a @p SerialDriver object
  */
-void sd_lld_start(SerialDriver *sdp, const SerialConfig *config) {
+void sd_lld_start(SerialDriver *sdp) {
 
-  if (config == NULL)
-    config = &default_config;
+  if (sdp->sd.config == NULL)
+    sdp->sd.config = &default_config;
 
-  if (sdp->state == SD_STOP) {
+  if (sdp->sd.state == SD_STOP) {
 #if USE_LPC214x_UART0
     if (&SD1 == sdp) {
       PCONP = (PCONP & PCALL) | PCUART0;
@@ -303,20 +307,20 @@ void sd_lld_start(SerialDriver *sdp, const SerialConfig *config) {
     }
 #endif
   }
-  uart_init(sdp, config);
+  uart_init(sdp);
 }
 
 /**
- * @brief   Low level serial driver stop.
+ * @brief Low level serial driver stop.
  * @details De-initializes the UART, stops the associated clock, resets the
  *          interrupt vector.
  *
- * @param[in] sdp       pointer to a @p SerialDriver object
+ * @param[in] sdp pointer to a @p SerialDriver object
  */
 void sd_lld_stop(SerialDriver *sdp) {
 
-  if (sdp->state == SD_READY) {
-    uart_deinit(sdp->uart);
+  if (sdp->sd.state == SD_READY) {
+    uart_deinit(sdp->sd.uart);
 #if USE_LPC214x_UART0
     if (&SD1 == sdp) {
       PCONP = (PCONP & PCALL) & ~PCUART0;

@@ -1,5 +1,5 @@
 /*
-    ChibiOS/RT - Copyright (C) 2006,2007,2008,2009,2010 Giovanni Di Sirio.
+    ChibiOS/RT - Copyright (C) 2010 Giovanni Di Sirio.
 
     This file is part of ChibiOS/RT.
 
@@ -10,11 +10,18 @@
 
     ChibiOS/RT is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+    along with this program. If not, see <http://www.gnu.org/licenses/>.
+
+                                      ---
+
+    A special exception to the GPL can be applied should you wish to distribute
+    a combined work that includes ChibiOS/RT, without being obliged to provide
+    the source code for any proprietary components. See the file exception.txt
+    for full details of how and when the exception can be applied.
 */
 
 #include "ch.h"
@@ -22,8 +29,6 @@
 
 /**
  * @page test_pools Memory Pools test
- *
- * File: @ref testpools.c
  *
  * <h2>Description</h2>
  * This module implements the test sequence for the @ref pools subsystem.
@@ -95,7 +100,7 @@ const struct testcase testpools1 = {
 #endif /* CH_USE_MEMPOOLS */
 
 /*
- * @brief   Test sequence for pools.
+ * Test sequence for pools pattern.
  */
 const struct testcase * const patternpools[] = {
 #if CH_USE_MEMPOOLS
