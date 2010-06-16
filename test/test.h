@@ -10,11 +10,18 @@
 
     ChibiOS/RT is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+    along with this program. If not, see <http://www.gnu.org/licenses/>.
+
+                                      ---
+
+    A special exception to the GPL can be applied should you wish to distribute
+    a combined work that includes ChibiOS/RT, without being obliged to provide
+    the source code for any proprietary components. See the file exception.txt
+    for full details of how and when the exception can be applied.
 */
 
 /**
@@ -60,7 +67,7 @@
  * @brief   Structure representing a test case.
  */
 struct testcase {
-  const char *name;             /**< @brief Test case name.                 */
+  char *(*gettest)(void);       /**< @brief Test case name get function.    */
   void (*setup)(void);          /**< @brief Test case preparation function. */
   void (*teardown)(void);       /**< @brief Test case clean up function.    */
   void (*execute)(void);        /**< @brief Test case execution function.   */
@@ -84,8 +91,8 @@ extern "C" {
 #endif
   msg_t TestThread(void *p);
   void test_printn(uint32_t n);
-  void test_print(const char *msgp);
-  void test_println(const char *msgp);
+  void test_print(char *msgp);
+  void test_println(char *msgp);
   void test_emit_token(char token);
   bool_t _test_fail(unsigned point);
   bool_t _test_assert(unsigned point, bool_t condition);

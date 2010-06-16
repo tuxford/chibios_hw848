@@ -10,11 +10,18 @@
 
     ChibiOS/RT is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+    along with this program. If not, see <http://www.gnu.org/licenses/>.
+
+                                      ---
+
+    A special exception to the GPL can be applied should you wish to distribute
+    a combined work that includes ChibiOS/RT, without being obliged to provide
+    the source code for any proprietary components. See the file exception.txt
+    for full details of how and when the exception can be applied.
 */
 
 #include "ch.h"
@@ -102,6 +109,11 @@ static unsigned int msg_loop_test(Thread *tp) {
  * printed in the output log.
  */
 
+static char *bmk1_gettest(void) {
+
+  return "Benchmark, messages #1";
+}
+
 static void bmk1_execute(void) {
   uint32_t n;
 
@@ -116,7 +128,7 @@ static void bmk1_execute(void) {
 }
 
 const struct testcase testbmk1 = {
-  "Benchmark, messages #1",
+  bmk1_gettest,
   NULL,
   NULL,
   bmk1_execute
@@ -130,6 +142,11 @@ const struct testcase testbmk1 = {
  * thread, the messages throughput per second is measured and the result
  * printed in the output log.
  */
+
+static char *bmk2_gettest(void) {
+
+  return "Benchmark, messages #2";
+}
 
 static void bmk2_execute(void) {
   uint32_t n;
@@ -145,7 +162,7 @@ static void bmk2_execute(void) {
 }
 
 const struct testcase testbmk2 = {
-  "Benchmark, messages #2",
+  bmk2_gettest,
   NULL,
   NULL,
   bmk2_execute
@@ -166,6 +183,11 @@ static msg_t thread2(void *p) {
  * printed in the output log.
  */
 
+static char *bmk3_gettest(void) {
+
+  return "Benchmark, messages #3";
+}
+
 static void bmk3_execute(void) {
   uint32_t n;
 
@@ -184,7 +206,7 @@ static void bmk3_execute(void) {
 }
 
 const struct testcase testbmk3 = {
-  "Benchmark, messages #3",
+  bmk3_gettest,
   NULL,
   NULL,
   bmk3_execute
@@ -199,6 +221,11 @@ const struct testcase testbmk3 = {
  * The Context Switch performance is calculated by measuring the number of
  * iterations after a second of continuous operations.
  */
+
+static char *bmk4_gettest(void) {
+
+  return "Benchmark, context switch";
+}
 
 msg_t thread4(void *p) {
   msg_t msg;
@@ -245,7 +272,7 @@ static void bmk4_execute(void) {
 }
 
 const struct testcase testbmk4 = {
-  "Benchmark, context switch",
+  bmk4_gettest,
   NULL,
   NULL,
   bmk4_execute
@@ -261,6 +288,11 @@ const struct testcase testbmk4 = {
  * The performance is calculated by measuring the number of iterations after
  * a second of continuous operations.
  */
+
+static char *bmk5_gettest(void) {
+
+  return "Benchmark, threads, full cycle";
+}
 
 static void bmk5_execute(void) {
 
@@ -282,7 +314,7 @@ static void bmk5_execute(void) {
 }
 
 const struct testcase testbmk5 = {
-  "Benchmark, threads, full cycle",
+  bmk5_gettest,
   NULL,
   NULL,
   bmk5_execute
@@ -300,6 +332,11 @@ const struct testcase testbmk5 = {
  * The performance is calculated by measuring the number of iterations after
  * a second of continuous operations.
  */
+
+static char *bmk6_gettest(void) {
+
+  return "Benchmark, threads, create only";
+}
 
 static void bmk6_execute(void) {
 
@@ -321,7 +358,7 @@ static void bmk6_execute(void) {
 }
 
 const struct testcase testbmk6 = {
-  "Benchmark, threads, create only",
+  bmk6_gettest,
   NULL,
   NULL,
   bmk6_execute
@@ -344,6 +381,11 @@ static msg_t thread3(void *p) {
   while (!chThdShouldTerminate())
     chSemWait(&sem1);
   return 0;
+}
+
+static char *bmk7_gettest(void) {
+
+  return "Benchmark, mass reschedule, 5 threads";
 }
 
 static void bmk7_setup(void) {
@@ -382,7 +424,7 @@ static void bmk7_execute(void) {
 }
 
 const struct testcase testbmk7 = {
-  "Benchmark, mass reschedule, 5 threads",
+  bmk7_gettest,
   bmk7_setup,
   NULL,
   bmk7_execute
@@ -413,6 +455,11 @@ static msg_t thread8(void *p) {
   return 0;
 }
 
+static char *bmk8_gettest(void) {
+
+  return "Benchmark, round robin context switching";
+}
+
 static void bmk8_execute(void) {
   uint32_t n;
 
@@ -435,7 +482,7 @@ static void bmk8_execute(void) {
 }
 
 const struct testcase testbmk8 = {
-  "Benchmark, round robin context switching",
+  bmk8_gettest,
   NULL,
   NULL,
   bmk8_execute
@@ -450,6 +497,11 @@ const struct testcase testbmk8 = {
  * The performance is calculated by measuring the number of iterations after
  * a second of continuous operations.
  */
+
+static char *bmk9_gettest(void) {
+
+  return "Benchmark, I/O Queues throughput";
+}
 
 static void bmk9_execute(void) {
   uint32_t n;
@@ -480,7 +532,7 @@ static void bmk9_execute(void) {
 }
 
 const struct testcase testbmk9 = {
-  "Benchmark, I/O Queues throughput",
+  bmk9_gettest,
   NULL,
   NULL,
   bmk9_execute
@@ -494,6 +546,11 @@ const struct testcase testbmk9 = {
  * The performance is calculated by measuring the number of iterations after
  * a second of continuous operations.
  */
+
+static char *bmk10_gettest(void) {
+
+  return "Benchmark, virtual timers set/reset";
+}
 
 static void tmo(void *param) {(void)param;}
 
@@ -521,7 +578,7 @@ static void bmk10_execute(void) {
 }
 
 const struct testcase testbmk10 = {
-  "Benchmark, virtual timers set/reset",
+  bmk10_gettest,
   NULL,
   NULL,
   bmk10_execute
@@ -536,6 +593,11 @@ const struct testcase testbmk10 = {
  * The performance is calculated by measuring the number of iterations after
  * a second of continuous operations.
  */
+
+static char *bmk11_gettest(void) {
+
+  return "Benchmark, semaphores wait/signal";
+}
 
 static void bmk11_setup(void) {
 
@@ -567,7 +629,7 @@ static void bmk11_execute(void) {
 }
 
 const struct testcase testbmk11 = {
-  "Benchmark, semaphores wait/signal",
+  bmk11_gettest,
   bmk11_setup,
   NULL,
   bmk11_execute
@@ -583,6 +645,11 @@ const struct testcase testbmk11 = {
  * The performance is calculated by measuring the number of iterations after
  * a second of continuous operations.
  */
+
+static char *bmk12_gettest(void) {
+
+  return "Benchmark, mutexes lock/unlock";
+}
 
 static void bmk12_setup(void) {
 
@@ -614,7 +681,7 @@ static void bmk12_execute(void) {
 }
 
 const struct testcase testbmk12 = {
-  "Benchmark, mutexes lock/unlock",
+  bmk12_gettest,
   bmk12_setup,
   NULL,
   bmk12_execute
@@ -627,6 +694,11 @@ const struct testcase testbmk12 = {
  * <h2>Description</h2>
  * The memory size of the various kernel objects is printed.
  */
+
+static char *bmk13_gettest(void) {
+
+  return "Benchmark, RAM footprint";
+}
 
 static void bmk13_execute(void) {
 
@@ -675,7 +747,7 @@ static void bmk13_execute(void) {
 }
 
 const struct testcase testbmk13 = {
-  "Benchmark, RAM footprint",
+  bmk13_gettest,
   NULL,
   NULL,
   bmk13_execute

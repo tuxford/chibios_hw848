@@ -10,11 +10,18 @@
 
     ChibiOS/RT is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+    along with this program. If not, see <http://www.gnu.org/licenses/>.
+
+                                      ---
+
+    A special exception to the GPL can be applied should you wish to distribute
+    a combined work that includes ChibiOS/RT, without being obliged to provide
+    the source code for any proprietary components. See the file exception.txt
+    for full details of how and when the exception can be applied.
 */
 
 #include "ch.h"
@@ -76,6 +83,11 @@ static OUTPUTQUEUE_DECL(oq, test.wa.T1, TEST_QUEUES_SIZE, notify);
  * consistent through the whole test.
  */
 
+static char *queues1_gettest(void) {
+
+  return "Queues, input queues";
+}
+
 static void queues1_setup(void) {
 
   chIQInit(&iq, wa[0], TEST_QUEUES_SIZE, notify);
@@ -130,7 +142,7 @@ static void queues1_execute(void) {
 }
 
 const struct testcase testqueues1 = {
-  "Queues, input queues",
+  queues1_gettest,
   queues1_setup,
   NULL,
   queues1_execute
@@ -144,6 +156,10 @@ const struct testcase testqueues1 = {
  * @p OutputQueue object including timeouts. The queue state must remain
  * consistent through the whole test.
  */
+static char *queues2_gettest(void) {
+
+  return "Queues, output queues";
+}
 
 static void queues2_setup(void) {
 
@@ -190,7 +206,7 @@ static void queues2_execute(void) {
 }
 
 const struct testcase testqueues2 = {
-  "Queues, output queues",
+  queues2_gettest,
   queues2_setup,
   NULL,
   queues2_execute
