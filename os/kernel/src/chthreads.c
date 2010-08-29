@@ -10,11 +10,18 @@
 
     ChibiOS/RT is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+    along with this program. If not, see <http://www.gnu.org/licenses/>.
+
+                                      ---
+
+    A special exception to the GPL can be applied should you wish to distribute
+    a combined work that includes ChibiOS/RT, without being obliged to provide
+    the source code for any proprietary components. See the file exception.txt
+    for full details of how and when the exception can be applied.
 */
 
 /**
@@ -94,9 +101,7 @@ Thread *init_thread(Thread *tp, tprio_t prio) {
 #if CH_USE_EVENTS
   tp->p_epending = 0;
 #endif
-#if defined(THREAD_EXT_EXIT_HOOK)
-  THREAD_EXT_INIT_HOOK(tp);
-#endif
+  THREAD_EXT_INIT(tp);
   return tp;
 }
 
@@ -359,9 +364,7 @@ void chThdExit(msg_t msg) {
 
   chSysLock();
   tp->p_u.exitcode = msg;
-#if defined(THREAD_EXT_EXIT_HOOK)
-  THREAD_EXT_EXIT_HOOK(tp);
-#endif
+  THREAD_EXT_EXIT(tp);
 #if CH_USE_WAITEXIT
   while (notempty(&tp->p_waiting))
     chSchReadyI(list_remove(&tp->p_waiting));
