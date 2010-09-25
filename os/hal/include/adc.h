@@ -10,11 +10,18 @@
 
     ChibiOS/RT is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+    along with this program. If not, see <http://www.gnu.org/licenses/>.
+
+                                      ---
+
+    A special exception to the GPL can be applied should you wish to distribute
+    a combined work that includes ChibiOS/RT, without being obliged to provide
+    the source code for any proprietary components. See the file exception.txt
+    for full details of how and when the exception can be applied.
 */
 
 /**
@@ -38,19 +45,12 @@
 /* Driver pre-compile time settings.                                         */
 /*===========================================================================*/
 
-/**
- * @brief   Inclusion of the @p adcWaitConversion() function.
- */
-#if !defined(ADC_USE_WAIT) || defined(__DOXYGEN__)
-#define ADC_USE_WAIT                TRUE
-#endif
-
 /*===========================================================================*/
 /* Derived constants and error checks.                                       */
 /*===========================================================================*/
 
-#if ADC_USE_WAIT && !CH_USE_SEMAPHORES
-#error "ADC driver requires CH_USE_SEMAPHORES when ADC_USE_WAIT is enabled"
+#if !CH_USE_SEMAPHORES
+#error "ADC driver requires CH_USE_SEMAPHORES"
 #endif
 
 /*===========================================================================*/
@@ -90,16 +90,8 @@ extern "C" {
                             adcsample_t *samples,
                             size_t depth,
                             adccallback_t callback);
-  bool_t adcStartConversionI(ADCDriver *adcp,
-                             const ADCConversionGroup *grpp,
-                             adcsample_t *samples,
-                             size_t depth,
-                             adccallback_t callback);
   void adcStopConversion(ADCDriver *adcp);
-  void adcStopConversionI(ADCDriver *adcp);
-#if ADC_USE_WAIT
   msg_t adcWaitConversion(ADCDriver *adcp, systime_t timeout);
-#endif
 #ifdef __cplusplus
 }
 #endif

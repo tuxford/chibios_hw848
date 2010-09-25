@@ -10,11 +10,18 @@
 
     ChibiOS/RT is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+    along with this program. If not, see <http://www.gnu.org/licenses/>.
+
+                                      ---
+
+    A special exception to the GPL can be applied should you wish to distribute
+    a combined work that includes ChibiOS/RT, without being obliged to provide
+    the source code for any proprietary components. See the file exception.txt
+    for full details of how and when the exception can be applied.
 */
 
 /**
@@ -77,32 +84,6 @@ typedef void (*pwmcallback_t)(void);
 /*===========================================================================*/
 /* Driver macros.                                                            */
 /*===========================================================================*/
-
-/**
- * @brief   Enables a PWM channel.
- * @details Programs (or reprograms) a PWM channel.
- * @note    This function has to be invoked from a lock zone.
- *
- * @param[in] pwmp      pointer to a @p PWMDriver object
- * @param[in] channel   PWM channel identifier
- * @param[in] width     PWM pulse width as clock pulses number
- */
-#define pwmEnableChannelI(pwmp, channel, width) {                           \
-  pwm_lld_enable_channel(pwmp, channel, width);                             \
-}
-
-/**
- * @brief Disables a PWM channel.
- * @details The channel is disabled and its output line returned to the
- *          idle state.
- * @note    This function has to be invoked from a lock zone.
- *
- * @param[in] pwmp      pointer to a @p PWMDriver object
- * @param[in] channel   PWM channel identifier
- */
-#define pwmDisableChannelI(pwmp, channel) {                                 \
-  pwm_lld_disable_channel(pwmp, channel);                                   \
-}
 
 /*===========================================================================*/
 /* External declarations.                                                    */

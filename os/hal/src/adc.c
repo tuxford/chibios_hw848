@@ -10,11 +10,18 @@
 
     ChibiOS/RT is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+    along with this program. If not, see <http://www.gnu.org/licenses/>.
+
+                                      ---
+
+    A special exception to the GPL can be applied should you wish to distribute
+    a combined work that includes ChibiOS/RT, without being obliged to provide
+    the source code for any proprietary components. See the file exception.txt
+    for full details of how and when the exception can be applied.
 */
 
 /**
@@ -67,9 +74,7 @@ void adcObjectInit(ADCDriver *adcp) {
   adcp->ad_samples  = NULL;
   adcp->ad_depth    = 0;
   adcp->ad_grpp     = NULL;
-#if ADC_USE_WAIT
   chSemInit(&adcp->ad_sem, 0);
-#endif
 }
 
 /**
@@ -102,7 +107,9 @@ void adcStop(ADCDriver *adcp) {
   chDbgCheck(adcp != NULL, "adcStop");
 
   chSysLock();
-  chDbgAssert((adcp->ad_state == ADC_STOP) || (adcp->ad_state == ADC_READY),
+  chDbgAssert((adcp->ad_state == ADC_STOP) ||
+              (adcp->ad_state == ADC_READY) ||
+              (adcp->ad_state == ADC_COMPLETE),
               "adcStop(), #1",
               "invalid state");
   adc_lld_stop(adcp);
@@ -145,75 +152,33 @@ bool_t adcStartConversion(ADCDriver *adcp,
                           adcsample_t *samples,
                           size_t depth,
                           adccallback_t callback) {
-  bool_t result;
-
-  chSysLock();
-  result = adcStartConversionI(adcp, grpp, samples, depth, callback);
-  chSysUnlock();
-  return result;
-}
-
-/**
- * @brief   Starts an ADC conversion.
- * @details Starts a conversion operation, there are two kind of conversion
- *          modes:
- *          - <b>LINEAR</b>, in this mode the buffer is filled once and then
- *            the conversion stops automatically.
- *          - <b>CIRCULAR</b>, in this mode the conversion never stops and
- *            the buffer is filled circularly.<br>
- *            During the conversion the callback function is invoked when
- *            the buffer is 50% filled and when the buffer is 100% filled,
- *            this way is possible to process the conversion stream in real
- *            time. This kind of conversion can only be stopped by explicitly
- *            invoking @p adcStopConversion().
- *          .
- * @note    The buffer is organized as a matrix of M*N elements where M is the
- *          channels number configured into the conversion group and N is the
- *          buffer depth. The samples are sequentially written into the buffer
- *          with no gaps.
- *
- * @param[in] adcp      pointer to the @p ADCDriver object
- * @param[in] grpp      pointer to a @p ADCConversionGroup object
- * @param[out] samples  pointer to the samples buffer
- * @param[in] depth     buffer depth (matrix rows number). The buffer depth
- *                      must be one or an even number.
- * @param[in] callback  pointer to the conversion callback function, this
- *                      parameter can be @p NULL if a callback is not required
- * @return              The operation status.
- * @retval FALSE        the conversion has been started.
- * @retval TRUE         the driver is busy, conversion not started.
- */
-bool_t adcStartConversionI(ADCDriver *adcp,
-                           const ADCConversionGroup *grpp,
-                           adcsample_t *samples,
-                           size_t depth,
-                           adccallback_t callback) {
 
   chDbgCheck((adcp != NULL) && (grpp != NULL) && (samples != NULL) &&
              ((depth == 1) || ((depth & 1) == 0)),
-             "adcStartConversionI");
+             "adcStartConversion");
 
+  chSysLock();
   chDbgAssert((adcp->ad_state == ADC_READY) ||
               (adcp->ad_state == ADC_RUNNING) ||
               (adcp->ad_state == ADC_COMPLETE),
-              "adcStartConversionI(), #1",
+              "adcStartConversion(), #1",
               "invalid state");
-  if (adcp->ad_state == ADC_RUNNING)
+  if (adcp->ad_state == ADC_RUNNING) {
+    chSysUnlock();
     return TRUE;
+  }
   adcp->ad_callback = callback;
   adcp->ad_samples  = samples;
   adcp->ad_depth    = depth;
   adcp->ad_grpp     = grpp;
   adc_lld_start_conversion(adcp);
   adcp->ad_state = ADC_RUNNING;
+  chSysUnlock();
   return FALSE;
 }
 
 /**
  * @brief   Stops an ongoing conversion.
- * @details This function stops the currently ongoing conversion and returns
- *          the driver in the @p ADC_READY state. If there was no conversion
- *          being processed then the function does nothing.
  *
  * @param[in] adcp      pointer to the @p ADCDriver object
  */
@@ -231,46 +196,14 @@ void adcStopConversion(ADCDriver *adcp) {
     adc_lld_stop_conversion(adcp);
     adcp->ad_grpp  = NULL;
     adcp->ad_state = ADC_READY;
-#if ADC_USE_WAIT
     chSemResetI(&adcp->ad_sem, 0);
     chSchRescheduleS();
-#endif
   }
   else
     adcp->ad_state = ADC_READY;
   chSysUnlock();
 }
 
-/**
- * @brief   Stops an ongoing conversion.
- * @details This function stops the currently ongoing conversion and returns
- *          the driver in the @p ADC_READY state. If there was no conversion
- *          being processed then the function does nothing.
- *
- * @param[in] adcp      pointer to the @p ADCDriver object
- */
-void adcStopConversionI(ADCDriver *adcp) {
-
-  chDbgCheck(adcp != NULL, "adcStopConversionI");
-
-  chDbgAssert((adcp->ad_state == ADC_READY) ||
-              (adcp->ad_state == ADC_RUNNING) ||
-              (adcp->ad_state == ADC_COMPLETE),
-              "adcStopConversionI(), #1",
-              "invalid state");
-  if (adcp->ad_state == ADC_RUNNING) {
-    adc_lld_stop_conversion(adcp);
-    adcp->ad_grpp  = NULL;
-    adcp->ad_state = ADC_READY;
-#if ADC_USE_WAIT
-    chSemResetI(&adcp->ad_sem, 0);
-#endif
-  }
-  else
-    adcp->ad_state = ADC_READY;
-}
-
-#if ADC_USE_WAIT || defined(__DOXYGEN__)
 /**
  * @brief   Waits for completion.
  * @details If the conversion is not completed or not yet started then the
@@ -303,7 +236,6 @@ msg_t adcWaitConversion(ADCDriver *adcp, systime_t timeout) {
   chSysUnlock();
   return RDY_OK;
 }
-#endif /* ADC_USE_WAIT */
 
 #endif /* CH_HAL_USE_ADC */
 

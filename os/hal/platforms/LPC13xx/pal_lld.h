@@ -10,11 +10,18 @@
 
     ChibiOS/RT is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+    along with this program. If not, see <http://www.gnu.org/licenses/>.
+
+                                      ---
+
+    A special exception to the GPL can be applied should you wish to distribute
+    a combined work that includes ChibiOS/RT, without being obliged to provide
+    the source code for any proprietary components. See the file exception.txt
+    for full details of how and when the exception can be applied.
 */
 
 /**
@@ -51,7 +58,7 @@ typedef struct {
   uint32_t      data;
   /** Initial value for FIO_DIR register.*/
   uint32_t      dir;
-} lpc13xx_gpio_setup_t;
+} LPC13xx_gpio_setup_t;
 
 /**
  * @brief   GPIO static initializer.
@@ -67,13 +74,13 @@ typedef struct {
  */
 typedef struct {
   /** @brief GPIO 0 setup data.*/
-  lpc13xx_gpio_setup_t   P0;
+  LPC13xx_gpio_setup_t   P0;
   /** @brief GPIO 1 setup data.*/
-  lpc13xx_gpio_setup_t   P1;
+  LPC13xx_gpio_setup_t   P1;
   /** @brief GPIO 2 setup data.*/
-  lpc13xx_gpio_setup_t   P2;
+  LPC13xx_gpio_setup_t   P2;
   /** @brief GPIO 3 setup data.*/
-  lpc13xx_gpio_setup_t   P3;
+  LPC13xx_gpio_setup_t   P3;
 } PALConfig;
 
 /**
