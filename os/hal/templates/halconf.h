@@ -10,11 +10,18 @@
 
     ChibiOS/RT is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+    along with this program. If not, see <http://www.gnu.org/licenses/>.
+
+                                      ---
+
+    A special exception to the GPL can be applied should you wish to distribute
+    a combined work that includes ChibiOS/RT, without being obliged to provide
+    the source code for any proprietary components. See the file exception.txt
+    for full details of how and when the exception can be applied.
 */
 
 /**
@@ -35,7 +42,12 @@
 #ifndef _HALCONF_H_
 #define _HALCONF_H_
 
-#include "mcuconf.h"
+/*
+ * Uncomment the following line in order to include a mcu-related
+ * settings file. This file can be used to include platform specific
+ * header files or to override the low level drivers settings.
+ */
+/*#include "mcuconf.h"*/
 
 /*===========================================================================*/
 /* PAL driver related settings.                                              */
@@ -59,13 +71,6 @@
 #define CH_HAL_USE_ADC              TRUE
 #endif
 
-/**
- * @brief   Inclusion of the @p adcWaitConversion() function.
- */
-#if !defined(ADC_USE_WAIT) || defined(__DOXYGEN__)
-#define ADC_USE_WAIT                TRUE
-#endif
-
 /*===========================================================================*/
 /* CAN driver related settings.                                              */
 /*===========================================================================*/
@@ -77,12 +82,10 @@
 #define CH_HAL_USE_CAN              TRUE
 #endif
 
-/**
- * @brief   Sleep mode related APIs inclusion switch.
+/*
+ * Default CAN settings overrides (uncomment to override).
  */
-#if !defined(CAN_USE_SLEEP_MODE) || defined(__DOXYGEN__)
-#define CAN_USE_SLEEP_MODE          TRUE
-#endif
+/*#define CAN_USE_SLEEP_MODE          TRUE*/
 
 /*===========================================================================*/
 /* MAC driver related settings.                                              */
@@ -117,25 +120,11 @@
 #define CH_HAL_USE_SERIAL           TRUE
 #endif
 
-/**
- * @brief   Default bit rate.
- * @details Configuration parameter, this is the baud rate selected for the
- *          default configuration.
+/*
+ * Default SERIAL settings overrides (uncomment to override).
  */
-#if !defined(SERIAL_DEFAULT_BITRATE) || defined(__DOXYGEN__)
-#define SERIAL_DEFAULT_BITRATE      38400
-#endif
-
-/**
- * @brief   Serial buffers size.
- * @details Configuration parameter, you can change the depth of the queue
- *          buffers depending on the requirements of your application.
- * @note    The default is 64 bytes for both the transmission and receive
- *          buffers.
- */
-#if !defined(SERIAL_BUFFERS_SIZE) || defined(__DOXYGEN__)
-#define SERIAL_BUFFERS_SIZE         16
-#endif
+/*#define SERIAL_DEFAULT_BITRATE      38400*/
+/*#define SERIAL_BUFFERS_SIZE         64*/
 
 /*===========================================================================*/
 /* SPI driver related settings.                                              */
@@ -148,21 +137,10 @@
 #define CH_HAL_USE_SPI              TRUE
 #endif
 
-/**
- * @brief   Enables the "wait" APIs.
- * @note    Disabling this option saves both code and data space.
+/*
+ * Default SPI settings overrides (uncomment to override).
  */
-#if !defined(SPI_USE_WAIT) || defined(__DOXYGEN__)
-#define SPI_USE_WAIT                TRUE
-#endif
-
-/**
- * @brief   Enables the @p spiAcquireBus() and @p spiReleaseBus() APIs.
- * @note    Disabling this option saves both code and data space.
- */
-#if !defined(SPI_USE_MUTUAL_EXCLUSION) || defined(__DOXYGEN__)
-#define SPI_USE_MUTUAL_EXCLUSION    TRUE
-#endif
+/*#define SPI_USE_MUTUAL_EXCLUSION    TRUE*/
 
 /*===========================================================================*/
 /* MMC_SPI driver related settings.                                          */
@@ -175,50 +153,13 @@
 #define CH_HAL_USE_MMC_SPI          TRUE
 #endif
 
-/**
- * @brief   Block size for MMC transfers.
+/*
+ * Default MMC_SPI settings overrides (uncomment to override).
  */
-#if !defined(MMC_SECTOR_SIZE) || defined(__DOXYGEN__)
-#define MMC_SECTOR_SIZE             512
-#endif
-
-/**
- * @brief   Delays insertions.
- * @details If enabled this options inserts delays into the MMC waiting
- *          routines releasing some extra CPU time for the threads with
- *          lower priority, this may slow down the driver a bit however.
- *          This option is recommended also if the SPI driver does not
- *          use a DMA channel and heavily loads the CPU.
- */
-#if !defined(MMC_NICE_WAITING) || defined(__DOXYGEN__)
-#define MMC_NICE_WAITING            TRUE
-#endif
-
-/**
- * @brief   Number of positive insertion queries before generating the
- *          insertion event.
- */
-#if !defined(MMC_POLLING_INTERVAL) || defined(__DOXYGEN__)
-#define MMC_POLLING_INTERVAL        10
-#endif
-
-/**
- * @brief   Interval, in milliseconds, between insertion queries.
- */
-#if !defined(MMC_POLLING_DELAY) || defined(__DOXYGEN__)
-#define MMC_POLLING_DELAY           10
-#endif
-
-/*===========================================================================*/
-/* UART driver related settings.                                             */
-/*===========================================================================*/
-
-/**
- * @brief   Enables the UART subsystem.
- */
-#if !defined(CH_HAL_USE_UART) || defined(__DOXYGEN__)
-#define CH_HAL_USE_UART             TRUE
-#endif
+/*#define MMC_SECTOR_SIZE             512*/
+/*#define MMC_NICE_WAITING            TRUE*/
+/*#define MMC_POLLING_INTERVAL        10*/
+/*#define MMC_POLLING_DELAY           10*/
 
 #endif /* _HALCONF_H_ */
 

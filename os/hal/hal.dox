@@ -10,36 +10,40 @@
 
     ChibiOS/RT is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+    along with this program. If not, see <http://www.gnu.org/licenses/>.
+
+                                      ---
+
+    A special exception to the GPL can be applied should you wish to distribute
+    a combined work that includes ChibiOS/RT, without being obliged to provide
+    the source code for any proprietary components. See the file exception.txt
+    for full details of how and when the exception can be applied.
 */
 
 /**
  * @defgroup IO HAL
  * @brief Hardware Abstraction Layer.
  * @details Under ChibiOS/RT the set of the various device driver interfaces
- * is called the HAL subsystem: Hardware Abstraction Layer. The HAL is the
- * abstract interface between ChibiOS/RT application and hardware.
- *
- * @section hal_device_driver_arch HAL Device Drivers Architecture
+ * is called the HAL subsystem: Hardware Abstraction Layer.<br>
  * A device driver is usually split in two layers:
  * - High Level Device Driver (<b>HLD</b>). This layer contains the definitions
  *   of the driver's APIs and the platform independent part of the driver.<br>
  *   An HLD is composed by two files:
- *   - @p @<driver@>.c, the HLD implementation file. This file must be
+ *   - @<driver@>.c, the HLD implementation file. This file must be
  *     included in the Makefile in order to use the driver.
- *   - @p @<driver@>.h, the HLD header file. This file is implicitly
+ *   - @<driver@>.h, the HLD header file. This file is implicitly
  *     included by the HAL header file @p hal.h.
  *   .
  * - Low Level Device Driver (<b>LLD</b>). This layer contains the platform
  *   dependent part of the driver.<br>
  *   A LLD is composed by two files:
- *   - @p @<driver@>_lld.c, the LLD implementation file. This file must be
+ *   - @<driver@>_lld.c, the LLD implementation file. This file must be
  *     included in the Makefile in order to use the driver.
- *   - @p @<driver@>_lld.h, the LLD header file. This file is implicitly
+ *   - @<driver@>_lld.h, the LLD header file. This file is implicitly
  *     included by the HLD header file.
  *   .
  *   The LLD may be not present in those drivers that do not access the
@@ -47,46 +51,24 @@
  *   @ref MMC_SPI driver uses the @ref SPI and @ref PAL drivers in order
  *   to implement its functionalities.
  * .
- * @subsection hal_device_driver_diagram Diagram
- * @dot
-  digraph example {
-    node [shape=rectangle, fontname=Helvetica, fontsize=8,
-          fixedsize="true", width="2.0", height="0.4"];
-    edge [fontname=Helvetica, fontsize=8];
-    app [label="Application"];
-    hld [label="High Level Driver"];
-    lld [label="Low Level Driver"];
-    hw [label="Microcontroller Hardware"];
-    hal_lld [label="HAL shared low level code"];
-    app->hld;
-    hld->lld;
-    lld-> hw;
-    lld->hal_lld;
-    hal_lld->hw;
-  }
- * @enddot
- */
-
-/**
- * @defgroup HAL_CONF Configuration
- * @brief @ref HAL Configuration.
- * @details The file @p halconf.h contains the high level settings for all
- * the drivers supported by the HAL. The low level, platform dependent,
- * settings are contained in the @p mcuconf.h file instead and are describe
- * in the various platforms reference manuals.
- *
- * @ingroup IO
+ * <h2>Available Device Drivers</h2>
+ * The I/O subsystem currently includes support for:
+ * - @ref HAL.
+ * - @ref PAL.
+ * - @ref SERIAL.
+ * - @ref ADC.
+ * - @ref CAN.
+ * - @ref MAC.
+ * - @ref MMC_SPI.
+ * - @ref SPI.
+ * .
  */
 
 /**
  * @defgroup HAL HAL Driver
  * @brief Hardware Abstraction Layer.
  * @details The HAL driver performs the system initialization and includes
- * the platform support code shared by the other drivers. This driver does
- * contain any API function except for a general initialization function
- * @p halInit() that must be invoked before any HAL service can be used,
- * usually the HAL initialization is performed immediately before the
- * kernel initialization.
+ * the platform support code shared by the other drivers.
  *
  * @ingroup IO
  */
@@ -94,6 +76,13 @@
 /**
  * @defgroup HAL_LLD HAL Low Level Driver
  * @brief @ref HAL low level driver template.
+ *
+ * @ingroup HAL
+ */
+
+/**
+ * @defgroup HAL_CONF Configuration
+ * @brief @ref HAL Configuration.
  *
  * @ingroup HAL
  */
@@ -113,14 +102,12 @@
  * in order to support specific features but, of course, the use of such
  * interfaces would not be portable. Such interfaces shall be marked with
  * the architecture name inside the function names.
- * @pre     In order to use the ADC driver the @p CH_HAL_USE_PAL option
- *          must be enabled in @p halconf.h.
  *
- * @section pal_1 Implementation Rules
+ * <h2>Implementation Rules</h2>
  * In implementing an @ref PAL_LLD there are some rules/behaviors that
  * should be respected.
  *
- * @subsection pal_1_1 Writing on input pads
+ * <h3>Writing on input pads</h3>
  * The behavior is not specified but there are implementations better than
  * others, this is the list of possible implementations, preferred options
  * are on top:
@@ -131,7 +118,7 @@
  *    pull up/down resistors or changing the pad direction. This scenario is
  *    discouraged, please try to avoid this scenario.
  * .
- * @subsection pal_1_2 Reading from output pads
+ * <h3>Reading from output pads</h3>
  * The behavior is not specified but there are implementations better than
  * others, this is the list of possible implementations, preferred options
  * are on top:
@@ -139,14 +126,19 @@
  * -# The output latch value is read (regardless of the actual pads states).
  * -# Unspecified, please try to avoid this scenario.
  * .
- * @subsection pal_1_3 Writing unused or unimplemented port bits
+ * <h3>Writing unused or unimplemented port bits</h3>
  * The behavior is not specified.
  *
- * @subsection pal_1_4 Reading from unused or unimplemented port bits
+ * <h3>Reading from unused or unimplemented port bits</h3>
  * The behavior is not specified.
  *
- * @subsection pal_1_5 Reading or writing on pins associated to other functionalities
+ * <h3>Reading or writing on pins associated to other functionalities</h3>
  * The behavior is not specified.
+ *
+ * <h2>Usage</h2>
+ * The use of I/O ports requires the inclusion of the header file @p pal.h,
+ * this file is not automatically included @p ch.h like the other header
+ * files.
  *
  * @ingroup IO
  */
@@ -154,9 +146,7 @@
 /**
  * @defgroup PAL_LLD PAL Low Level Driver
  * @brief @ref PAL low level driver template.
- * @details This file is a template for an I/O port low level driver not an
- * actual implementation. This template is only meant as documentation of
- * a generic @ref PAL_LLD entry points.
+ * @details This file is a template for an I/O port low level driver.
  *
  * @ingroup PAL
  */
@@ -171,8 +161,6 @@
  * events.<br>
  * The  module also contains functions that make the implementation of the
  * interrupt service routines much easier.
- * @pre     In order to use the ADC driver the @p CH_HAL_USE_SERIAL option
- *          must be enabled in @p halconf.h.
  *
  * @ingroup IO
  */
@@ -180,109 +168,38 @@
 /**
  * @defgroup SERIAL_LLD Serial Low Level Driver
  * @brief @ref SERIAL low level driver template.
- * @details This file is a template for a serial low level driver not an
- * actual implementation. This template is only meant as documentation of
- * a generic @ref SERIAL_LLD entry points.
+ * @details This file is a template for a serial low level driver.
  *
  * @ingroup SERIAL
  */
 
 /**
- * @defgroup I2C I2C Driver
- * @brief Generic I2C Driver.
- * @details This module implements a generic I2C driver.
- * @pre     In order to use the ADC driver the @p CH_HAL_USE_I2C option
- *          must be enabled in @p halconf.h.
- *
- * @section i2c_1 Driver State Machine
- * The driver implements a state machine internally, not all the driver
- * functionalities can be used in any moment, any transition not explicitly
- * shown in the following diagram has to be considered an error and shall
- * be captured by an assertion (if enabled).
- * @if LATEX_PDF
- * @else
- * @endif
- *
- * The driver is not thread safe for performance reasons, if you need to access
- * the I2C bus from multiple thread then use the @p i2cAcquireBus() and
- * @p i2cReleaseBus() APIs in order to gain exclusive access.
- *
- * @ingroup IO
- */
-
-/**
- * @defgroup I2C_LLD I2C Low Level Driver
- * @brief @ref I2C low level driver template.
- * @details This file is a template for an I2C low level driver not an
- * actual implementation. This template is only meant as documentation of
- * a generic @ref I2C_LLD entry points.
- *
- * @ingroup I2C
- */
-
-/**
  * @defgroup SPI SPI Driver
  * @brief Generic SPI Driver.
- * @details This module implements a generic SPI driver.
- * @pre     In order to use the ADC driver the @p CH_HAL_USE_SPI option
- *          must be enabled in @p halconf.h.
- *
- * @section spi_1 Driver State Machine
- * The driver implements a state machine internally, not all the driver
- * functionalities can be used in any moment, any transition not explicitly
- * shown in the following diagram has to be considered an error and shall
- * be captured by an assertion (if enabled).
- * @if LATEX_PDF
+ * @details This module implements a generic SPI driver. The driver implements
+ *          a state machine internally:
  * @dot
   digraph example {
-    size="5, 7";
-    rankdir="LR";
-    node [shape=circle, fontname=Helvetica, fontsize=8, fixedsize="true", width="0.9", height="0.9"];
-    edge [fontname=Helvetica, fontsize=8];
-
-    stop  [label="SPI_STOP\nLow Power"];
-    uninit [label="SPI_UNINIT", style="bold"];
-    ready [label="SPI_READY\nClock Enabled"];
-    active [label="SPI_ACTIVE\nBus Active"];
-    complete [label="SPI_COMPLETE\nComplete"];
-
-    uninit -> stop [label="\n spiInit()", constraint=false];
-    stop -> ready [label="\nspiStart()"];
-    ready -> ready [label="\nspiSelect()\nspiUnselect()\nspiStart()"];
-    ready -> stop [label="\nspiStop()"];
-    stop -> stop [label="\nspiStop()"];
-    ready -> active [label="\nspiStartXXXI() (async)\nspiXXX() (sync)"];
-    active -> ready [label="\nsync return"];
-    active -> complete [label="\nasync callback\n>spc_endcb<"];
-    complete -> active [label="\nspiStartXXXI() (async)\nthen\ncallback return"];
-    complete -> ready [label="\ncallback return"];
-  }
- * @else
- * @dot
-  digraph example {
-    rankdir="LR";
-    node [shape=circle, fontname=Helvetica, fontsize=8, fixedsize="true", width="0.9", height="0.9"];
-    edge [fontname=Helvetica, fontsize=8];
-
-    stop  [label="SPI_STOP\nLow Power"];
-    uninit [label="SPI_UNINIT", style="bold"];
-    ready [label="SPI_READY\nClock Enabled"];
-    active [label="SPI_ACTIVE\nBus Active"];
-    complete [label="SPI_COMPLETE\nComplete"];
-
-    uninit -> stop [label="\n spiInit()", constraint=false];
-    stop -> ready [label="\nspiStart()"];
-    ready -> ready [label="\nspiSelect()\nspiUnselect()\nspiStart()"];
-    ready -> stop [label="\nspiStop()"];
-    stop -> stop [label="\nspiStop()"];
-    ready -> active [label="\nspiStartXXX() (async)\nspiXXX() (sync)"];
-    active -> ready [label="\nsync return"];
-    active -> complete [label="\nasync callback\n>spc_endcb<"];
-    complete -> active [label="\nspiStartXXXI() (async)\nthen\ncallback return"];
-    complete -> ready [label="\ncallback return"];
+      rankdir="LR";
+      node [shape=circle, fontname=Helvetica, fontsize=8, fixedsize="true", width="0.8", height="0.8"];
+      edge [fontname=Helvetica, fontsize=8];
+      uninit [label="SPI_UNINIT", style="bold"];
+      stop  [label="SPI_STOP\nLow Power"];
+      ready [label="SPI_READY\nClock Enabled"];
+      active [label="SPI_ACTIVE\nBus Active"];
+      uninit -> stop [label="spiInit()"];
+      stop -> ready [label="spiStart()"];
+      ready -> ready [label="spiStart()"];
+      ready -> ready [label="spiIgnore()"];
+      ready -> stop [label="spiStop()"];
+      stop -> stop [label="spiStop()"];
+      ready -> active [label="spiSelect()"];
+      active -> active [label="spiSelect()"];
+      active -> ready [label="spiUnselect()"];
+      ready -> ready [label="spiUnselect()"];
+      active -> active [label="spiIgnore()\nspiExchange()\nspiSend()\nspiReceive()"];
   }
  * @enddot
- * @endif
  *
  * The driver is not thread safe for performance reasons, if you need to access
  * the SPI bus from multiple thread then use the @p spiAcquireBus() and
@@ -294,9 +211,7 @@
 /**
  * @defgroup SPI_LLD SPI Low Level Driver
  * @brief @ref SPI low level driver template.
- * @details This file is a template for an SPI low level driver not an
- * actual implementation. This template is only meant as documentation of
- * a generic @ref SPI_LLD entry points.
+ * @details This file is a template for a SPI low level driver.
  *
  * @ingroup SPI
  */
@@ -304,111 +219,37 @@
 /**
  * @defgroup ADC ADC Driver
  * @brief Generic ADC Driver.
- * @details This module implements a generic ADC driver.
- * @pre     In order to use the ADC driver the @p CH_HAL_USE_ADC option
- *          must be enabled in @p halconf.h.
- *
- * @section adc_1 Driver State Machine
- * The driver implements a state machine internally, not all the driver
- * functionalities can be used in any moment, any transition not explicitly
- * shown in the following diagram has to be considered an error and shall
- * be captured by an assertion (if enabled).
- * @if LATEX_PDF
+ * @details This module implements a generic ADC driver. The driver implements
+ *          a state machine internally:
  * @dot
   digraph example {
-    size="5, 7";
-    rankdir="LR";
-    node [shape=circle, fontname=Helvetica, fontsize=8, fixedsize="true", width="0.9", height="0.9"];
-    edge [fontname=Helvetica, fontsize=8];
-
-    stop  [label="ADC_STOP\nLow Power"];
-    uninit [label="ADC_UNINIT", style="bold"];
-    ready [label="ADC_READY\nClock Enabled"];
-    active [label="ADC_ACTIVE\nConverting"];
-    complete [label="ADC_COMPLETE\nComplete"];
-
-    uninit -> stop [label="\n adcInit()", constraint=false];
-    stop -> ready [label="\nadcStart()"];
-    ready -> ready [label="\nadcStart()\nadcStopConversion()"];
-    ready -> stop [label="\nadcStop()"];
-    stop -> stop [label="\nadcStop()"];
-    ready -> active [label="\nadcStartConversion() (async)\nadcConvert() (sync)"];
-    active -> ready [label="\nadcStopConversion()\nsync return"];
-    active -> active [label="\nasync callback (half buffer)\nasync callback (full buffer circular)\n>acg_endcb<"];
-    active -> complete [label="\nasync callback (full buffer)\n>acg_endcb<"];
-    complete -> active [label="\nadcStartConversionI()\nthen\ncallback return()"];
-    complete -> ready [label="\ncallback return"];
+      rankdir="LR";
+      node [shape=circle, fontname=Helvetica, fontsize=8, fixedsize="true", width="0.8", height="0.8"];
+      edge [fontname=Helvetica, fontsize=8];
+      uninit [label="ADC_UNINIT", style="bold"];
+      stop  [label="ADC_STOP\nLow Power"];
+      ready [label="ADC_READY\nClock Enabled"];
+      running [label="ADC_RUNNING"];
+      complete [label="ADC_COMPLETE"];
+      uninit -> stop [label="adcInit()"];
+      stop -> ready [label="adcStart()"];
+      ready -> ready [label="adcStart()"];
+      ready -> ready [label="adcWaitConversion()"];
+      ready -> stop [label="adcStop()"];
+      stop -> stop [label="adcStop()"];
+      ready -> running [label="adcStartConversion()"];
+      running -> ready [label="adcStopConversion()"];
+      running -> complete [label="End of Conversion"];
+      complete -> running [label="adcStartConversion()"];
+      complete -> ready [label="adcStopConversion()"];
+      complete -> ready [label="adcWaitConversion()"];
+      complete -> stop [label="adcStop()"];
   }
  * @enddot
- * @else
- * @dot
-  digraph example {
-    rankdir="LR";
-    node [shape=circle, fontname=Helvetica, fontsize=8, fixedsize="true", width="0.9", height="0.9"];
-    edge [fontname=Helvetica, fontsize=8];
-
-    stop  [label="ADC_STOP\nLow Power"];
-    uninit [label="ADC_UNINIT", style="bold"];
-    ready [label="ADC_READY\nClock Enabled"];
-    active [label="ADC_ACTIVE\nConverting"];
-    complete [label="ADC_COMPLETE\nComplete"];
-
-    uninit -> stop [label="\n adcInit()", constraint=false];
-    stop -> ready [label="\nadcStart()"];
-    ready -> ready [label="\nadcStart()\nadcStopConversion()"];
-    ready -> stop [label="\nadcStop()"];
-    stop -> stop [label="\nadcStop()"];
-    ready -> active [label="\nadcStartConversion() (async)\nadcConvert() (sync)"];
-    active -> ready [label="\nadcStopConversion()\nsync return"];
-    active -> active [label="\nasync callback (half buffer)\nasync callback (full buffer circular)\n>acg_endcb<"];
-    active -> complete [label="\nasync callback (full buffer)\n>acg_endcb<"];
-    complete -> active [label="\nadcStartConversionI()\nthen\ncallback return()"];
-    complete -> ready [label="\ncallback return"];
-  }
- * @enddot
- * @endif
  *
- * @section adc_2 ADC Operations
- * The ADC driver is quite complex, an explanation of the terminology and of
- * the operational details follows.
- *
- * @subsection adc_2_1 ADC Conversion Groups
- * The @p ADCConversionGroup is the objects that specifies a physical
- * conversion operation. This structure contains some standard fields and
- * several implementation-dependent fields.<br>
- * The standard fields define the CG mode, the number of channels belonging
- * to the CG and the optional callbacks.<br>
- * The implementation-dependent fields specify the physical ADC operation
- * mode, the analog channels belonging to the group and any other
- * implementation-specific setting. Usually the extra fields just mirror
- * the physical ADC registers, please refer to the vendor's MCU Reference
- * Manual for details about the available settings. Details are also available
- * into the documentation of the ADC low level drivers and in the various
- * sample applications.
- *
- * @subsection adc_2_2 ADC Conversion Modes
- * The driver supports several conversion modes:
- * - <b>One Shot</b>, the driver performs a single group conversion then stops.
- * - <b>Linear Buffer</b>, the driver performs a series of group conversions
- *   then stops. This mode is like a one shot conversion repeated N times,
- *   the buffer pointer increases after each conversion. The buffer is
- *   organized as an S(CG)*N samples matrix, when S(CG) is the conversion
- *   group size (number of channels) and N is the buffer depth (number of
- *   repeated conversions).
- * - <b>Circular Buffer</b>, much like the linear mode but the operation does
- *   not stop when the buffer is filled, it is automatically restarted
- *   with the buffer pointer wrapping back to the buffer base.
- * .
- * @subsection adc_2_3 ADC Callbacks
- * The driver is able to invoke callbacks during the conversion process. A
- * callback is invoked when the operation has been completed or, in circular
- * mode, when the buffer has been filled and the operation is restarted. In
- * linear and circular modes a callback is also invoked when the buffer is
- * half filled.<br>
- * The "half filled" and "filled" callbacks in circular mode allow to
- * implement "streaming processing" of the sampled data, while the driver is
- * busy filling one half of the buffer the application can process the
- * other half, this allows for continuous interleaved operations.
+ * The driver supports a continuous conversion mode with circular buffer,
+ * callback functions allow to process the converted data in real time.
+ * Please refer to the documentation of the function @p adcStartConversion().
  *
  * @ingroup IO
  */
@@ -416,9 +257,7 @@
 /**
  * @defgroup ADC_LLD ADC Low Level Driver
  * @brief @ref ADC low level driver template.
- * @details This file is a template for an ADC low level driver not an
- * actual implementation. This template is only meant as documentation of
- * a generic @ref ADC_LLD entry points.
+ * @details This file is a template for a ADC low level driver.
  *
  * @ingroup ADC
  */
@@ -426,71 +265,29 @@
 /**
  * @defgroup CAN CAN Driver
  * @brief Generic CAN Driver.
- * @details This module implements a generic ADC driver.
- * @pre     In order to use the ADC driver the @p CH_HAL_USE_CAN option
- *          must be enabled in @p halconf.h.
- *
- * @section can_1 Driver State Machine
- * The driver implements a state machine internally, not all the driver
- * functionalities can be used in any moment, any transition not explicitly
- * shown in the following diagram has to be considered an error and shall
- * be captured by an assertion (if enabled).
- * @if LATEX_PDF
+ * @details This module implements a generic ADC driver. The driver implements
+ *          a state machine internally:
  * @dot
   digraph example {
-    size="5, 7";
-    rankdir="LR";
-    node [shape=circle, fontname=Helvetica, fontsize=8, fixedsize="true", width="0.9", height="0.9"];
-    edge [fontname=Helvetica, fontsize=8];
-
-    stop  [label="CAN_STOP\nLow Power"];
-    uninit [label="CAN_UNINIT", style="bold"];
-    starting [label="CAN_STARTING\nInitializing"];
-    ready [label="CAN_READY\nClock Enabled"];
-    sleep [label="CAN_SLEEP\nLow Power"];
-
-    uninit -> stop [label=" canInit()", constraint=false];
-    stop -> stop [label="\ncanStop()"];
-    stop -> ready [label="\ncanStart()\n(fast implementation)"];
-    stop -> starting [label="\ncanStart()\n(slow implementation)"];
-    starting -> starting [label="\ncanStart()\n(other thread)"];
-    starting -> ready [label="\ninitialization complete\n(all threads)"];
-    ready -> stop [label="\ncanStop()"];
-    ready -> ready [label="\ncanStart()\ncanReceive()\ncanTransmit()"];
-    ready -> sleep [label="\ncanSleep()"];
-    sleep -> sleep [label="\ncanSleep()"];
-    sleep -> ready [label="\ncanWakeup()"];
-    sleep -> ready [label="\nhardware\nwakeup event"];
+      rankdir="LR";
+      node [shape=circle, fontname=Helvetica, fontsize=8, fixedsize="true", width="0.8", height="0.8"];
+      edge [fontname=Helvetica, fontsize=8];
+      uninit [label="CAN_UNINIT", style="bold"];
+      stop  [label="CAN_STOP\nLow Power"];
+      ready [label="CAN_READY\nClock Enabled"];
+      sleep [label="CAN_SLEEP\nLow Power"];
+      uninit -> stop [label="canInit()"];
+      stop -> stop [label="canStop()"];
+      stop -> ready [label="canStart()"];
+      ready -> stop [label="canStop()"];
+      ready -> ready [label="canReceive()\ncanTransmit()"];
+      ready -> ready [label="canStart()"];
+      ready -> sleep [label="canSleep()"];
+      sleep -> sleep [label="canSleep()"];
+      sleep -> ready [label="canWakeup()"];
+      sleep -> ready [label="wakeup event"];
   }
  * @enddot
- * @else
- * @dot
-  digraph example {
-    rankdir="LR";
-    node [shape=circle, fontname=Helvetica, fontsize=8, fixedsize="true", width="0.9", height="0.9"];
-    edge [fontname=Helvetica, fontsize=8];
-
-    stop  [label="CAN_STOP\nLow Power"];
-    uninit [label="CAN_UNINIT", style="bold"];
-    starting [label="CAN_STARTING\nInitializing"];
-    ready [label="CAN_READY\nClock Enabled"];
-    sleep [label="CAN_SLEEP\nLow Power"];
-
-    uninit -> stop [label=" canInit()", constraint=false];
-    stop -> stop [label="\ncanStop()"];
-    stop -> ready [label="\ncanStart()\n(fast implementation)"];
-    stop -> starting [label="\ncanStart()\n(slow implementation)"];
-    starting -> starting [label="\ncanStart()\n(other thread)"];
-    starting -> ready [label="\ninitialization complete\n(all threads)"];
-    ready -> stop [label="\ncanStop()"];
-    ready -> ready [label="\ncanStart()\ncanReceive()\ncanTransmit()"];
-    ready -> sleep [label="\ncanSleep()"];
-    sleep -> sleep [label="\ncanSleep()"];
-    sleep -> ready [label="\ncanWakeup()"];
-    sleep -> ready [label="\nhardware\nwakeup event"];
-  }
- * @enddot
- * @endif
  *
  * @ingroup IO
  */
@@ -498,9 +295,6 @@
 /**
  * @defgroup CAN_LLD CAN Low Level Driver
  * @brief @ref CAN low level driver template.
- * @details This file is a template for a CAN low level driver not an
- * actual implementation. This template is only meant as documentation of
- * a generic @ref CAN_LLD entry points.
  *
  * @ingroup CAN
  */
@@ -508,47 +302,23 @@
 /**
  * @defgroup PWM PWM Driver
  * @brief Generic PWM Driver.
- * @details This module implements a generic PWM driver.
- * @pre     In order to use the ADC driver the @p CH_HAL_USE_PWM option
- *          must be enabled in @p halconf.h.
- *
- * @section pwm_1 Driver State Machine
- * The driver implements a state machine internally, not all the driver
- * functionalities can be used in any moment, any transition not explicitly
- * shown in the following diagram has to be considered an error and shall
- * be captured by an assertion (if enabled).
+ * @details This module implements a generic PWM driver. The driver implements
+ *          a state machine internally:
  * @dot
   digraph example {
-    rankdir="LR";
-    node [shape=circle, fontname=Helvetica, fontsize=8, fixedsize="true", width="0.9", height="0.9"];
-    edge [fontname=Helvetica, fontsize=8];
-    uninit [label="PWM_UNINIT", style="bold"];
-    stop  [label="PWM_STOP\nLow Power"];
-    ready [label="PWM_READY\nClock Enabled"];
-    uninit -> stop [label="pwmInit()"];
-    stop -> stop [label="pwmStop()"];
-    stop -> ready [label="pwmStart()"];
-    ready -> stop [label="pwmStop()"];
-    ready -> ready [label="pwmEnableChannel()\npwmDisableChannel()"];
+      rankdir="LR";
+      node [shape=circle, fontname=Helvetica, fontsize=8, fixedsize="true", width="0.8", height="0.8"];
+      edge [fontname=Helvetica, fontsize=8];
+      uninit [label="PWM_UNINIT", style="bold"];
+      stop  [label="PWM_STOP\nLow Power"];
+      ready [label="PWM_READY\nClock Enabled"];
+      uninit -> stop [label="pwmInit()"];
+      stop -> stop [label="pwmStop()"];
+      stop -> ready [label="pwmStart()"];
+      ready -> stop [label="pwmStop()"];
+      ready -> ready [label="pwmEnableChannel()\npwmDisableChannel()"];
   }
  * @enddot
- *
- * @section pwm_1 PWM Operations.
- * This driver abstracts a generic PWM times composed of:
- * - A main up counter.
- * - A comparator register that resets the main counter to zero when the limit
- *   is reached. An optional callback can be generated when this happens.
- * - An array of @p PWM_CHANNELS PWM channels, each channel has an output,
- *   a comparator and is able to invoke an optional callback when a comparator
- *   match with the main counter happens.
- * .
- * A PWM channel output can be in two different states:
- * - <b>IDLE</b>, when the channel is disabled or after a match occurred.
- * - <b>ACTIVE</b>, when the channel is enabled and a match didn't occur yet
- *   in the current PWM cycle.
- * .
- * Note that the two states can be associated to both logical zero or one in
- * the @p PWMChannelConfig structure.
  *
  * @ingroup IO
  */
@@ -556,9 +326,6 @@
 /**
  * @defgroup PWM_LLD PWM Low Level Driver
  * @brief @ref PWM low level driver template.
- * @details This file is a template for a PWM low level driver not an
- * actual implementation. This template is only meant as documentation of
- * a generic @ref PWM_LLD entry points.
  *
  * @ingroup PWM
  */
@@ -568,8 +335,6 @@
  * @brief Generic MAC driver.
  * @details This module implements a generic interface for MAC (Media
  *          Access Control) drivers, as example Ethernet controllers.
- * @pre     In order to use the ADC driver the @p CH_HAL_USE_MAC option
- *          must be enabled in @p halconf.h.
  *
  * @ingroup IO
  */
@@ -577,9 +342,7 @@
 /**
  * @defgroup MAC_LLD MAC Low Level Driver
  * @brief @ref MAC low level driver template.
- * @details This file is a template for a MAC low level driver not an
- * actual implementation. This template is only meant as documentation of
- * a generic @ref MAC_LLD entry points.
+ * @details This file is a template for a MAC low level driver.
  *
  * @ingroup MAC
  */
@@ -588,97 +351,48 @@
  * @defgroup MMC_SPI MMC over SPI Driver
  * @brief Generic MMC driver.
  * @details This module implements a portable MMC driver that uses a SPI
- *          driver as physical layer.
- * @pre     In order to use the ADC driver the @p CH_HAL_USE_MMC_SPI option
- *          must be enabled in @p halconf.h.
- *
- * @section mmc_spi_1 Driver State Machine
- * The driver implements a state machine internally, not all the driver
- * functionalities can be used in any moment, any transition not explicitly
- * shown in the following diagram has to be considered an error and shall
- * be captured by an assertion (if enabled).
- * @if LATEX_PDF
+ *          driver as physical layer.<br>
+ *          The driver implements the following state machine:
  * @dot
   digraph example {
-    size="5, 7";
-    rankdir="LR";
-    node [shape=circle, fontname=Helvetica, fontsize=8, fixedsize="true", width="0.9", height="0.9"];
-    edge [fontname=Helvetica, fontsize=8];
+      rankdir="LR";
+      node [shape=circle, fontname=Helvetica, fontsize=8, fixedsize="true", width="0.8", height="0.8"];
+      edge [fontname=Helvetica, fontsize=8];
 
-    any [label="Any State"];
-    stop2 [label="MMC_STOP\nLow Power"];
-    uninit [label="MMC_UNINIT", style="bold"];
-    stop [label="MMC_STOP\nLow Power"];
-    wait [label="MMC_WAIT\nWaiting Card"];
-    inserted [label="MMC_INSERTED\nCard Inserted"];
-    ready [label="MMC_READY\nCard Ready"];
-    reading [label="MMC_READING\nReading"];
-    writing [label="MMC_WRITING\nWriting"];
+      any [label="Any State"];
+      stop2 [label="MMC_STOP\nLow Power"];
+      uninit [label="MMC_UNINIT", style="bold"];
+      stop [label="MMC_STOP\nLow Power"];
+      wait [label="MMC_WAIT\nWaiting Card"];
+      inserted [label="MMC_INSERTED\nCard Inserted"];
+      ready [label="MMC_READY\nCard Ready"];
+      reading [label="MMC_READING\nReading"];
+      writing [label="MMC_WRITING\nWriting"];
 
-    uninit -> stop [label="mmcInit()"];
-    stop -> wait [label="mmcStart()", constraint=false];
-    wait -> inserted [label="insertion (inserted event)"];
-    inserted -> inserted [label="mmcDisconnect()"];
-    inserted -> ready [label="mmcConnect()"];
-    ready -> ready [label="mmcConnect()"];
-    ready -> inserted [label="mmcDisconnect()"];
-    ready -> reading [label="mmcStartSequentialRead()"];
-    reading -> reading [label="mmcSequentialRead()"];
-    reading -> ready [label="mmcStopSequentialRead()"];
-    reading -> ready [label="read error"];
-    ready -> writing [label="mmcStartSequentialWrite()"];
-    writing -> writing [label="mmcSequentialWrite()"];
-    writing -> ready [label="mmcStopSequentialWrite()"];
-    writing -> ready [label="write error"];
-    inserted -> wait [label="removal (removed event)"];
-    ready -> wait [label="removal (removed event)"];
-    reading -> wait [label="removal (removed event)"];
-    writing -> wait [label="removal (removed event)"];
+      uninit -> stop [label="mmcInit()"];
+      stop -> wait [label="mmcStart()", constraint=false];
+      wait -> inserted [label="insertion (inserted event)"];
+      inserted -> inserted [label="mmcDisconnect()"];
+      inserted -> ready [label="mmcConnect()"];
+      ready -> ready [label="mmcConnect()"];
+      ready -> inserted [label="mmcDisconnect()"];
+      ready -> reading [label="mmcStartSequentialRead()"];
+      reading -> reading [label="mmcSequentialRead()"];
+      reading -> ready [label="mmcStopSequentialRead()"];
+      reading -> ready [label="read error"];
+      ready -> writing [label="mmcStartSequentialWrite()"];
+      writing -> writing [label="mmcSequentialWrite()"];
+      writing -> ready [label="mmcStopSequentialWrite()"];
+      writing -> ready [label="write error"];
 
-    any -> stop2 [label="mmcStop()"];
+      inserted -> wait [label="removal (removed event)"];
+      ready -> wait [label="removal (removed event)"];
+      reading -> wait [label="removal (removed event)"];
+      writing -> wait [label="removal (removed event)"];
+
+      any -> stop2 [label="mmcStop()"];
   }
  * @enddot
- * @else
- * @dot
-  digraph example {
-    rankdir="LR";
-    node [shape=circle, fontname=Helvetica, fontsize=8, fixedsize="true", width="0.9", height="0.9"];
-    edge [fontname=Helvetica, fontsize=8];
-
-    any [label="Any State"];
-    stop2 [label="MMC_STOP\nLow Power"];
-    uninit [label="MMC_UNINIT", style="bold"];
-    stop [label="MMC_STOP\nLow Power"];
-    wait [label="MMC_WAIT\nWaiting Card"];
-    inserted [label="MMC_INSERTED\nCard Inserted"];
-    ready [label="MMC_READY\nCard Ready"];
-    reading [label="MMC_READING\nReading"];
-    writing [label="MMC_WRITING\nWriting"];
-
-    uninit -> stop [label="mmcInit()"];
-    stop -> wait [label="mmcStart()", constraint=false];
-    wait -> inserted [label="insertion (inserted event)"];
-    inserted -> inserted [label="mmcDisconnect()"];
-    inserted -> ready [label="mmcConnect()"];
-    ready -> ready [label="mmcConnect()"];
-    ready -> inserted [label="mmcDisconnect()"];
-    ready -> reading [label="mmcStartSequentialRead()"];
-    reading -> reading [label="mmcSequentialRead()"];
-    reading -> ready [label="mmcStopSequentialRead()"];
-    reading -> ready [label="read error"];
-    ready -> writing [label="mmcStartSequentialWrite()"];
-    writing -> writing [label="mmcSequentialWrite()"];
-    writing -> ready [label="mmcStopSequentialWrite()"];
-    writing -> ready [label="write error"];
-    inserted -> wait [label="removal (removed event)"];
-    ready -> wait [label="removal (removed event)"];
-    reading -> wait [label="removal (removed event)"];
-    writing -> wait [label="removal (removed event)"];
-
-    any -> stop2 [label="mmcStop()"];
-  }
- * @enddot
- * @endif
  *
  * The MMC drivers currently supports only cards with capacity up to 2GB
  * and does not implement CRC checking. Hot plugging and removal are supported
@@ -688,117 +402,3 @@
  */
 
  
-/**
- * @defgroup UART UART Driver
- * @brief Generic UART Driver.
- * @details This driver abstracts a generic UART peripheral, the API is
- * designed to be:
- * - Unbuffered and copy-less, transfers are always directly performed
- *   from/to the application-level buffers without extra copy operations.
- * - Asynchronous, the API is always non blocking.
- * - Callbacks capable, operations completion and other events are notified
- *   via callbacks.
- * .
- * Special hardware features like deep hardware buffers, DMA transfers
- * are hidden to the user but fully supportable by the low level
- * implementations.<br>
- * This driver model is best used where communication events are meant to
- * drive an higher level state machine, as example:
- * - RS485 drivers.
- * - Multipoint network drivers.
- * - Serial protocol decoders.
- * .
- * If your application requires a synchronoyus buffered driver then the
- * @ref SERIAL should be used instead.
- * @pre     In order to use the ADC driver the @p CH_HAL_USE_UART option
- *          must be enabled in @p halconf.h.
- *
- * @section uart_1 Driver State Machine
- * The driver implements a state machine internally, not all the driver
- * functionalities can be used in any moment, any transition not explicitly
- * shown in the following diagram has to be considered an error and shall
- * be captured by an assertion (if enabled).
- * @dot
-  digraph example {
-    rankdir="LR";
-    node [shape=circle, fontname=Helvetica, fontsize=8, fixedsize="true", width="0.9", height="0.9"];
-    edge [fontname=Helvetica, fontsize=8];
-
-    uninit [label="UART_UNINIT", style="bold"];
-    stop  [label="UART_STOP\nLow Power"];
-    ready [label="UART_READY\nClock Enabled"];
-
-    uninit -> stop [label="\nuartInit()"];
-    stop -> ready [label="\nuartStart()"];
-    ready -> ready [label="\nuartStart()"];
-    ready -> stop [label="\nuartStop()"];
-    stop -> stop [label="\nuartStop()"];
-  }
- * @enddot
- *
- * @subsection uart_1_1 Transmitter sub State Machine
- * The follow diagram describes the transmitter state machine, this diagram
- * is valid while the driver is in the @p UART_READY state. This state
- * machine is automatically reset to the @p TX_IDLE state each time the
- * driver enters the @p UART_READY state.
- * @dot
-  digraph example {
-    rankdir="LR";
-    node [shape=circle, fontname=Helvetica, fontsize=8, fixedsize="true", width="0.9", height="0.9"];
-    edge [fontname=Helvetica, fontsize=8];
-
-    tx_idle [label="TX_IDLE", style="bold"];
-    tx_active [label="TX_ACTIVE"];
-    tx_complete [label="TX_COMPLETE"];
-    tx_fatal [label="Fatal Error", style="bold"];
-
-    tx_idle -> tx_active [label="\nuartStartSend()"];
-    tx_idle -> tx_idle [label="\nuartStopSend()\n>uc_txend2<"];
-    tx_active -> tx_complete [label="\nbuffer transmitted\n>uc_txend1<"];
-    tx_active -> tx_idle [label="\nuartStopSend()"];
-    tx_active -> tx_fatal [label="\nuartStartSend()"];
-    tx_complete -> tx_active [label="\nuartStartSendI()\nthen\ncallback return"];
-    tx_complete -> tx_idle [label="\ncallback return"];
-  }
- * @enddot
- *
- * @subsection uart_1_2 Receiver sub State Machine
- * The follow diagram describes the receiver state machine, this diagram
- * is valid while the driver is in the @p UART_READY state. This state
- * machine is automatically reset to the @p RX_IDLE state each time the
- * driver enters the @p UART_READY state.
- * @dot
-  digraph example {
-    rankdir="LR";
-    node [shape=circle, fontname=Helvetica, fontsize=8, fixedsize="true", width="0.9", height="0.9"];
-    edge [fontname=Helvetica, fontsize=8];
-
-    rx_idle [label="RX_IDLE", style="bold"];
-    rx_active [label="RX_ACTIVE"];
-    rx_complete [label="RX_COMPLETE"];
-    rx_fatal [label="Fatal Error", style="bold"];
-
-    rx_idle -> rx_idle [label="\nuartStopReceive()\n>uc_rxchar<\n>uc_rxerr<"];
-    rx_idle -> rx_active [label="\nuartStartReceive()"];
-
-    rx_active -> rx_complete [label="\nbuffer filled\n>uc_rxend<"];
-    rx_active -> rx_idle [label="\nuartStopReceive()"];
-    rx_active -> rx_active [label="\nreceive error\n>uc_rxerr<"];
-    rx_active -> rx_fatal [label="\nuartStartReceive()"];
-    rx_complete -> rx_active [label="\nuartStartReceiveI()\nthen\ncallback return"];
-    rx_complete -> rx_idle [label="\ncallback return"];
-  }
- * @enddot
- *
- * @ingroup IO
- */
-
-/**
- * @defgroup UART_LLD UART Low Level Driver
- * @brief @ref UART low level driver template.
- * @details This file is a template for a UART low level driver not an
- * actual implementation. This template is only meant as documentation of
- * a generic @ref UART_LLD entry points.
- *
- * @ingroup UART
- */
