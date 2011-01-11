@@ -38,7 +38,7 @@ endif
 
 # Enable this if you really want to use the STM FWLib.
 ifeq ($(USE_FWLIB),)
-  USE_FWLIB = no
+  USE_FWLIB = yes
 endif
 
 #
@@ -60,9 +60,10 @@ CHIBIOS = ../..
 include $(CHIBIOS)/boards/ST_STM3210C_EVAL/board.mk
 include $(CHIBIOS)/os/hal/platforms/STM32/platform.mk
 include $(CHIBIOS)/os/hal/hal.mk
-include $(CHIBIOS)/os/ports/GCC/ARMCMx/STM32/port.mk
+include $(CHIBIOS)/os/ports/GCC/ARMCMx/STM32F10x/port.mk
 include $(CHIBIOS)/os/kernel/kernel.mk
 include $(CHIBIOS)/test/test.mk
+include ./lwip/lwip.mk
 
 # C sources that can be compiled in ARM or THUMB mode depending on the global
 # setting.
@@ -74,6 +75,13 @@ CSRC = $(PORTSRC) \
        $(BOARDSRC) \
        $(CHIBIOS)/os/various/evtimer.c \
        $(CHIBIOS)/os/various/syscalls.c \
+       $(LWNETIFSRC) \
+       $(LWCORESRC) \
+       $(LWIPV4SRC) \
+       $(LWAPISRC) \
+       ./lwip/arch/sys_arch.c \
+       ./lwip/lwipthread.c \
+       ./web/web.c \
        main.c
 
 # C++ sources that can be compiled in ARM or THUMB mode depending on the global
@@ -101,11 +109,13 @@ TCSRC =
 TCPPSRC =
 
 # List ASM source files here
-ASMSRC = $(PORTASM)
+ASMSRC = $(PORTASM) \
+         $(CHIBIOS)/os/ports/GCC/ARMCMx/STM32F10x/vectors.s
 
 INCDIR = $(PORTINC) $(KERNINC) $(TESTINC) \
          $(HALINC) $(PLATFORMINC) $(BOARDINC) \
-         $(CHIBIOS)/os/various
+         $(CHIBIOS)/os/various \
+         $(LWINC) ./lwip
 
 #
 # Project, sources and paths
@@ -153,7 +163,7 @@ CPPWARN = -Wall -Wextra
 #
 
 # List all default C defines here, like -D_DEBUG=1
-DDEFS =
+DDEFS = -DCORTEX_USE_BASEPRI=TRUE -DLWIP_PROVIDE_ERRNO -DSTM32F10X_CL
 
 # List all default ASM defines here, like -D_DEBUG=1
 DADEFS =
@@ -201,4 +211,4 @@ ifeq ($(USE_FWLIB),yes)
   USE_OPT += -DUSE_STDPERIPH_DRIVER
 endif
 
-include $(CHIBIOS)/os/ports/GCC/ARMCMx/rules.mk
+include $(CHIBIOS)/os/ports/GCC/ARM/rules.mk

@@ -10,19 +10,28 @@
 
     ChibiOS/RT is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+    along with this program. If not, see <http://www.gnu.org/licenses/>.
+
+                                      ---
+
+    A special exception to the GPL can be applied should you wish to distribute
+    a combined work that includes ChibiOS/RT, without being obliged to provide
+    the source code for any proprietary components. See the file exception.txt
+    for full details of how and when the exception can be applied.
 */
 
 #include "ch.h"
 #include "hal.h"
 #include "test.h"
+#include "lwip/lwipthread.h"
+#include "web/web.h"
 
 /*
- * Red LED blinker thread, times are in milliseconds.
+ * Red LEDs blinker thread, times are in milliseconds.
  */
 static WORKING_AREA(waThread1, 128);
 static msg_t Thread1(void *arg) {
@@ -38,19 +47,13 @@ static msg_t Thread1(void *arg) {
 }
 
 /*
- * Application entry point.
+ * Entry point, note, the main() function is already a thread in the system
+ * on entry.
  */
-int main(void) {
+int main(int argc, char **argv) {
 
-  /*
-   * System initializations.
-   * - HAL initialization, this also initializes the configured device drivers
-   *   and performs the board-specific initializations.
-   * - Kernel initialization, the main() function becomes a thread and the
-   *   RTOS is active.
-   */
-  halInit();
-  chSysInit();
+  (void)argc;
+  (void)argv;
 
   /*
    * Activates the serial driver 2 using the driver default configuration.
@@ -61,6 +64,18 @@ int main(void) {
    * Creates the blinker thread.
    */
   chThdCreateStatic(waThread1, sizeof(waThread1), NORMALPRIO, Thread1, NULL);
+
+  /*
+   * Creates the LWIP threads (it changes priority internally).
+   */
+  chThdCreateStatic(wa_lwip_thread, LWIP_THREAD_STACK_SIZE, NORMALPRIO + 1,
+                    lwip_thread, NULL);
+
+  /*
+   * Creates the HTTP thread (it changes priority internally).
+   */
+  chThdCreateStatic(wa_http_server, sizeof(wa_http_server), NORMALPRIO + 1,
+                    http_server, NULL);
 
   /*
    * Normal main() thread activity, in this demo it does nothing except
