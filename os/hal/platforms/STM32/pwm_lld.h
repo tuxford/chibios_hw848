@@ -1,6 +1,5 @@
 /*
-    ChibiOS/RT - Copyright (C) 2006,2007,2008,2009,2010,
-                 2011 Giovanni Di Sirio.
+    ChibiOS/RT - Copyright (C) 2006,2007,2008,2009,2010,2011 Giovanni Di Sirio.
 
     This file is part of ChibiOS/RT.
 
@@ -11,11 +10,18 @@
 
     ChibiOS/RT is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+    along with this program. If not, see <http://www.gnu.org/licenses/>.
+
+                                      ---
+
+    A special exception to the GPL can be applied should you wish to distribute
+    a combined work that includes ChibiOS/RT, without being obliged to provide
+    the source code for any proprietary components. See the file exception.txt
+    for full details of how and when the exception can be applied.
 */
 
 /**
@@ -187,13 +193,13 @@ typedef struct {
   /**
    * @brief Channel active logic level.
    */
-  pwmmode_t                 mode;
+  pwmmode_t                 pcc_mode;
   /**
    * @brief Channel callback pointer.
    * @note  This callback is invoked on the channel compare event. If set to
    *        @p NULL then the callback is disabled.
    */
-  pwmcallback_t             callback;
+  pwmcallback_t             pcc_callback;
   /* End of the mandatory fields.*/
 } PWMChannelConfig;
 
@@ -206,25 +212,25 @@ typedef struct {
    * @note  This callback is invoked on PWM counter reset. If set to
    *        @p NULL then the callback is disabled.
    */
-  pwmcallback_t             callback;
+  pwmcallback_t             pc_callback;
   /**
    * @brief Channels configurations.
    */
-  PWMChannelConfig          channels[PWM_CHANNELS];
+  PWMChannelConfig          pc_channels[PWM_CHANNELS];
   /* End of the mandatory fields.*/
   /**
    * @brief TIM PSC (pre-scaler) register initialization data.
    */
-  uint16_t                  psc;
+  uint16_t                  pc_psc;
   /**
    * @brief TIM ARR (auto-reload) register initialization data.
    */
-  uint16_t                  arr;
+  uint16_t                  pc_arr;
   /**
    * @brief TIM CR2 register initialization data.
    * @note  The value of this field should normally be equal to zero.
    */
-  uint16_t                  cr2;
+  uint16_t                  pc_cr2;
 } PWMConfig;
 
 /**
@@ -234,11 +240,11 @@ struct PWMDriver {
   /**
    * @brief Driver state.
    */
-  pwmstate_t                state;
+  pwmstate_t                pd_state;
   /**
    * @brief Current driver configuration data.
    */
-  const PWMConfig           *config;
+  const PWMConfig           *pd_config;
 #if defined(PWM_DRIVER_EXT_FIELDS)
   PWM_DRIVER_EXT_FIELDS
 #endif
@@ -246,11 +252,11 @@ struct PWMDriver {
   /**
    * @brief Bit mask of the enabled channels.
    */
-  uint32_t                  enabled_channels;
+  uint32_t                  pd_enabled_channels;
   /**
    * @brief Pointer to the TIMx registers block.
    */
-  TIM_TypeDef               *tim;
+  TIM_TypeDef               *pd_tim;
 };
 
 /*===========================================================================*/
@@ -273,7 +279,7 @@ struct PWMDriver {
  *                      and/or the STM32 Reference Manual for the right clock
  *                      source.
  * @param[in] pwmclk    PWM clock frequency in cycles
- * @return              The value to be stored in the @p psc field of the
+ * @return              The value to be stored in the @p pc_psc field of the
  *                      @p PWMConfig structure.
  */
 #define PWM_COMPUTE_PSC(clksrc, pwmclk)                                     \
@@ -285,7 +291,7 @@ struct PWMDriver {
  *
  * @param[in] pwmclk    PWM clock frequency in cycles
  * @param[in] pwmperiod PWM cycle period in nanoseconds
- * @return              The value to be stored in the @p arr field of the
+ * @return              The value to be stored in the @p pc_arr field of the
  *                      @p PWMConfig structure.
  */
 #define PWM_COMPUTE_ARR(pwmclk, pwmperiod)                                  \
@@ -306,7 +312,7 @@ struct PWMDriver {
  * @api
  */
 #define PWM_FRACTION_TO_WIDTH(pwmp, numerator, denominator)                 \
-  ((uint16_t)((((uint32_t)(pwmp)->config->arr + 1UL) *                      \
+  ((uint16_t)((((uint32_t)(pwmp)->pd_config->pc_arr + 1UL) *                \
                (uint32_t)(denominator)) / (uint32_t)(numerator)))
 
 /**
