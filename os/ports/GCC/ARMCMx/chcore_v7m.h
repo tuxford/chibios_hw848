@@ -1,6 +1,5 @@
 /*
-    ChibiOS/RT - Copyright (C) 2006,2007,2008,2009,2010,
-                 2011 Giovanni Di Sirio.
+    ChibiOS/RT - Copyright (C) 2006,2007,2008,2009,2010,2011 Giovanni Di Sirio.
 
     This file is part of ChibiOS/RT.
 
@@ -11,11 +10,18 @@
 
     ChibiOS/RT is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+    along with this program. If not, see <http://www.gnu.org/licenses/>.
+
+                                      ---
+
+    A special exception to the GPL can be applied should you wish to distribute
+    a combined work that includes ChibiOS/RT, without being obliged to provide
+    the source code for any proprietary components. See the file exception.txt
+    for full details of how and when the exception can be applied.
 */
 
 /**
@@ -28,93 +34,6 @@
 
 #ifndef _CHCORE_V7M_H_
 #define _CHCORE_V7M_H_
-
-/*===========================================================================*/
-/* Port constants.                                                           */
-/*===========================================================================*/
-
-/*===========================================================================*/
-/* Port configurable parameters.                                             */
-/*===========================================================================*/
-
-/**
- * @brief   Simplified priority handling flag.
- * @details Activating this option will make the Kernel work in compact mode.
- */
-#ifndef CORTEX_SIMPLIFIED_PRIORITY
-#define CORTEX_SIMPLIFIED_PRIORITY      FALSE
-#endif
-
-/**
- * @brief   SVCALL handler priority.
- * @note    The default SVCALL handler priority is defaulted to
- *          @p CORTEX_MAXIMUM_PRIORITY+1, this reserves the
- *          @p CORTEX_MAXIMUM_PRIORITY priority level as fast interrupts
- *          priority level.
- */
-#ifndef CORTEX_PRIORITY_SVCALL
-#define CORTEX_PRIORITY_SVCALL          (CORTEX_MAXIMUM_PRIORITY + 1)
-#else
-/* If it is externally redefined then better perform a validity check on it.*/
-#if !CORTEX_IS_VALID_PRIORITY(CORTEX_PRIORITY_SVCALL)
-#error "invalid priority level specified for CORTEX_PRIORITY_SVCALL"
-#endif
-#endif
-
-/*===========================================================================*/
-/* Port derived parameters.                                                  */
-/*===========================================================================*/
-
-/**
- * @brief   BASEPRI level within kernel lock.
- * @note    In compact kernel mode this constant value is enforced to zero.
- */
-#if !CORTEX_SIMPLIFIED_PRIORITY || defined(__DOXYGEN__)
-#define CORTEX_BASEPRI_KERNEL                                               \
-  CORTEX_PRIORITY_MASK(CORTEX_PRIORITY_SVCALL+1)
-#else
-#define CORTEX_BASEPRI_KERNEL           0
-#endif
-
-/**
- * @brief   PendSV priority level.
- * @note    This priority is enforced to be equal to @p CORTEX_BASEPRI_KERNEL,
- *          this handler always have the highest priority that cannot preempt
- *          the kernel.
- */
-#define CORTEX_PRIORITY_PENDSV          CORTEX_BASEPRI_KERNEL
-
-/*===========================================================================*/
-/* Port exported info.                                                       */
-/*===========================================================================*/
-
-/**
- * @brief   Macro defining the specific ARM architecture.
- */
-#define CH_ARCHITECTURE_ARM_v7M
-
-/**
- * @brief   Name of the implemented architecture.
- */
-#define CH_ARCHITECTURE_NAME            "ARMv7-M"
-
-/**
- * @brief   Name of the architecture variant.
- */
-#if (CORTEX_MODEL == CORTEX_M3) || defined(__DOXYGEN__)
-#define CH_CORE_VARIANT_NAME            "Cortex-M3"
-#elif (CORTEX_MODEL == CORTEX_M4)
-#define CH_CORE_VARIANT_NAME            "Cortex-M4"
-#endif
-
-/**
- * @brief   Port-specific information string.
- */
-#if !CORTEX_SIMPLIFIED_PRIORITY || defined(__DOXYGEN__)
-#define CH_PORT_INFO                    "Advanced kernel mode"
-#else
-#define CH_PORT_INFO                    "Compact kernel mode"
-#endif
 
 /*===========================================================================*/
 /* Port implementation part.                                                 */
@@ -136,13 +55,57 @@ struct intctx {
   regarm_t      r4;
   regarm_t      r5;
   regarm_t      r6;
+#ifndef CH_CURRP_REGISTER_CACHE
   regarm_t      r7;
+#endif
   regarm_t      r8;
   regarm_t      r9;
   regarm_t      r10;
   regarm_t      r11;
   regarm_t      lr;
 };
+#endif
+
+/**
+ * @brief   Platform dependent part of the @p chThdCreateI() API.
+ * @details This code usually setup the context switching frame represented
+ *          by an @p intctx structure.
+ */
+#define SETUP_CONTEXT(workspace, wsize, pf, arg) {                          \
+  tp->p_ctx.r13 = (struct intctx *)((uint8_t *)workspace +                  \
+                                     wsize -                                \
+                                     sizeof(struct intctx));                \
+  tp->p_ctx.r13->r4 = pf;                                                   \
+  tp->p_ctx.r13->r5 = arg;                                                  \
+  tp->p_ctx.r13->lr = _port_thread_start;                                   \
+}
+
+/**
+ * @brief   Stack size for the system idle thread.
+ * @details This size depends on the idle thread implementation, usually
+ *          the idle thread should take no more space than those reserved
+ *          by @p INT_REQUIRED_STACK.
+ * @note    In this port it is set to 8 because the idle thread does have
+ *          a stack frame when compiling without optimizations. You may
+ *          reduce this value to zero when compiling with optimizations.
+ */
+#ifndef IDLE_THREAD_STACK_SIZE
+#define IDLE_THREAD_STACK_SIZE      8
+#endif
+
+/**
+ * @brief   Per-thread stack overhead for interrupts servicing.
+ * @details This constant is used in the calculation of the correct working
+ *          area size.
+ *          This value can be zero on those architecture where there is a
+ *          separate interrupt stack and the stack space between @p intctx and
+ *          @p extctx is known to be zero.
+ * @note    In this port it is conservatively set to 16 because the function
+ *          @p chSchDoRescheduleI() can have a stack frame, expecially with
+ *          compiler optimizations disabled.
+ */
+#ifndef INT_REQUIRED_STACK
+#define INT_REQUIRED_STACK          16
 #endif
 
 /**
@@ -180,8 +143,6 @@ struct intctx {
   SCB_AIRCR = AIRCR_VECTKEY | AIRCR_PRIGROUP(0);                            \
   NVICSetSystemHandlerPriority(HANDLER_SVCALL,                              \
     CORTEX_PRIORITY_MASK(CORTEX_PRIORITY_SVCALL));                          \
-  NVICSetSystemHandlerPriority(HANDLER_PENDSV,                              \
-    CORTEX_PRIORITY_MASK(CORTEX_PRIORITY_PENDSV));                          \
   NVICSetSystemHandlerPriority(HANDLER_SYSTICK,                             \
     CORTEX_PRIORITY_MASK(CORTEX_PRIORITY_SYSTICK));                         \
 }
@@ -192,20 +153,16 @@ struct intctx {
  *          more actions.
  * @note    In this port this it raises the base priority to kernel level.
  */
-#if !CORTEX_SIMPLIFIED_PRIORITY || defined(__DOXYGEN__)
-#if CH_OPTIMIZE_SPEED || defined(__DOXYGEN__)
+#if CH_OPTIMIZE_SPEED
 #define port_lock() {                                                       \
   register uint32_t tmp asm ("r3") = CORTEX_BASEPRI_KERNEL;                 \
   asm volatile ("msr     BASEPRI, %0" : : "r" (tmp) : "memory");            \
 }
-#else /* !CH_OPTIMIZE_SPEED */
+#else
 #define port_lock() {                                                       \
   asm volatile ("bl      _port_lock" : : : "r3", "lr", "memory");           \
 }
-#endif /* !CH_OPTIMIZE_SPEED */
-#else /* CORTEX_SIMPLIFIED_PRIORITY */
-#define port_lock() asm volatile ("cpsid   i" : : : "memory")
-#endif /* CORTEX_SIMPLIFIED_PRIORITY */
+#endif
 
 /**
  * @brief   Kernel-unlock action.
@@ -213,20 +170,16 @@ struct intctx {
  *          more actions.
  * @note    In this port this it lowers the base priority to user level.
  */
-#if !CORTEX_SIMPLIFIED_PRIORITY || defined(__DOXYGEN__)
-#if CH_OPTIMIZE_SPEED || defined(__DOXYGEN__)
+#if CH_OPTIMIZE_SPEED
 #define port_unlock() {                                                     \
   register uint32_t tmp asm ("r3") = CORTEX_BASEPRI_DISABLED;               \
   asm volatile ("msr     BASEPRI, %0" : : "r" (tmp) : "memory");            \
 }
-#else /* !CH_OPTIMIZE_SPEED */
+#else
 #define port_unlock() {                                                     \
   asm volatile ("bl      _port_unlock" : : : "r3", "lr", "memory");         \
 }
-#endif /* !CH_OPTIMIZE_SPEED */
-#else /* CORTEX_SIMPLIFIED_PRIORITY */
-#define port_unlock() asm volatile ("cpsie   i" : : : "memory")
-#endif /* CORTEX_SIMPLIFIED_PRIORITY */
+#endif
 
 /**
  * @brief   Kernel-lock action from an interrupt handler.
@@ -259,29 +212,21 @@ struct intctx {
  * @note    Interrupt sources above kernel level remains enabled.
  * @note    In this port it raises/lowers the base priority to kernel level.
  */
-#if !CORTEX_SIMPLIFIED_PRIORITY || defined(__DOXYGEN__)
 #define port_suspend() {                                                    \
   register uint32_t tmp asm ("r3") = CORTEX_BASEPRI_KERNEL;                 \
   asm volatile ("msr     BASEPRI, %0                    \n\t"               \
                 "cpsie   i" : : "r" (tmp) : "memory");                      \
 }
-#else /* CORTEX_SIMPLIFIED_PRIORITY */
-#define port_suspend() asm volatile ("cpsid   i" : : : "memory")
-#endif /* CORTEX_SIMPLIFIED_PRIORITY */
 
 /**
  * @brief   Enables all the interrupt sources.
  * @note    In this port it lowers the base priority to user level.
  */
-#if !CORTEX_SIMPLIFIED_PRIORITY || defined(__DOXYGEN__)
 #define port_enable() {                                                     \
   register uint32_t tmp asm ("r3") = CORTEX_BASEPRI_DISABLED;               \
   asm volatile ("msr     BASEPRI, %0                    \n\t"               \
                 "cpsie   i" : : "r" (tmp) : "memory");                      \
 }
-#else /* CORTEX_SIMPLIFIED_PRIORITY */
-#define port_enable() asm volatile ("cpsie   i" : : : "memory")
-#endif /* CORTEX_SIMPLIFIED_PRIORITY */
 
 /**
  * @brief   Enters an architecture-dependent IRQ-waiting mode.

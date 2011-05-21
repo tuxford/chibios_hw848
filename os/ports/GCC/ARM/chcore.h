@@ -1,6 +1,5 @@
 /*
-    ChibiOS/RT - Copyright (C) 2006,2007,2008,2009,2010,
-                 2011 Giovanni Di Sirio.
+    ChibiOS/RT - Copyright (C) 2006,2007,2008,2009,2010,2011 Giovanni Di Sirio.
 
     This file is part of ChibiOS/RT.
 
@@ -11,11 +10,18 @@
 
     ChibiOS/RT is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+    along with this program. If not, see <http://www.gnu.org/licenses/>.
+
+                                      ---
+
+    A special exception to the GPL can be applied should you wish to distribute
+    a combined work that includes ChibiOS/RT, without being obliged to provide
+    the source code for any proprietary components. See the file exception.txt
+    for full details of how and when the exception can be applied.
 */
 
 /**
@@ -155,7 +161,9 @@ struct intctx {
   regarm_t      r4;
   regarm_t      r5;
   regarm_t      r6;
+#ifndef CH_CURRP_REGISTER_CACHE
   regarm_t      r7;
+#endif
   regarm_t      r8;
   regarm_t      r9;
   regarm_t      r10;
@@ -190,12 +198,12 @@ struct context {
  * @brief   Stack size for the system idle thread.
  * @details This size depends on the idle thread implementation, usually
  *          the idle thread should take no more space than those reserved
- *          by @p PORT_INT_REQUIRED_STACK.
+ *          by @p INT_REQUIRED_STACK.
  * @note    In this port it is set to 4 because the idle thread does have
  *          a stack frame when compiling without optimizations.
  */
-#ifndef PORT_IDLE_THREAD_STACK_SIZE
-#define PORT_IDLE_THREAD_STACK_SIZE     4
+#ifndef IDLE_THREAD_STACK_SIZE
+#define IDLE_THREAD_STACK_SIZE      4
 #endif
 
 /**
@@ -208,8 +216,8 @@ struct context {
  * @note    In this port 0x10 is a safe value, it can be reduced after careful
  *          analysis of the generated code.
  */
-#ifndef PORT_INT_REQUIRED_STACK
-#define PORT_INT_REQUIRED_STACK         0x10
+#ifndef INT_REQUIRED_STACK
+#define INT_REQUIRED_STACK          0x10
 #endif
 
 /**
@@ -223,7 +231,7 @@ struct context {
 #define THD_WA_SIZE(n) STACK_ALIGN(sizeof(Thread) +                         \
                                    sizeof(struct intctx) +                  \
                                    sizeof(struct extctx) +                  \
-                                  (n) + (PORT_INT_REQUIRED_STACK))
+                                  (n) + (INT_REQUIRED_STACK))
 
 /**
  * @brief   Static working area allocation.
