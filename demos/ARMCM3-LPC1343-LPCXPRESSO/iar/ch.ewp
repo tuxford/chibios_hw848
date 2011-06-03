@@ -523,6 +523,7 @@
         </option>
         <option>
           <name>AUserIncludes</name>
+          <state>$PROJ_DIR$\..\</state>
           <state>$PROJ_DIR$\..\..\..\os\ports\IAR\ARMCMx\LPC13xx</state>
           <state>$PROJ_DIR$\..\..\..\boards\EA_LPCXPRESSO_BB_1343</state>
         </option>
@@ -1387,6 +1388,7 @@
         </option>
         <option>
           <name>AUserIncludes</name>
+          <state>$PROJ_DIR$\..\</state>
           <state>$PROJ_DIR$\..\..\..\os\ports\IAR\ARMCMx\LPC13xx</state>
           <state>$PROJ_DIR$\..\..\..\boards\EA_LPCXPRESSO_BB_1343</state>
         </option>
@@ -1755,9 +1757,6 @@
           <name>$PROJ_DIR$\..\..\..\os\hal\include\hal.h</name>
         </file>
         <file>
-          <name>$PROJ_DIR$\..\..\..\os\hal\include\i2c.h</name>
-        </file>
-        <file>
           <name>$PROJ_DIR$\..\..\..\os\hal\include\mac.h</name>
         </file>
         <file>
@@ -1792,9 +1791,6 @@
         </file>
         <file>
           <name>$PROJ_DIR$\..\..\..\os\hal\src\hal.c</name>
-        </file>
-        <file>
-          <name>$PROJ_DIR$\..\..\..\os\hal\src\i2c.c</name>
         </file>
         <file>
           <name>$PROJ_DIR$\..\..\..\os\hal\src\mac.c</name>
