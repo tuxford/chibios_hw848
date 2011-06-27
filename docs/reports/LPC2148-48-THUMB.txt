@@ -5,11 +5,10 @@ Settings: CCLK=48, MAMCR=2, MAMTIM=3 (3 wait states)
 
 *** ChibiOS/RT test suite
 ***
-*** Kernel:       2.3.3unstable
-*** Compiler:     GCC 4.5.2
+*** Kernel:       2.2.4
+*** GCC Version:  4.5.2
 *** Architecture: ARM7
 *** Core Variant: ARM7TDMI
-*** Port Info:    Pure THUMB mode
 *** Platform:     LPC214x
 *** Test Board:   Olimex LPC-P2148
 
@@ -99,19 +98,19 @@ Settings: CCLK=48, MAMCR=2, MAMTIM=3 (3 wait states)
 --- Result: SUCCESS
 ----------------------------------------------------------------------------
 --- Test Case 11.1 (Benchmark, messages #1)
---- Score : 108146 msgs/S, 216292 ctxswc/S
+--- Score : 106223 msgs/S, 212446 ctxswc/S
 --- Result: SUCCESS
 ----------------------------------------------------------------------------
 --- Test Case 11.2 (Benchmark, messages #2)
---- Score : 89014 msgs/S, 178028 ctxswc/S
+--- Score : 88032 msgs/S, 176064 ctxswc/S
 --- Result: SUCCESS
 ----------------------------------------------------------------------------
 --- Test Case 11.3 (Benchmark, messages #3)
---- Score : 89014 msgs/S, 178028 ctxswc/S
+--- Score : 88032 msgs/S, 176064 ctxswc/S
 --- Result: SUCCESS
 ----------------------------------------------------------------------------
 --- Test Case 11.4 (Benchmark, context switch)
---- Score : 412536 ctxswc/S
+--- Score : 412528 ctxswc/S
 --- Result: SUCCESS
 ----------------------------------------------------------------------------
 --- Test Case 11.5 (Benchmark, threads, full cycle)
@@ -131,11 +130,11 @@ Settings: CCLK=48, MAMCR=2, MAMTIM=3 (3 wait states)
 --- Result: SUCCESS
 ----------------------------------------------------------------------------
 --- Test Case 11.9 (Benchmark, I/O Queues throughput)
---- Score : 315532 bytes/S
+--- Score : 315528 bytes/S
 --- Result: SUCCESS
 ----------------------------------------------------------------------------
 --- Test Case 11.10 (Benchmark, virtual timers set/reset)
---- Score : 326304 timers/S
+--- Score : 326300 timers/S
 --- Result: SUCCESS
 ----------------------------------------------------------------------------
 --- Test Case 11.11 (Benchmark, semaphores wait/signal)
