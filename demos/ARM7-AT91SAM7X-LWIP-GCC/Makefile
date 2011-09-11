@@ -39,18 +39,18 @@ endif
 # Define project name here
 PROJECT = ch
 
-# Imported source files and paths
+# Define linker script file here
+LDSCRIPT= ch.ld
+
+# Imported source files
 CHIBIOS = ../..
 include $(CHIBIOS)/boards/OLIMEX_SAM7_EX256/board.mk
 include $(CHIBIOS)/os/hal/platforms/AT91SAM7/platform.mk
 include $(CHIBIOS)/os/hal/hal.mk
-include $(CHIBIOS)/os/ports/GCC/ARM/AT91SAM7/port.mk
+include $(CHIBIOS)/os/ports/GCC/ARM/port.mk
 include $(CHIBIOS)/os/kernel/kernel.mk
 include $(CHIBIOS)/test/test.mk
 include ./lwip/lwip.mk
-
-# Define linker script file here
-LDSCRIPT= $(PORTLD)/AT91SAM7X256.ld
 
 # C sources that can be compiled in ARM or THUMB mode depending on the global
 # setting.
@@ -95,11 +95,13 @@ TCSRC =
 TCPPSRC =
 
 # List ASM source files here
-ASMSRC = $(PORTASM)
+ASMSRC = $(PORTASM) \
+         $(CHIBIOS)/os/ports/GCC/ARM/AT91SAM7/vectors.s
 
 INCDIR = $(PORTINC) $(KERNINC) $(TESTINC) \
          $(HALINC) $(PLATFORMINC) $(BOARDINC) $(LWINC) \
          $(CHIBIOS)/os/various \
+         $(CHIBIOS)/os/ports/GCC/ARM/AT91SAM7 \
          ./lwip
 
 #
@@ -148,7 +150,7 @@ CPPWARN = -Wall -Wextra
 #
 
 # List all default C defines here, like -D_DEBUG=1
-DDEFS =
+DDEFS = -DLWIP_PROVIDE_ERRNO
 
 # List all default ASM defines here, like -D_DEBUG=1
 DADEFS =

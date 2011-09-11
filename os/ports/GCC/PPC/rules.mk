@@ -46,9 +46,7 @@ CPFLAGS += -MD -MP -MF .dep/$(@F).d
 #
 # Makefile rules
 #
-all: $(OBJS) $(PROJECT).elf $(PROJECT).hex $(PROJECT).bin $(PROJECT).dmp MAKE_ALL_RULE_HOOK
-
-MAKE_ALL_RULE_HOOK:
+all: $(OBJS) $(PROJECT).elf $(PROJECT).hex $(PROJECT).bin $(PROJECT).dmp
 
 $(CPPOBJS) : %.o : %.cpp
 	@echo
