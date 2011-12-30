@@ -1,6 +1,5 @@
 /*
-    ChibiOS/RT - Copyright (C) 2006,2007,2008,2009,2010,
-                 2011 Giovanni Di Sirio.
+    ChibiOS/RT - Copyright (C) 2006,2007,2008,2009,2010,2011 Giovanni Di Sirio.
 
     This file is part of ChibiOS/RT.
 
@@ -11,11 +10,18 @@
 
     ChibiOS/RT is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+    along with this program. If not, see <http://www.gnu.org/licenses/>.
+
+                                      ---
+
+    A special exception to the GPL can be applied should you wish to distribute
+    a combined work that includes ChibiOS/RT, without being obliged to provide
+    the source code for any proprietary components. See the file exception.txt
+    for full details of how and when the exception can be applied.
 */
 
         MODULE  ?chcoreasm_v7m
@@ -30,18 +36,17 @@
 #include "chconf.h"
 #include "chcore.h"
 
+EXTCTX_SIZE     SET 32
 CONTEXT_OFFSET  SET 12
 SCB_ICSR        SET 0xE000ED04
+ICSR_RETTOBASE  SET 0x00000800
 ICSR_PENDSVSET  SET 0x10000000
 
         SECTION .text:CODE:NOROOT(2)
 
         EXTERN  chThdExit
-        EXTERN  chSchDoReschedule
-#if CH_DBG_SYSTEM_STATE_CHECK
-        EXTERN  dbg_check_unlock
-        EXTERN  dbg_check_lock
-#endif
+        EXTERN  chSchIsRescRequiredExI
+        EXTERN  chSchDoRescheduleI
 
         THUMB
 
@@ -51,14 +56,8 @@ ICSR_PENDSVSET  SET 0x10000000
         PUBLIC _port_switch
 _port_switch:
         push    {r4, r5, r6, r7, r8, r9, r10, r11, lr}
-#if CORTEX_USE_FPU
-        vpush   {s16-s31}
-#endif
         str     sp, [r1, #CONTEXT_OFFSET]
         ldr     sp, [r0, #CONTEXT_OFFSET]
-#if CORTEX_USE_FPU
-        vpop    {s16-s31}
-#endif
         pop     {r4, r5, r6, r7, r8, r9, r10, r11, pc}
 
 /*
@@ -67,9 +66,6 @@ _port_switch:
  */
         PUBLIC  _port_thread_start
 _port_thread_start:
-#if CH_DBG_SYSTEM_STATE_CHECK
-        bl      dbg_check_unlock
-#endif
 #if CORTEX_SIMPLIFIED_PRIORITY
         cpsie   i
 #else
@@ -85,16 +81,11 @@ _port_thread_start:
  * Exception handlers return here for context switching.
  */
         PUBLIC  _port_switch_from_isr
-        PUBLIC  _port_exit_from_isr
 _port_switch_from_isr:
-#if CH_DBG_SYSTEM_STATE_CHECK
-        bl      dbg_check_lock
-#endif
-        bl      chSchDoReschedule
-#if CH_DBG_SYSTEM_STATE_CHECK
-        bl      dbg_check_unlock
-#endif
-_port_exit_from_isr:
+        bl      chSchIsRescRequiredExI
+        cbz     r0, .L2
+        bl      chSchDoRescheduleI
+.L2:
 #if CORTEX_SIMPLIFIED_PRIORITY
         mov     r3, #LWRD SCB_ICSR
         movt    r3, #HWRD SCB_ICSR
@@ -104,6 +95,69 @@ _port_exit_from_isr:
 .L3:    b       .L3
 #else
         svc     #0
+#endif
+
+/*
+ * Reschedule verification and setup after an IRQ.
+ */
+        PUBLIC  _port_irq_epilogue
+_port_irq_epilogue:
+#if CORTEX_SIMPLIFIED_PRIORITY
+        cpsid   i
+#else
+        movs    r3, #CORTEX_BASEPRI_KERNEL
+        msr     BASEPRI, r3
+#endif
+        mov     r3, #LWRD SCB_ICSR
+        movt    r3, #HWRD SCB_ICSR
+        ldr     r3, [r3, #0]
+        ands    r3, r3, #ICSR_RETTOBASE
+        bne     .L8
+#if CORTEX_SIMPLIFIED_PRIORITY
+        cpsie   i
+#else
+        /* Note, R3 is already zero.*/
+        msr     BASEPRI, r3
+#endif
+        bx      lr
+.L8:
+        mrs     r3, PSP
+        subs    r3, r3, #EXTCTX_SIZE
+        msr     PSP, r3
+        ldr     r2, =_port_switch_from_isr
+        str     r2, [r3, #24]
+        mov     r2, #0x01000000
+        str     r2, [r3, #28]
+        bx      lr
+
+/*
+ * SVC vector.
+ * Discarding the current exception context and positioning the stack to
+ * point to the real one.
+ */
+#if !CORTEX_SIMPLIFIED_PRIORITY
+        PUBLIC  SVCallVector
+SVCallVector:
+        mrs     r3, PSP
+        adds    r3, r3, #EXTCTX_SIZE
+        msr     PSP, r3
+        movs    r3, #CORTEX_BASEPRI_DISABLED
+        msr     BASEPRI, r3
+        bx      lr
+#endif
+
+/*
+ * PendSV vector.
+ * Discarding the current exception context and positioning the stack to
+ * point to the real one.
+ */
+#if CORTEX_SIMPLIFIED_PRIORITY
+        PUBLIC  PendSVVector
+PendSVVector:
+        mrs     r3, PSP
+        adds    r3, r3, #EXTCTX_SIZE
+        msr     PSP, r3
+        bx      lr
 #endif
 
         END

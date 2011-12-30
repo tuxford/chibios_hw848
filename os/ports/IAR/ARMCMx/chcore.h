@@ -1,6 +1,5 @@
 /*
-    ChibiOS/RT - Copyright (C) 2006,2007,2008,2009,2010,
-                 2011 Giovanni Di Sirio.
+    ChibiOS/RT - Copyright (C) 2006,2007,2008,2009,2010,2011 Giovanni Di Sirio.
 
     This file is part of ChibiOS/RT.
 
@@ -11,11 +10,18 @@
 
     ChibiOS/RT is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+    along with this program. If not, see <http://www.gnu.org/licenses/>.
+
+                                      ---
+
+    A special exception to the GPL can be applied should you wish to distribute
+    a combined work that includes ChibiOS/RT, without being obliged to provide
+    the source code for any proprietary components. See the file exception.txt
+    for full details of how and when the exception can be applied.
 */
 
 /**
@@ -50,10 +56,9 @@
 #include "cmparams.h"
 
 /* Cortex model check, only M0 and M3 supported right now.*/
-#if (CORTEX_MODEL == CORTEX_M0) || (CORTEX_MODEL == CORTEX_M3) ||           \
-    (CORTEX_MODEL == CORTEX_M4)
-#elif (CORTEX_MODEL == CORTEX_M1)
-#error "untested Cortex-M model"
+#if (CORTEX_MODEL == CORTEX_M0) || (CORTEX_MODEL == CORTEX_M3)
+#elif (CORTEX_MODEL == CORTEX_M1) || (CORTEX_MODEL == CORTEX_M4)
+#error "untested Cortex-M model, manually remove this check in chcore.h"
 #else
 #error "unknown or unsupported Cortex-M model"
 #endif
@@ -105,8 +110,8 @@
  *          a stack frame when compiling without optimizations. You may
  *          reduce this value to zero when compiling with optimizations.
  */
-#if !defined(PORT_IDLE_THREAD_STACK_SIZE)
-#define PORT_IDLE_THREAD_STACK_SIZE     16
+#ifndef IDLE_THREAD_STACK_SIZE
+#define IDLE_THREAD_STACK_SIZE          16
 #endif
 
 /**
@@ -117,17 +122,17 @@
  *          separate interrupt stack and the stack space between @p intctx and
  *          @p extctx is known to be zero.
  * @note    In this port it is conservatively set to 16 because the function
- *          @p chSchDoReschedule() can have a stack frame, expecially with
+ *          @p chSchDoRescheduleI() can have a stack frame, expecially with
  *          compiler optimizations disabled.
  */
-#if !defined(PORT_INT_REQUIRED_STACK)
-#define PORT_INT_REQUIRED_STACK         16
+#ifndef INT_REQUIRED_STACK
+#define INT_REQUIRED_STACK              16
 #endif
 
 /**
  * @brief   Enables the use of the WFI instruction in the idle thread loop.
  */
-#if !defined(CORTEX_ENABLE_WFI_IDLE)
+#ifndef CORTEX_ENABLE_WFI_IDLE
 #define CORTEX_ENABLE_WFI_IDLE          FALSE
 #endif
 
@@ -136,11 +141,24 @@
  * @note    The default SYSTICK handler priority is calculated as the priority
  *          level in the middle of the numeric priorities range.
  */
-#if !defined(CORTEX_PRIORITY_SYSTICK)
+#ifndef CORTEX_PRIORITY_SYSTICK
 #define CORTEX_PRIORITY_SYSTICK         (CORTEX_PRIORITY_LEVELS >> 1)
-#elif !CORTEX_IS_VALID_PRIORITY(CORTEX_PRIORITY_SYSTICK)
+#else
 /* If it is externally redefined then better perform a validity check on it.*/
+#if !CORTEX_IS_VALID_PRIORITY(CORTEX_PRIORITY_SYSTICK)
 #error "invalid priority level specified for CORTEX_PRIORITY_SYSTICK"
+#endif
+#endif
+
+/**
+ * @brief   Stack alignment enforcement.
+ * @note    The default value is 64 in order to comply with EABI, reducing
+ *          the value to 32 can save some RAM space if you don't care about
+ *          binary compatibility with EABI compiled libraries.
+ * @note    Allowed values are 32 or 64.
+ */
+#ifndef CORTEX_STACK_ALIGNMENT
+#define CORTEX_STACK_ALIGNMENT          64
 #endif
 
 /*===========================================================================*/
@@ -155,11 +173,6 @@
  * @brief   Macro defining a generic ARM architecture.
  */
 #define CH_ARCHITECTURE_ARM
-
-/**
- * @brief   Name of the compiler supported by this port.
- */
-#define CH_COMPILER_NAME                "IAR"
 
 /*===========================================================================*/
 /* Port implementation part (common).                                        */
@@ -177,51 +190,80 @@
 #include <intrinsics.h>
 #include "nvic.h"
 
-/* The following declarations are there just for Doxygen documentation, the
-   real declarations are inside the sub-headers.*/
-#if defined(__DOXYGEN__)
-
 /**
  * @brief   Stack and memory alignment enforcement.
- * @note    In this architecture the stack alignment is enforced to 64 bits,
- *          32 bits alignment is supported by hardware but deprecated by ARM,
- *          the implementation choice is to not offer the option.
  */
+#if (CORTEX_STACK_ALIGNMENT == 64) || defined(__DOXYGEN__)
 typedef uint64_t stkalign_t;
+#elif CORTEX_STACK_ALIGNMENT == 32
+typedef uint32_t stkalign_t;
+#else
+#error "invalid stack alignment selected"
+#endif
 
+#if defined(__DOXYGEN__)
 /**
  * @brief   Interrupt saved context.
  * @details This structure represents the stack frame saved during a
  *          preemption-capable interrupt handler.
  * @note    It is implemented to match the Cortex-Mx exception context.
  */
-struct extctx {};
+struct extctx {
+  /* Dummy definition, just for Doxygen.*/
+};
 
 /**
  * @brief   System saved context.
  * @details This structure represents the inner stack frame during a context
  *          switching.
  */
-struct intctx {};
-
-#endif /* defined(__DOXYGEN__) */
+struct intctx {
+  /* Dummy definition, just for Doxygen.*/
+};
+#endif
 
 /**
- * @brief   Excludes the default @p chSchIsPreemptionRequired()implementation.
+ * @brief   Platform dependent part of the @p Thread structure.
+ * @details In this port the structure just holds a pointer to the @p intctx
+ *          structure representing the stack pointer at context switch time.
  */
-#define PORT_OPTIMIZED_ISPREEMPTIONREQUIRED
+struct context {
+  struct intctx *r13;
+};
 
-#if (CH_TIME_QUANTUM > 0) || defined(__DOXYGEN__)
 /**
- * @brief   Inlineable version of this kernel function.
+ * @brief   Platform dependent part of the @p chThdCreateI() API.
+ * @details This code usually setup the context switching frame represented
+ *          by an @p intctx structure.
  */
-#define chSchIsPreemptionRequired()                                         \
-  (rlist.r_preempt ? firstprio(&rlist.r_queue) > currp->p_prio :            \
-                     firstprio(&rlist.r_queue) >= currp->p_prio)
-#else /* CH_TIME_QUANTUM == 0 */
-#define chSchIsPreemptionRequired()                                         \
-  (firstprio(&rlist.r_queue) > currp->p_prio)
-#endif /* CH_TIME_QUANTUM == 0 */
+#define SETUP_CONTEXT(workspace, wsize, pf, arg) {                          \
+  tp->p_ctx.r13 = (struct intctx *)((uint8_t *)workspace +                  \
+                                     wsize -                                \
+                                     sizeof(struct intctx));                \
+  tp->p_ctx.r13->r4 = (void *)pf;                                           \
+  tp->p_ctx.r13->r5 = (void *)arg;                                          \
+  tp->p_ctx.r13->lr = (void *)_port_thread_start;                           \
+}
+
+/**
+ * @brief   Enforces a correct alignment for a stack area size value.
+ */
+#define STACK_ALIGN(n) ((((n) - 1) | (sizeof(stkalign_t) - 1)) + 1)
+
+/**
+ * @brief   Computes the thread working area global size.
+ */
+#define THD_WA_SIZE(n) STACK_ALIGN(sizeof(Thread) +                         \
+                                   sizeof(struct intctx) +                  \
+                                   sizeof(struct extctx) +                  \
+                                   (n) + (INT_REQUIRED_STACK))
+
+/**
+ * @brief   Static working area allocation.
+ * @details This macro is used to allocate a static thread working area
+ *          aligned as both position and size.
+ */
+#define WORKING_AREA(s, n) stkalign_t s[THD_WA_SIZE(n) / sizeof(stkalign_t)]
 
 #endif /* _FROM_ASM_ */
 
