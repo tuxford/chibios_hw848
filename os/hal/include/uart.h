@@ -16,6 +16,13 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+                                      ---
+
+    A special exception to the GPL can be applied should you wish to distribute
+    a combined work that includes ChibiOS/RT, without being obliged to provide
+    the source code for any proprietary components. See the file exception.txt
+    for full details of how and when the exception can be applied.
 */
 
 /**
@@ -35,17 +42,18 @@
 /* Driver constants.                                                         */
 /*===========================================================================*/
 
-/**
- * @name    UART status flags
- * @{
- */
-#define UART_NO_ERROR           0   /**< @brief No pending conditions.      */
-#define UART_PARITY_ERROR       4   /**< @brief Parity error happened.      */
-#define UART_FRAMING_ERROR      8   /**< @brief Framing error happened.     */
-#define UART_OVERRUN_ERROR      16  /**< @brief Overflow happened.          */
-#define UART_NOISE_ERROR        32  /**< @brief Noise on the line.          */
-#define UART_BREAK_DETECTED     64  /**< @brief Break detected.             */
-/** @} */
+/** @brief No pending conditions.*/
+#define UART_NO_ERROR           0
+/** @brief Parity error happened.*/
+#define UART_PARITY_ERROR       4
+/** @brief Framing error happened.*/
+#define UART_FRAMING_ERROR      8
+/** @brief Overflow happened.*/
+#define UART_OVERRUN_ERROR      16
+/** @brief Noise on the line.*/
+#define UART_NOISE_ERROR        32
+/** @brief Break detected.*/
+#define UART_BREAK_DETECTED     64
 
 /*===========================================================================*/
 /* Driver pre-compile time settings.                                         */

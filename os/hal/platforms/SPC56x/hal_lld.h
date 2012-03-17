@@ -16,6 +16,13 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+                                      ---
+
+    A special exception to the GPL can be applied should you wish to distribute
+    a combined work that includes ChibiOS/RT, without being obliged to provide
+    the source code for any proprietary components. See the file exception.txt
+    for full details of how and when the exception can be applied.
 */
 
 /**
@@ -34,11 +41,6 @@
 /*===========================================================================*/
 /* Driver constants.                                                         */
 /*===========================================================================*/
-
-/**
- * @brief   Defines the support for realtime counters in the HAL.
- */
-#define HAL_IMPLEMENTS_COUNTERS FALSE
 
 /**
  * @brief   Platform name.
@@ -118,7 +120,7 @@
  * @note    The effective divider factor is this value plus one.
  */
 #if !defined(SPC563_CLK_PREDIV) || defined(__DOXYGEN__)
-#define SPC563_CLK_PREDIV           1
+#define SPC563_CLK_PREDIV           0
 #endif
 
 /**
@@ -126,7 +128,7 @@
  * @note    Must be in range 32...96.
  */
 #if !defined(SPC563_CLK_MFD) || defined(__DOXYGEN__)
-#define SPC563_CLK_MFD              80
+#define SPC563_CLK_MFD              40
 #endif
 
 /**

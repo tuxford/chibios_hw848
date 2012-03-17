@@ -16,6 +16,13 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+                                      ---
+
+    A special exception to the GPL can be applied should you wish to distribute
+    a combined work that includes ChibiOS/RT, without being obliged to provide
+    the source code for any proprietary components. See the file exception.txt
+    for full details of how and when the exception can be applied.
 */
 
 /**
@@ -42,7 +49,7 @@
  */
 
 /**
- * @defgroup STM8L_PAL STM8L PAL Support
+ * @defgroup STM8L_PAL STM8L GPIO Support
  * @details The STM8L PAL driver uses the GPIO peripherals.
  *
  * @section stm8l_pal_1 Supported HW resources
@@ -85,7 +92,7 @@
  */
 
 /**
- * @defgroup STM8L_SERIAL STM8L Serial Support
+ * @defgroup STM8L_SERIAL STM8L USART Support (buffered)
  * @details The STM8L Serial driver uses the USART1 peripheral in a
  *          buffered, interrupt driven, implementation.
  *

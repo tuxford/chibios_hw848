@@ -16,6 +16,13 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+                                      ---
+
+    A special exception to the GPL can be applied should you wish to distribute
+    a combined work that includes ChibiOS/RT, without being obliged to provide
+    the source code for any proprietary components. See the file exception.txt
+    for full details of how and when the exception can be applied.
 */
 
 /**
@@ -90,11 +97,6 @@ typedef struct {
 typedef uint32_t ioportmask_t;
 
 /**
- * @brief   Digital I/O modes.
- */
-typedef uint32_t iomode_t;
-
-/**
  * @brief   Port Identifier.
  */
 typedef FIO * ioportid_t;
@@ -121,8 +123,6 @@ typedef FIO * ioportid_t;
 /**
  * @brief   FIO subsystem initialization.
  * @details Enables the access through the fast registers.
- *
- * @notapi
  */
 #define pal_lld_init(config) _pal_lld_init(config)
 
@@ -131,7 +131,7 @@ typedef FIO * ioportid_t;
  * @details This function is implemented by reading the FIO PIN register, the
  *          implementation has no side effects.
  *
- * @param[in] port      port identifier
+ * @param[in] port      the port identifier
  * @return              The port bits.
  *
  * @notapi
@@ -143,7 +143,7 @@ typedef FIO * ioportid_t;
  * @details This function is implemented by reading the FIO SET register, the
  *          implementation has no side effects.
  *
- * @param[in] port      port identifier
+ * @param[in] port      the port identifier
  * @return              The latched logical states.
  *
  * @notapi
@@ -155,8 +155,8 @@ typedef FIO * ioportid_t;
  * @details This function is implemented by writing the FIO PIN register, the
  *          implementation has no side effects.
  *
- * @param[in] port      port identifier
- * @param[in] bits      bits to be written on the specified port
+ * @param[in] port      the port identifier
+ * @param[in] bits      the bits to be written on the specified port
  *
  * @notapi
  */
@@ -167,8 +167,8 @@ typedef FIO * ioportid_t;
  * @details This function is implemented by writing the FIO SET register, the
  *          implementation has no side effects.
  *
- * @param[in] port      port identifier
- * @param[in] bits      bits to be ORed on the specified port
+ * @param[in] port      the port identifier
+ * @param[in] bits      the bits to be ORed on the specified port
  *
  * @notapi
  */
@@ -179,8 +179,8 @@ typedef FIO * ioportid_t;
  * @details This function is implemented by writing the FIO CLR register, the
  *          implementation has no side effects.
  *
- * @param[in] port      port identifier
- * @param[in] bits      bits to be cleared on the specified port
+ * @param[in] port      the port identifier
+ * @param[in] bits      the bits to be cleared on the specified port
  *
  * @notapi
  */
@@ -192,19 +192,20 @@ typedef FIO * ioportid_t;
  *          registers, the implementation is not atomic because the multiple
  *          accesses.
  *
- * @param[in] port      port identifier
- * @param[in] mask      group mask, a logical AND is performed on the
+ * @param[in] port      the port identifier
+ * @param[in] mask      the group mask, a logical AND is performed on the
  *                      output data
  * @param[in] offset    the group bit offset within the port
- * @param[in] bits      bits to be written. Values exceeding the group
+ * @param[in] bits      the bits to be written. Values exceeding the group
  *                      width are masked.
  *
  * @notapi
  */
-#define pal_lld_writegroup(port, mask, offset, bits)                    \
-  ((port)->FIO_MASK = ~((mask) << (offset)),                            \
-   (port)->FIO_PIN = (bits) << (offset),                                \
-   (port)->FIO_MASK = 0)
+#define pal_lld_writegroup(port, mask, offset, bits) {                  \
+  (port)->FIO_MASK = ~((mask) << (offset));                             \
+  (port)->FIO_PIN = (bits) << (offset);                                 \
+  (port)->FIO_MASK = 0;                                                 \
+}
 
 /**
  * @brief   Pads group mode setup.
@@ -215,21 +216,20 @@ typedef FIO * ioportid_t;
  * @note    This function does not alter the @p PINSELx registers. Alternate
  *          functions setup must be handled by device-specific code.
  *
- * @param[in] port      port identifier
- * @param[in] mask      group mask
- * @param[in] offset    group bit offset within the port
- * @param[in] mode      group mode
+ * @param[in] port      the port identifier
+ * @param[in] mask      the group mask
+ * @param[in] mode      the mode
  *
  * @notapi
  */
-#define pal_lld_setgroupmode(port, mask, offset, mode)                      \
-  _pal_lld_setgroupmode(port, mask << offset, mode)
+#define pal_lld_setgroupmode(port, mask, mode) \
+  _pal_lld_setgroupmode(port, mask, mode)
 
 /**
  * @brief   Writes a logical state on an output pad.
  *
- * @param[in] port      port identifier
- * @param[in] pad       pad number within the port
+ * @param[in] port      the port identifier
+ * @param[in] pad       the pad number within the port
  * @param[in] bit       logical value, the value must be @p PAL_LOW or
  *                      @p PAL_HIGH
  *
@@ -243,7 +243,9 @@ typedef FIO * ioportid_t;
  *
  * @notapi
  */
-#define pal_lld_lpc214x_set_direction(port, dir) ((port)->FIO_DIR = (dir))
+#define pal_lld_lpc214x_set_direction(port, dir) {                      \
+  (port)->FIO_DIR = (dir);                                              \
+}
 
 extern const PALConfig pal_default_config;
 
@@ -253,7 +255,7 @@ extern "C" {
   void _pal_lld_init(const PALConfig *config);
   void _pal_lld_setgroupmode(ioportid_t port,
                              ioportmask_t mask,
-                             iomode_t mode);
+                             uint_fast8_t mode);
 #ifdef __cplusplus
 }
 #endif

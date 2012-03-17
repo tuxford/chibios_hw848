@@ -16,6 +16,13 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+                                      ---
+
+    A special exception to the GPL can be applied should you wish to distribute
+    a combined work that includes ChibiOS/RT, without being obliged to provide
+    the source code for any proprietary components. See the file exception.txt
+    for full details of how and when the exception can be applied.
 */
 
 /**
@@ -265,7 +272,7 @@ void sd_lld_start(SerialDriver *sdp, const SerialConfig *config) {
     if (&SD1 == sdp) {
       LPC_SYSCON->SYSAHBCLKCTRL |= (1 << 12);
       LPC_SYSCON->UARTCLKDIV = LPC13xx_SERIAL_UART0CLKDIV;
-      nvicEnableVector(UART_IRQn,
+      NVICEnableVector(UART_IRQn,
                        CORTEX_PRIORITY_MASK(LPC13xx_SERIAL_UART0_IRQ_PRIORITY));
     }
 #endif
@@ -290,7 +297,7 @@ void sd_lld_stop(SerialDriver *sdp) {
     if (&SD1 == sdp) {
       LPC_SYSCON->UARTCLKDIV = 0;
       LPC_SYSCON->SYSAHBCLKCTRL &= ~(1 << 12);
-      nvicDisableVector(UART_IRQn);
+      NVICDisableVector(UART_IRQn);
       return;
     }
 #endif

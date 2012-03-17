@@ -16,6 +16,13 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+                                      ---
+
+    A special exception to the GPL can be applied should you wish to distribute
+    a combined work that includes ChibiOS/RT, without being obliged to provide
+    the source code for any proprietary components. See the file exception.txt
+    for full details of how and when the exception can be applied.
 */
 
 /**
@@ -30,10 +37,6 @@
 #include "hal.h"
 
 #if HAL_USE_SERIAL || defined(__DOXYGEN__)
-
-/*===========================================================================*/
-/* Driver local definitions.                                                 */
-/*===========================================================================*/
 
 /*===========================================================================*/
 /* Driver exported variables.                                                */
@@ -211,7 +214,6 @@ void sdStop(SerialDriver *sdp) {
  */
 void sdIncomingDataI(SerialDriver *sdp, uint8_t b) {
 
-  chDbgCheckClassI();
   chDbgCheck(sdp != NULL, "sdIncomingDataI");
 
   if (chIQIsEmptyI(&sdp->iqueue))
@@ -238,7 +240,6 @@ void sdIncomingDataI(SerialDriver *sdp, uint8_t b) {
 msg_t sdRequestDataI(SerialDriver *sdp) {
   msg_t  b;
 
-  chDbgCheckClassI();
   chDbgCheck(sdp != NULL, "sdRequestDataI");
 
   b = chOQGetI(&sdp->oqueue);

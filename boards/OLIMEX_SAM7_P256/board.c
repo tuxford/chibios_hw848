@@ -16,6 +16,13 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+                                      ---
+
+    A special exception to the GPL can be applied should you wish to distribute
+    a combined work that includes ChibiOS/RT, without being obliged to provide
+    the source code for any proprietary components. See the file exception.txt
+    for full details of how and when the exception can be applied.
 */
 
 #include "ch.h"
@@ -84,14 +91,13 @@ void boardInit(void) {
   /*
    * buttons setup.
    */
-  palSetGroupMode(IOPORT1, PIOA_B1_MASK | PIOA_B2_MASK, 0, PAL_MODE_INPUT);
+  palSetGroupMode(IOPORT1, PIOA_B1_MASK | PIOA_B2_MASK, PAL_MODE_INPUT);
 
   /*
    * MMC/SD slot setup.
    */
   palSetGroupMode(IOPORT1,
                   PIOA_MMC_WP_MASK | PIOA_MMC_CP_MASK,
-                  0,
                   PAL_MODE_INPUT);
 
   /*

@@ -16,6 +16,13 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+                                      ---
+
+    A special exception to the GPL can be applied should you wish to distribute
+    a combined work that includes ChibiOS/RT, without being obliged to provide
+    the source code for any proprietary components. See the file exception.txt
+    for full details of how and when the exception can be applied.
 */
 
 /**
@@ -69,16 +76,17 @@ void port_halt(void) {
 }
 
 /**
- * @brief   Start a thread by invoking its work function.
- * @details If the work function returns @p chThdExit() is automatically
- *          invoked.
+ * Threads return point, it just invokes @p chThdExit().
  */
-__attribute__((cdecl, noreturn))
-void _port_thread_start(msg_t (*pf)(void *), void *p) {
+void threadexit(void) {
 
-  chSysUnlock();
-  chThdExit(pf(p));
-  while(1);
+#if defined(WIN32) || defined (__APPLE__)
+  asm volatile ("push    %eax                                   \n\t" \
+                "call    _chThdExit");
+#else
+  asm volatile ("push    %eax                                   \n\t" \
+                "call    chThdExit");
+#endif
 }
 
 /** @} */

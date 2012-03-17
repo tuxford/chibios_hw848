@@ -16,6 +16,13 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+                                      ---
+
+    A special exception to the GPL can be applied should you wish to distribute
+    a combined work that includes ChibiOS/RT, without being obliged to provide
+    the source code for any proprietary components. See the file exception.txt
+    for full details of how and when the exception can be applied.
 */
 /*
    Concepts and parts of this file have been contributed by Leon Woestenberg.
@@ -86,7 +93,6 @@ void chCondSignal(CondVar *cp) {
  */
 void chCondSignalI(CondVar *cp) {
 
-  chDbgCheckClassI();
   chDbgCheck(cp != NULL, "chCondSignalI");
 
   if (notempty(&cp->c_queue))
@@ -121,7 +127,6 @@ void chCondBroadcast(CondVar *cp) {
  */
 void chCondBroadcastI(CondVar *cp) {
 
-  chDbgCheckClassI();
   chDbgCheck(cp != NULL, "chCondBroadcastI");
 
   /* Empties the condition variable queue and inserts all the Threads into the
@@ -179,7 +184,6 @@ msg_t chCondWaitS(CondVar *cp) {
   Mutex *mp;
   msg_t msg;
 
-  chDbgCheckClassS();
   chDbgCheck(cp != NULL, "chCondWaitS");
   chDbgAssert(ctp->p_mtxlist != NULL,
               "chCondWaitS(), #1",
@@ -264,7 +268,6 @@ msg_t chCondWaitTimeoutS(CondVar *cp, systime_t time) {
   Mutex *mp;
   msg_t msg;
 
-  chDbgCheckClassS();
   chDbgCheck((cp != NULL) && (time != TIME_IMMEDIATE), "chCondWaitTimeoutS");
   chDbgAssert(currp->p_mtxlist != NULL,
               "chCondWaitTimeoutS(), #1",

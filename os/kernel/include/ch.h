@@ -16,6 +16,13 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+                                      ---
+
+    A special exception to the GPL can be applied should you wish to distribute
+    a combined work that includes ChibiOS/RT, without being obliged to provide
+    the source code for any proprietary components. See the file exception.txt
+    for full details of how and when the exception can be applied.
 */
 
 /**
@@ -40,12 +47,8 @@
 /**
  * @brief   Kernel version string.
  */
-#define CH_KERNEL_VERSION       "2.5.0"
+#define CH_KERNEL_VERSION       "2.2.9"
 
-/**
- * @name    Kernel version
- * @{
- */
 /**
  * @brief   Kernel version major number.
  */
@@ -54,13 +57,12 @@
 /**
  * @brief   Kernel version minor number.
  */
-#define CH_KERNEL_MINOR         5
+#define CH_KERNEL_MINOR         2
 
 /**
  * @brief   Kernel version patch number.
  */
-#define CH_KERNEL_PATCH         0
-/** @} */
+#define CH_KERNEL_PATCH         9
 
 /*
  * Common values.
@@ -100,7 +102,7 @@
 #include "chdebug.h"
 
 #if !defined(__DOXYGEN__)
-extern WORKING_AREA(_idle_thread_wa, PORT_IDLE_THREAD_STACK_SIZE);
+extern WORKING_AREA(_idle_thread_wa, IDLE_THREAD_STACK_SIZE);
 #endif
 
 #ifdef __cplusplus

@@ -16,6 +16,13 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+                                      ---
+
+    A special exception to the GPL can be applied should you wish to distribute
+    a combined work that includes ChibiOS/RT, without being obliged to provide
+    the source code for any proprietary components. See the file exception.txt
+    for full details of how and when the exception can be applied.
 */
 
 /**
@@ -91,23 +98,23 @@ typedef struct {
   /**
    * @brief End of transmission buffer callback.
    */
-  uartcb_t                  txend1_cb;
+  uartcb_t                  uc_txend1;
   /**
    * @brief Physical end of transmission callback.
    */
-  uartcb_t                  txend2_cb;
+  uartcb_t                  uc_txend2;
   /**
    * @brief Receive buffer filled callback.
    */
-  uartcb_t                  rxend_cb;
+  uartcb_t                  uc_rxend;
   /**
    * @brief Character received while out if the @p UART_RECEIVE state.
    */
-  uartccb_t                 rxchar_cb;
+  uartccb_t                 uc_rxchar;
   /**
    * @brief Receive error callback.
    */
-  uartecb_t                 rxerr_cb;
+  uartecb_t                 uc_rxerr;
   /* End of the mandatory fields.*/
 } UARTConfig;
 
@@ -120,19 +127,19 @@ struct UARTDriver {
   /**
    * @brief Driver state.
    */
-  uartstate_t               state;
+  uartstate_t               ud_state;
   /**
    * @brief Transmitter state.
    */
-  uarttxstate_t             txstate;
+  uarttxstate_t             ud_txstate;
   /**
    * @brief Receiver state.
    */
-  uartrxstate_t             rxstate;
+  uartrxstate_t             ud_rxstate;
   /**
    * @brief Current configuration data.
    */
-  const UARTConfig          *config;
+  const UARTConfig          *ud_config;
 #if defined(UART_DRIVER_EXT_FIELDS)
   UART_DRIVER_EXT_FIELDS
 #endif

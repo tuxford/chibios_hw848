@@ -16,6 +16,13 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+                                      ---
+
+    A special exception to the GPL can be applied should you wish to distribute
+    a combined work that includes ChibiOS/RT, without being obliged to provide
+    the source code for any proprietary components. See the file exception.txt
+    for full details of how and when the exception can be applied.
 */
 
 /**
@@ -31,7 +38,7 @@
 #include "ch.h"
 
 #if !defined(__DOXYGEN__)
-extern void __main_stack_end__(void);
+extern void __ram_end__(void);
 extern void ResetHandler(void);
 extern void NMIVector(void);
 extern void HardFaultVector(void);
@@ -112,7 +119,7 @@ extern void Vector11C(void);
 __attribute__ ((section("vectors")))
 #endif
 void  (*_vectors[])(void) = {
-  __main_stack_end__, ResetHandler,       NMIVector,          HardFaultVector,
+  __ram_end__,        ResetHandler,       NMIVector,          HardFaultVector,
   MemManageVector,    BusFaultVector,     UsageFaultVector,   Vector1C,
   Vector20,           Vector24,           Vector28,           SVCallVector,
   DebugMonitorVector, Vector34,           PendSVVector,       SysTickVector,

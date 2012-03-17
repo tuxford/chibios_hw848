@@ -16,6 +16,13 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+                                      ---
+
+    A special exception to the GPL can be applied should you wish to distribute
+    a combined work that includes ChibiOS/RT, without being obliged to provide
+    the source code for any proprietary components. See the file exception.txt
+    for full details of how and when the exception can be applied.
 */
 
 ;/* <<< Use Configuration Wizard in Context Menu >>> */
@@ -41,8 +48,6 @@ main_stack_mem  SPACE   main_stack_size
 __initial_msp
 
                 AREA    CSTACK, NOINIT, READWRITE, ALIGN=3
-__main_thread_stack_base__
-                EXPORT  __main_thread_stack_base__
 proc_stack_mem  SPACE   proc_stack_size
                 EXPORT  __initial_sp
 __initial_sp
@@ -75,14 +80,6 @@ Reset_Handler   PROC
                 msr     CONTROL, r0
                 isb
                 bl      __early_init
-
-                IF      {CPU} = "Cortex-M4.fp"
-                LDR     R0, =0xE000ED88           ; Enable CP10,CP11
-                LDR     R1, [R0]
-                ORR     R1, R1, #(0xF << 20)
-                STR     R1, [R0]
-                ENDIF
-
                 ldr     r0, =__main
                 bx      r0
                 ENDP

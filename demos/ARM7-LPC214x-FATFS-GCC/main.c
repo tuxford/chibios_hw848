@@ -16,6 +16,13 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+                                      ---
+
+    A special exception to the GPL can be applied should you wish to distribute
+    a combined work that includes ChibiOS/RT, without being obliged to provide
+    the source code for any proprietary components. See the file exception.txt
+    for full details of how and when the exception can be applied.
 */
 
 #include <stdio.h>
@@ -273,9 +280,9 @@ int main(void) {
   evtInit(&evt, MS2ST(500));            /* Initializes an event timer object.   */
   evtStart(&evt);                       /* Starts the event timer.              */
   chEvtRegister(&evt.et_es, &el0, 0);   /* Registers on the timer event source. */
-  chEvtRegister(&MMCD1.inserted_event, &el1, 1);
-  chEvtRegister(&MMCD1.removed_event, &el2, 2);
-  while (TRUE)
+  chEvtRegister(&MMCD1.mmc_inserted_event, &el1, 1);
+  chEvtRegister(&MMCD1.mmc_removed_event, &el2, 2);
+  while (TRUE)// chThdSleepMilliseconds(50);
     chEvtDispatch(evhndl, chEvtWaitOne(ALL_EVENTS));
   return 0;
 }

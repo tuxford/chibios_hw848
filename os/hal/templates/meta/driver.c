@@ -16,6 +16,13 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+                                      ---
+
+    A special exception to the GPL can be applied should you wish to distribute
+    a combined work that includes ChibiOS/RT, without being obliged to provide
+    the source code for any proprietary components. See the file exception.txt
+    for full details of how and when the exception can be applied.
 */
 
 /**
@@ -30,10 +37,6 @@
 #include "hal.h"
 
 #if HAL_USE_XXX || defined(__DOXYGEN__)
-
-/*===========================================================================*/
-/* Driver local definitions.                                                 */
-/*===========================================================================*/
 
 /*===========================================================================*/
 /* Driver exported variables.                                                */
@@ -72,8 +75,8 @@ void xxxInit(void) {
  */
 void xxxObjectInit(XXXDriver *xxxp) {
 
-  xxxp->state  = XXX_STOP;
-  xxxp->config = NULL;
+  xxxp->xxx_state    = XXX_STOP;
+  xxxp->xxx_config   = NULL;
 }
 
 /**
@@ -89,11 +92,12 @@ void xxxStart(XXXDriver *xxxp, const XXXConfig *config) {
   chDbgCheck((xxxp != NULL) && (config != NULL), "xxxStart");
 
   chSysLock();
-  chDbgAssert((xxxp->state == XXX_STOP) || (xxxp->state == XXX_READY),
-              "xxxStart(), #1", "invalid state");
-  xxxp->config = config;
+  chDbgAssert((xxxp->xxx_state == XXX_STOP) || (xxxp->xxx_state == XXX_READY),
+              "xxxStart(), #1",
+              "invalid state");
+  xxxp->xxx_config = config;
   xxx_lld_start(xxxp);
-  xxxp->state = XXX_READY;
+  xxxp->xxx_state = XXX_READY;
   chSysUnlock();
 }
 
@@ -109,10 +113,11 @@ void xxxStop(XXXDriver *xxxp) {
   chDbgCheck(xxxp != NULL, "xxxStop");
 
   chSysLock();
-  chDbgAssert((xxxp->state == XXX_STOP) || (xxxp->state == XXX_READY),
-              "xxxStop(), #1", "invalid state");
+  chDbgAssert((xxxp->xxx_state == XXX_STOP) || (xxxp->xxx_state == XXX_READY),
+              "xxxStop(), #1",
+              "invalid state");
   xxx_lld_stop(xxxp);
-  xxxp->state = XXX_STOP;
+  xxxp->xxx_state = XXX_STOP;
   chSysUnlock();
 }
 

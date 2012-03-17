@@ -16,6 +16,13 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+                                      ---
+
+    A special exception to the GPL can be applied should you wish to distribute
+    a combined work that includes ChibiOS/RT, without being obliged to provide
+    the source code for any proprietary components. See the file exception.txt
+    for full details of how and when the exception can be applied.
 */
 
 /**
@@ -79,7 +86,7 @@ sim_vio_port_t vio_port_2;
  */
 void _pal_lld_setgroupmode(ioportid_t port,
                            ioportmask_t mask,
-                           iomode_t mode) {
+                           uint_fast8_t mode) {
 
   switch (mode) {
   case PAL_MODE_RESET:

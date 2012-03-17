@@ -16,6 +16,13 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+                                      ---
+
+    A special exception to the GPL can be applied should you wish to distribute
+    a combined work that includes ChibiOS/RT, without being obliged to provide
+    the source code for any proprietary components. See the file exception.txt
+    for full details of how and when the exception can be applied.
 */
 
 /**
@@ -106,27 +113,7 @@ typedef struct {
  * @brief   Macro for baud rate computation.
  * @note    Make sure the final baud rate is within tolerance.
  */
-#define UBRR(b)     (((F_CPU / b) >> 4) - 1)
-
-/**
- * @brief   Macro for baud rate computationwhen U2Xn == 1.
- * @note    Make sure the final baud rate is within tolerance.
- */
-#define UBRR2(b)    (((F_CPU / b) >> 3) - 1)
-
-/**
-* @brief   Macro for baud rate computation.
-* @note    Make sure the final baud rate is within tolerance.
-* @note    This version uses floating point math for greater accuracy.
-*/
-#define UBRR_F(b)   ((((double) F_CPU / (double) b) / 16.0) - 0.5)
-
-/**
-* @brief   Macro for baud rate computation when U2Xn == 1.
-* @note    Make sure the final baud rate is within tolerance.
-* @note    This version uses floating point math for greater accuracy.
-*/
-#define UBRR2_F(b)  ((((double) F_CPU / (double) b) / 8.0) - 0.5)
+#define UBRR(b) (((F_CPU / b) >> 4) - 1)
 
 /*===========================================================================*/
 /* External declarations.                                                    */

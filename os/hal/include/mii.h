@@ -16,7 +16,19 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+                                      ---
+
+    A special exception to the GPL can be applied should you wish to distribute
+    a combined work that includes ChibiOS/RT, without being obliged to provide
+    the source code for any proprietary components. See the file exception.txt
+    for full details of how and when the exception can be applied.
 */
+
+/*
+ * Parts of this file are borrowed by the Linux include file linux/mii.h:
+ * Copyright (C) 1996, 1999, 2001 David S. Miller (davem@redhat.com)
+ */
 
 /*-*
  * @file    mii.h
@@ -178,8 +190,7 @@
 #define MII_DM9161_ID     0x0181b8a0
 #define MII_AM79C875_ID   0x00225540
 #define MII_KS8721_ID     0x00221610
-#define MII_STE101P_ID    0x00061C50
 
 #endif /* _MII_H_ */
 
-/** @} */
+/*-* @} */

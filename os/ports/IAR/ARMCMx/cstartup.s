@@ -16,6 +16,13 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+                                      ---
+
+    A special exception to the GPL can be applied should you wish to distribute
+    a combined work that includes ChibiOS/RT, without being obliged to provide
+    the source code for any proprietary components. See the file exception.txt
+    for full details of how and when the exception can be applied.
 */
 
         MODULE  ?cstartup
@@ -31,8 +38,6 @@ CONTROL_USE_PSP SET 2
         SECTION .intvec:CODE:NOROOT(3)
 
         SECTION CSTACK:DATA:NOROOT(3)
-        PUBLIC  __main_thread_stack_base__
-__main_thread_stack_base__:
         PUBLIC  __heap_end__
 __heap_end__:
 

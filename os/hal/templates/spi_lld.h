@@ -16,6 +16,13 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+                                      ---
+
+    A special exception to the GPL can be applied should you wish to distribute
+    a combined work that includes ChibiOS/RT, without being obliged to provide
+    the source code for any proprietary components. See the file exception.txt
+    for full details of how and when the exception can be applied.
 */
 
 /**
@@ -69,7 +76,7 @@ typedef struct {
   /**
    * @brief Operation complete callback.
    */
-  spicallback_t         end_cb;
+  spicallback_t         spc_endcb;
   /* End of the mandatory fields.*/
 } SPIConfig;
 
@@ -82,25 +89,25 @@ struct SPIDriver {
   /**
    * @brief Driver state.
    */
-  spistate_t            state;
+  spistate_t            spd_state;
   /**
    * @brief Current configuration data.
    */
-  const SPIConfig       *config;
+  const SPIConfig       *spd_config;
 #if SPI_USE_WAIT || defined(__DOXYGEN__)
   /**
    * @brief Waiting thread.
    */
-  Thread                *thread;
+  Thread                *spd_thread;
 #endif /* SPI_USE_WAIT */
 #if SPI_USE_MUTUAL_EXCLUSION || defined(__DOXYGEN__)
 #if CH_USE_MUTEXES || defined(__DOXYGEN__)
   /**
    * @brief Mutex protecting the bus.
    */
-  Mutex                 mutex;
+  Mutex                 spd_mutex;
 #elif CH_USE_SEMAPHORES
-  Semaphore             semaphore;
+  Semaphore             spd_semaphore;
 #endif
 #endif /* SPI_USE_MUTUAL_EXCLUSION */
 #if defined(SPI_DRIVER_EXT_FIELDS)

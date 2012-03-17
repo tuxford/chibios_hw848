@@ -16,6 +16,13 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+                                      ---
+
+    A special exception to the GPL can be applied should you wish to distribute
+    a combined work that includes ChibiOS/RT, without being obliged to provide
+    the source code for any proprietary components. See the file exception.txt
+    for full details of how and when the exception can be applied.
 */
 
 /**
@@ -51,8 +58,10 @@ void port_switch(Thread *ntp, Thread *otp) {
   asm volatile ("push    r5");
   asm volatile ("push    r6");
   asm volatile ("push    r7");
+#ifndef CH_CURRP_REGISTER_CACHE
   asm volatile ("push    r8");
   asm volatile ("push    r9");
+#endif
   asm volatile ("push    r10");
   asm volatile ("push    r11");
   asm volatile ("push    r12");
@@ -86,8 +95,10 @@ void port_switch(Thread *ntp, Thread *otp) {
   asm volatile ("pop     r12");
   asm volatile ("pop     r11");
   asm volatile ("pop     r10");
+#ifndef CH_CURRP_REGISTER_CACHE
   asm volatile ("pop     r9");
   asm volatile ("pop     r8");
+#endif
   asm volatile ("pop     r7");
   asm volatile ("pop     r6");
   asm volatile ("pop     r5");
@@ -123,7 +134,7 @@ void port_halt(void) {
  */
 void _port_thread_start(void) {
 
-  chSysUnlock();
+  asm volatile ("sei");
   asm volatile ("movw    r24, r4");
   asm volatile ("movw    r30, r2");
   asm volatile ("icall");

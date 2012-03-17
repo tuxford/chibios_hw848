@@ -16,6 +16,13 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+                                      ---
+
+    A special exception to the GPL can be applied should you wish to distribute
+    a combined work that includes ChibiOS/RT, without being obliged to provide
+    the source code for any proprietary components. See the file exception.txt
+    for full details of how and when the exception can be applied.
 */
 
 /**
@@ -278,7 +285,9 @@ void test_start_timer(unsigned ms) {
 
   systime_t duration = MS2ST(ms);
   test_timer_done = FALSE;
-  chVTSet(&vt, duration, tmr, NULL);
+  chSysLock();
+  chVTSetI(&vt, duration, tmr, NULL);
+  chSysUnlock();
 }
 
 /*
@@ -326,21 +335,15 @@ msg_t TestThread(void *p) {
   test_println("***");
   test_print("*** Kernel:       ");
   test_println(CH_KERNEL_VERSION);
-  test_print("*** Compiled:     ");
-  test_println(__DATE__ " - " __TIME__);
-#ifdef CH_COMPILER_NAME
-  test_print("*** Compiler:     ");
-  test_println(CH_COMPILER_NAME);
+#ifdef __GNUC__
+  test_print("*** GCC Version:  ");
+  test_println(__VERSION__);
 #endif
   test_print("*** Architecture: ");
   test_println(CH_ARCHITECTURE_NAME);
 #ifdef CH_CORE_VARIANT_NAME
   test_print("*** Core Variant: ");
   test_println(CH_CORE_VARIANT_NAME);
-#endif
-#ifdef CH_PORT_INFO
-  test_print("*** Port Info:    ");
-  test_println(CH_PORT_INFO);
 #endif
 #ifdef PLATFORM_NAME
   test_print("*** Platform:     ");

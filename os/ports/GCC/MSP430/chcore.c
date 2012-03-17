@@ -16,6 +16,13 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+                                      ---
+
+    A special exception to the GPL can be applied should you wish to distribute
+    a combined work that includes ChibiOS/RT, without being obliged to provide
+    the source code for any proprietary components. See the file exception.txt
+    for full details of how and when the exception can be applied.
 */
 
 /**
@@ -93,8 +100,8 @@ void port_halt(void) {
  */
 void _port_thread_start(void) {
 
-  chSysUnlock();
-  asm volatile ("mov     r11, r15                               \n\t" \
+  asm volatile ("eint                                           \n\t" \
+                "mov     r11, r15                               \n\t" \
                 "call    r10                                    \n\t" \
                 "call    #chThdExit");
 }
