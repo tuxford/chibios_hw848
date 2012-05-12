@@ -16,6 +16,13 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+                                      ---
+
+    A special exception to the GPL can be applied should you wish to distribute
+    a combined work that includes ChibiOS/RT, without being obliged to provide
+    the source code for any proprietary components. See the file exception.txt
+    for full details of how and when the exception can be applied.
 */
 
 /**
@@ -43,20 +50,6 @@
 /* Driver local variables.                                                   */
 /*===========================================================================*/
 
-/**
- * @brief   Virtual methods table.
- */
-static const struct MMCSDBlockDeviceVMT sdc_vmt = {
-  (bool_t (*)(void *))sdc_lld_is_card_inserted,
-  (bool_t (*)(void *))sdc_lld_is_write_protected,
-  (bool_t (*)(void *))sdcConnect,
-  (bool_t (*)(void *))sdcDisconnect,
-  (bool_t (*)(void *, uint32_t, uint8_t *, uint32_t))sdcRead,
-  (bool_t (*)(void *, uint32_t, const uint8_t *, uint32_t))sdcWrite,
-  (bool_t (*)(void *))sdcSync,
-  (bool_t (*)(void *, BlockDeviceInfo *))sdcGetInfo
-};
-
 /*===========================================================================*/
 /* Driver local functions.                                                   */
 /*===========================================================================*/
@@ -65,10 +58,10 @@ static const struct MMCSDBlockDeviceVMT sdc_vmt = {
  * @brief   Wait for the card to complete pending operations.
  *
  * @param[in] sdcp      pointer to the @p SDCDriver object
- *
  * @return              The operation status.
- * @retval FALSE  operation succeeded.
- * @retval TRUE   operation failed.
+ * @retval FALSE        the card is now in transfer state.
+ * @retval TRUE         an error occurred while waiting or the card is in an
+ *                      unexpected state.
  *
  * @notapi
  */
@@ -76,16 +69,16 @@ bool_t _sdc_wait_for_transfer_state(SDCDriver *sdcp) {
   uint32_t resp[1];
 
   while (TRUE) {
-    if (sdc_lld_send_cmd_short_crc(sdcp, MMCSD_CMD_SEND_STATUS,
+    if (sdc_lld_send_cmd_short_crc(sdcp, SDC_CMD_SEND_STATUS,
                                    sdcp->rca, resp) ||
-        MMCSD_R1_ERROR(resp[0]))
-      return CH_FAILED;
-    switch (MMCSD_R1_STS(resp[0])) {
-    case MMCSD_STS_TRAN:
-      return CH_SUCCESS;
-    case MMCSD_STS_DATA:
-    case MMCSD_STS_RCV:
-    case MMCSD_STS_PRG:
+        SDC_R1_ERROR(resp[0]))
+      return TRUE;
+    switch (SDC_R1_STS(resp[0])) {
+    case SDC_STS_TRAN:
+      return FALSE;
+    case SDC_STS_DATA:
+    case SDC_STS_RCV:
+    case SDC_STS_PRG:
 #if SDC_NICE_WAITING
       chThdSleepMilliseconds(1);
 #endif
@@ -93,11 +86,9 @@ bool_t _sdc_wait_for_transfer_state(SDCDriver *sdcp) {
     default:
       /* The card should have been initialized so any other state is not
          valid and is reported as an error.*/
-      return CH_FAILED;
+      return TRUE;
     }
   }
-  /* If something going too wrong.*/
-  return CH_FAILED;
 }
 
 /*===========================================================================*/
@@ -125,11 +116,8 @@ void sdcInit(void) {
  */
 void sdcObjectInit(SDCDriver *sdcp) {
 
-  sdcp->vmt    = &sdc_vmt;
   sdcp->state  = SDC_STOP;
-  sdcp->errors = SDC_NO_ERROR;
   sdcp->config = NULL;
-  sdcp->capacity = 0;
 }
 
 /**
@@ -181,10 +169,10 @@ void sdcStop(SDCDriver *sdcp) {
  *          to perform read and write operations.
  *
  * @param[in] sdcp      pointer to the @p SDCDriver object
- *
  * @return              The operation status.
- * @retval CH_FAILED    operation succeeded.
- * @retval CH_SUCCESS   operation failed.
+ * @retval FALSE        operation succeeded, the driver is now
+ *                      in the @p SDC_ACTIVE state.
+ * @retval TRUE         operation failed.
  *
  * @api
  */
@@ -203,23 +191,23 @@ bool_t sdcConnect(SDCDriver *sdcp) {
   sdc_lld_start_clk(sdcp);
 
   /* Enforces the initial card state.*/
-  sdc_lld_send_cmd_none(sdcp, MMCSD_CMD_GO_IDLE_STATE, 0);
+  sdc_lld_send_cmd_none(sdcp, SDC_CMD_GO_IDLE_STATE, 0);
 
   /* V2.0 cards detection.*/
-  if (!sdc_lld_send_cmd_short_crc(sdcp, MMCSD_CMD_SEND_IF_COND,
-                                  MMCSD_CMD8_PATTERN, resp)) {
+  if (!sdc_lld_send_cmd_short_crc(sdcp, SDC_CMD_SEND_IF_COND,
+                                  SDC_CMD8_PATTERN, resp)) {
     sdcp->cardmode = SDC_MODE_CARDTYPE_SDV20;
     /* Voltage verification.*/
     if (((resp[0] >> 8) & 0xF) != 1)
       goto failed;
-    if (sdc_lld_send_cmd_short_crc(sdcp, MMCSD_CMD_APP_CMD, 0, resp) ||
-        MMCSD_R1_ERROR(resp[0]))
+    if (sdc_lld_send_cmd_short_crc(sdcp, SDC_CMD_APP_CMD, 0, resp) ||
+        SDC_R1_ERROR(resp[0]))
       goto failed;
   }
   else {
 #if SDC_MMC_SUPPORT
     /* MMC or SD V1.1 detection.*/
-    if (sdc_lld_send_cmd_short_crc(sdcp, SDMMC_CMD_APP_CMD, 0, resp) ||
+    if (sdc_lld_send_cmd_short_crc(sdcp, SDC_CMD_APP_CMD, 0, resp) ||
         SDC_R1_ERROR(resp[0]))
       sdcp->cardmode = SDC_MODE_CARDTYPE_MMC;
     else
@@ -230,7 +218,7 @@ bool_t sdcConnect(SDCDriver *sdcp) {
 #if SDC_MMC_SUPPORT
     if ((sdcp->cardmode &  SDC_MODE_CARDTYPE_MASK) == SDC_MODE_CARDTYPE_MMC) {
     /* TODO: MMC initialization.*/
-    return CH_FAILED;
+    return TRUE;
   }
   else
 #endif /* SDC_MMC_SUPPORT */
@@ -247,10 +235,10 @@ bool_t sdcConnect(SDCDriver *sdcp) {
     /* SD-type initialization. */
     i = 0;
     while (TRUE) {
-      if (sdc_lld_send_cmd_short_crc(sdcp, MMCSD_CMD_APP_CMD, 0, resp) ||
-        MMCSD_R1_ERROR(resp[0]))
+      if (sdc_lld_send_cmd_short_crc(sdcp, SDC_CMD_APP_CMD, 0, resp) ||
+        SDC_R1_ERROR(resp[0]))
         goto failed;
-      if (sdc_lld_send_cmd_short(sdcp, MMCSD_CMD_APP_OP_COND, ocr, resp))
+      if (sdc_lld_send_cmd_short(sdcp, SDC_CMD_APP_OP_COND, ocr, resp))
         goto failed;
       if ((resp[0] & 0x80000000) != 0) {
         if (resp[0] & 0x40000000)
@@ -264,31 +252,30 @@ bool_t sdcConnect(SDCDriver *sdcp) {
   }
 
   /* Reads CID.*/
-  if (sdc_lld_send_cmd_long_crc(sdcp, MMCSD_CMD_ALL_SEND_CID, 0, sdcp->cid))
+  if (sdc_lld_send_cmd_long_crc(sdcp, SDC_CMD_ALL_SEND_CID, 0, sdcp->cid))
     goto failed;
 
   /* Asks for the RCA.*/
-  if (sdc_lld_send_cmd_short_crc(sdcp, MMCSD_CMD_SEND_RELATIVE_ADDR,
+  if (sdc_lld_send_cmd_short_crc(sdcp, SDC_CMD_SEND_RELATIVE_ADDR,
                                  0, &sdcp->rca))
     goto failed;
 
   /* Reads CSD.*/
-  if (sdc_lld_send_cmd_long_crc(sdcp, MMCSD_CMD_SEND_CSD,
-                                sdcp->rca, sdcp->csd))
+  if (sdc_lld_send_cmd_long_crc(sdcp, SDC_CMD_SEND_CSD, sdcp->rca, sdcp->csd))
     goto failed;
 
   /* Switches to high speed.*/
   sdc_lld_set_data_clk(sdcp);
 
   /* Selects the card for operations.*/
-  if (sdc_lld_send_cmd_short_crc(sdcp, MMCSD_CMD_SEL_DESEL_CARD,
+  if (sdc_lld_send_cmd_short_crc(sdcp, SDC_CMD_SEL_DESEL_CARD,
                                  sdcp->rca, resp))
     goto failed;
 
   /* Block length fixed at 512 bytes.*/
-  if (sdc_lld_send_cmd_short_crc(sdcp, MMCSD_CMD_SET_BLOCKLEN,
-                                 MMCSD_BLOCK_SIZE, resp) ||
-      MMCSD_R1_ERROR(resp[0]))
+  if (sdc_lld_send_cmd_short_crc(sdcp, SDC_CMD_SET_BLOCKLEN,
+                                 SDC_BLOCK_SIZE, resp) ||
+      SDC_R1_ERROR(resp[0]))
     goto failed;
 
   /* Switches to wide bus mode.*/
@@ -296,39 +283,30 @@ bool_t sdcConnect(SDCDriver *sdcp) {
   case SDC_MODE_CARDTYPE_SDV11:
   case SDC_MODE_CARDTYPE_SDV20:
     sdc_lld_set_bus_mode(sdcp, SDC_MODE_4BIT);
-    if (sdc_lld_send_cmd_short_crc(sdcp, MMCSD_CMD_APP_CMD, sdcp->rca, resp) ||
-        MMCSD_R1_ERROR(resp[0]))
+    if (sdc_lld_send_cmd_short_crc(sdcp, SDC_CMD_APP_CMD, sdcp->rca, resp) ||
+        SDC_R1_ERROR(resp[0]))
       goto failed;
-    if (sdc_lld_send_cmd_short_crc(sdcp, MMCSD_CMD_SET_BUS_WIDTH, 2, resp) ||
-        MMCSD_R1_ERROR(resp[0]))
+    if (sdc_lld_send_cmd_short_crc(sdcp, SDC_CMD_SET_BUS_WIDTH, 2, resp) ||
+        SDC_R1_ERROR(resp[0]))
       goto failed;
-    break;
   }
 
-  /* Determine capacity.*/
-  sdcp->capacity = mmcsdGetCapacity(sdcp->csd);
-  if (sdcp->capacity == 0)
-    goto failed;
-
-  /* Initialization complete.*/
   sdcp->state = SDC_ACTIVE;
-  return CH_SUCCESS;
-
-  /* Initialization failed.*/
+  return FALSE;
 failed:
   sdc_lld_stop_clk(sdcp);
   sdcp->state = SDC_READY;
-  return CH_FAILED;
+  return TRUE;
 }
 
 /**
  * @brief   Brings the driver in a state safe for card removal.
  *
  * @param[in] sdcp      pointer to the @p SDCDriver object
- *
  * @return              The operation status.
- * @retval CH_FAILED    operation succeeded.
- * @retval CH_SUCCESS   operation failed.
+ * @retval FALSE        the operation succeeded and the driver is now
+ *                      in the @p SDC_READY state.
+ * @retval TRUE         the operation failed.
  *
  * @api
  */
@@ -341,20 +319,20 @@ bool_t sdcDisconnect(SDCDriver *sdcp) {
               "sdcDisconnect(), #1", "invalid state");
   if (sdcp->state == SDC_READY) {
     chSysUnlock();
-    return CH_SUCCESS;
+    return FALSE;
   }
   sdcp->state = SDC_DISCONNECTING;
   chSysUnlock();
 
   /* Waits for eventual pending operations completion.*/
   if (_sdc_wait_for_transfer_state(sdcp))
-    return CH_FAILED;
+    return TRUE;
 
   /* Card clock stopped.*/
   sdc_lld_stop_clk(sdcp);
 
   sdcp->state = SDC_READY;
-  return CH_SUCCESS;
+  return FALSE;
 }
 
 /**
@@ -366,32 +344,27 @@ bool_t sdcDisconnect(SDCDriver *sdcp) {
  * @param[in] startblk  first block to read
  * @param[out] buf      pointer to the read buffer
  * @param[in] n         number of blocks to read
- *
  * @return              The operation status.
- * @retval CH_FAILED    operation succeeded.
- * @retval CH_SUCCESS   operation failed.
+ * @retval FALSE        operation succeeded, the requested blocks have been
+ *                      read.
+ * @retval TRUE         operation failed, the state of the buffer is uncertain.
  *
  * @api
  */
 bool_t sdcRead(SDCDriver *sdcp, uint32_t startblk,
                uint8_t *buf, uint32_t n) {
-  bool_t status;
+  bool_t err;
 
   chDbgCheck((sdcp != NULL) && (buf != NULL) && (n > 0), "sdcRead");
-
-  if ((startblk + n - 1) > sdcp->capacity){
-    sdcp->errors |= SDC_OVERFLOW_ERROR;
-    return CH_FAILED;
-  }
 
   chSysLock();
   chDbgAssert(sdcp->state == SDC_ACTIVE, "sdcRead(), #1", "invalid state");
   sdcp->state = SDC_READING;
   chSysUnlock();
 
-  status = sdc_lld_read(sdcp, startblk, buf, n);
+  err = sdc_lld_read(sdcp, startblk, buf, n);
   sdcp->state = SDC_ACTIVE;
-  return status;
+  return err;
 }
 
 /**
@@ -403,106 +376,27 @@ bool_t sdcRead(SDCDriver *sdcp, uint32_t startblk,
  * @param[in] startblk  first block to write
  * @param[out] buf      pointer to the write buffer
  * @param[in] n         number of blocks to write
- *
  * @return              The operation status.
- * @retval CH_FAILED    operation succeeded.
- * @retval CH_SUCCESS   operation failed.
+ * @retval FALSE        operation succeeded, the requested blocks have been
+ *                      written.
+ * @retval TRUE         operation failed.
  *
  * @api
  */
 bool_t sdcWrite(SDCDriver *sdcp, uint32_t startblk,
                 const uint8_t *buf, uint32_t n) {
-  bool_t status;
+  bool_t err;
 
   chDbgCheck((sdcp != NULL) && (buf != NULL) && (n > 0), "sdcWrite");
-
-  if ((startblk + n - 1) > sdcp->capacity){
-    sdcp->errors |= SDC_OVERFLOW_ERROR;
-    return CH_FAILED;
-  }
 
   chSysLock();
   chDbgAssert(sdcp->state == SDC_ACTIVE, "sdcWrite(), #1", "invalid state");
   sdcp->state = SDC_WRITING;
   chSysUnlock();
 
-  status = sdc_lld_write(sdcp, startblk, buf, n);
+  err = sdc_lld_write(sdcp, startblk, buf, n);
   sdcp->state = SDC_ACTIVE;
-  return status;
-}
-
-/**
- * @brief   Returns the errors mask associated to the previous operation.
- *
- * @param[in] sdcp      pointer to the @p SDCDriver object
- * @return              The errors mask.
- *
- * @api
- */
-sdcflags_t sdcGetAndClearErrors(SDCDriver *sdcp) {
-
-  chDbgCheck(sdcp != NULL, "sdcGetAndClearErrors");
-
-  chSysLock();
-  sdcflags_t flags = sdcp->errors;
-  sdcp->errors = SDC_NO_ERROR;
-  chSysUnlock();
-  return flags;
-}
-
-/**
- * @brief   Waits for card idle condition.
- *
- * @param[in] sdcp      pointer to the @p SDCDriver object
- *
- * @return              The operation status.
- * @retval CH_SUCCESS   the operation succeeded.
- * @retval CH_FAILED    the operation failed.
- *
- * @api
- */
-bool_t sdcSync(SDCDriver *sdcp) {
-
-  chDbgCheck(sdcp != NULL, "sdcSync");
-
-  chSysLock();
-  if (sdcp->state != SDC_READY) {
-    chSysUnlock();
-    return CH_FAILED;
-  }
-  chSysUnlock();
-
-  return sdc_lld_sync(sdcp);
-}
-
-/**
- * @brief   Returns the media info.
- *
- * @param[in] sdcp      pointer to the @p SDCDriver object
- * @param[out] bdip     pointer to a @p BlockDeviceInfo structure
- *
- * @return              The operation status.
- * @retval CH_SUCCESS   the operation succeeded.
- * @retval CH_FAILED    the operation failed.
- *
- * @api
- */
-bool_t sdcGetInfo(SDCDriver *sdcp, BlockDeviceInfo *bdip) {
-
-
-  chDbgCheck((sdcp != NULL) && (bdip != NULL), "sdcGetInfo");
-
-  chSysLock();
-  if (sdcp->state != SDC_READY) {
-    chSysUnlock();
-    return CH_FAILED;
-  }
-  chSysUnlock();
-
-  bdip->blk_num = sdcp->capacity;
-  bdip->blk_size = MMCSD_BLOCK_SIZE;
-
-  return CH_SUCCESS;
+  return err;
 }
 
 #endif /* HAL_USE_SDC */

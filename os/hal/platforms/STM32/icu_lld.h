@@ -16,6 +16,13 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+                                      ---
+
+    A special exception to the GPL can be applied should you wish to distribute
+    a combined work that includes ChibiOS/RT, without being obliged to provide
+    the source code for any proprietary components. See the file exception.txt
+    for full details of how and when the exception can be applied.
 */
 
 /**
@@ -179,7 +186,7 @@
 /*===========================================================================*/
 
 /**
- * @brief   ICU driver mode.
+ * @brief ICU driver mode.
  */
 typedef enum {
   ICU_INPUT_ACTIVE_HIGH = 0,        /**< Trigger on rising edge.            */
@@ -190,14 +197,6 @@ typedef enum {
  * @brief   ICU frequency type.
  */
 typedef uint32_t icufreq_t;
-
-/**
- * @brief   ICU channel.
- */
-typedef enum {
-  ICU_CHANNEL_1 = 0,              /**< Use TIMxCH1.      */
-  ICU_CHANNEL_2 = 1,              /**< Use TIMxCH2.      */
-} icuchannel_t;
 
 /**
  * @brief   ICU counter type.
@@ -227,16 +226,7 @@ typedef struct {
    * @brief   Callback for cycle period measurement.
    */
   icucallback_t             period_cb;
-  /**
-   * @brief   Callback for timer overflow.
-   */
-  icucallback_t             overflow_cb;
   /* End of the mandatory fields.*/
-  /**
-   * @brief   Timer input channel to be used.
-   * @note    Only inputs TIMx 1 and 2 are supported.
-   */
-  icuchannel_t              channel;
 } ICUConfig;
 
 /**
@@ -263,14 +253,6 @@ struct ICUDriver {
    * @brief Pointer to the TIMx registers block.
    */
   stm32_tim_t               *tim;
-  /**
-   * @bried CCR register used for width capture.
-   */
-  volatile uint32_t         *wccrp;
-  /**
-   * @bried CCR register used for period capture.
-   */
-  volatile uint32_t         *pccrp;
 };
 
 /*===========================================================================*/
@@ -287,7 +269,7 @@ struct ICUDriver {
  *
  * @notapi
  */
-#define icu_lld_get_width(icup) (*((icup)->wccrp) + 1)
+#define icu_lld_get_width(icup) ((icup)->tim->CCR[1] + 1)
 
 /**
  * @brief   Returns the width of the latest cycle.
@@ -299,7 +281,7 @@ struct ICUDriver {
  *
  * @notapi
  */
-#define icu_lld_get_period(icup) (*((icup)->pccrp) + 1)
+#define icu_lld_get_period(icup) ((icup)->tim->CCR[0] + 1)
 
 /*===========================================================================*/
 /* External declarations.                                                    */

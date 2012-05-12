@@ -16,11 +16,14 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+                                      ---
+
+    A special exception to the GPL can be applied should you wish to distribute
+    a combined work that includes ChibiOS/RT, without being obliged to provide
+    the source code for any proprietary components. See the file exception.txt
+    for full details of how and when the exception can be applied.
 */
-/*
-   Concepts and parts of this file have been contributed by Fabio Utzig and
-   Xo Wang.
- */
 
 /**
  * @file    STM32/icu_lld.c
@@ -105,19 +108,10 @@ static void icu_lld_serve_interrupt(ICUDriver *icup) {
 
   sr = icup->tim->SR & icup->tim->DIER;
   icup->tim->SR = 0;
-  if (icup->config->channel == ICU_CHANNEL_1) {
-    if ((sr & TIM_SR_CC1IF) != 0)
-      _icu_isr_invoke_period_cb(icup);
-    if ((sr & TIM_SR_CC2IF) != 0)
-      _icu_isr_invoke_width_cb(icup);
-  } else {
-    if ((sr & TIM_SR_CC1IF) != 0)
-      _icu_isr_invoke_width_cb(icup);
-    if ((sr & TIM_SR_CC2IF) != 0)
-      _icu_isr_invoke_period_cb(icup);
-  }
-  if ((sr & TIM_SR_UIF) != 0)
-    _icu_isr_invoke_overflow_cb(icup);
+  if ((sr & TIM_SR_CC1IF) != 0)
+    _icu_isr_invoke_period_cb(icup);
+  if ((sr & TIM_SR_CC2IF) != 0)
+    _icu_isr_invoke_width_cb(icup);
 }
 
 /*===========================================================================*/
@@ -296,10 +290,6 @@ void icu_lld_init(void) {
 void icu_lld_start(ICUDriver *icup) {
   uint32_t psc;
 
-  chDbgAssert((icup->config->channel == ICU_CHANNEL_1) ||
-              (icup->config->channel == ICU_CHANNEL_2),
-              "icu_lld_start(), #1", "invalid input");
-
   if (icup->state == ICU_STOP) {
     /* Clock activation and timer reset.*/
 #if STM32_ICU_USE_TIM1
@@ -376,53 +366,23 @@ void icu_lld_start(ICUDriver *icup) {
   icup->tim->PSC  = (uint16_t)psc;
   icup->tim->ARR   = 0xFFFF;
 
-  if (icup->config->channel == ICU_CHANNEL_1) {
-    /* Selected input 1.
-       CCMR1_CC1S = 01 = CH1 Input on TI1.
-       CCMR1_CC2S = 10 = CH2 Input on TI1.*/
-    icup->tim->CCMR1 = TIM_CCMR1_CC1S_0 |
-                       TIM_CCMR1_CC2S_1;
-    /* SMCR_TS  = 101, input is TI1FP1.
-       SMCR_SMS = 100, reset on rising edge.*/
-    icup->tim->SMCR  = TIM_SMCR_TS_2 | TIM_SMCR_TS_0 |
-                       TIM_SMCR_SMS_2;
-    /* The CCER settings depend on the selected trigger mode.
-       ICU_INPUT_ACTIVE_HIGH: Active on rising edge, idle on falling edge.
-       ICU_INPUT_ACTIVE_LOW:  Active on falling edge, idle on rising edge.*/
-    if (icup->config->mode == ICU_INPUT_ACTIVE_HIGH)
-      icup->tim->CCER = TIM_CCER_CC1E |
-                        TIM_CCER_CC2E | TIM_CCER_CC2P;
-    else
-      icup->tim->CCER = TIM_CCER_CC1E | TIM_CCER_CC1P |
-                        TIM_CCER_CC2E;
-    /* Direct pointers to the capture registers in order to make reading
-       data faster from within callbacks.*/
-    icup->wccrp = &icup->tim->CCR[1];
-    icup->pccrp = &icup->tim->CCR[0];
-  } else {
-    /* Selected input 2.
-       CCMR1_CC1S = 10 = CH1 Input on TI2.
-       CCMR1_CC2S = 01 = CH2 Input on TI2.*/
-    icup->tim->CCMR1 = TIM_CCMR1_CC1S_1 |
-                       TIM_CCMR1_CC2S_0;
-    /* SMCR_TS  = 110, input is TI2FP2.
-       SMCR_SMS = 100, reset on rising edge.*/
-    icup->tim->SMCR  = TIM_SMCR_TS_2 | TIM_SMCR_TS_1 |
-                       TIM_SMCR_SMS_2;
-    /* The CCER settings depend on the selected trigger mode.
-       ICU_INPUT_ACTIVE_HIGH: Active on rising edge, idle on falling edge.
-       ICU_INPUT_ACTIVE_LOW:  Active on falling edge, idle on rising edge.*/
-    if (icup->config->mode == ICU_INPUT_ACTIVE_HIGH)
-      icup->tim->CCER = TIM_CCER_CC1E | TIM_CCER_CC1P |
-                        TIM_CCER_CC2E;
-    else
-      icup->tim->CCER = TIM_CCER_CC1E |
-                        TIM_CCER_CC2E | TIM_CCER_CC2P;
-    /* Direct pointers to the capture registers in order to make reading
-       data faster from within callbacks.*/
-    icup->wccrp = &icup->tim->CCR[0];
-    icup->pccrp = &icup->tim->CCR[1];
-  }
+  /* CCMR1_CC1S = 01 = CH1 Input on TI1.
+     CCMR1_CC2S = 10 = CH2 Input on TI1.*/
+  icup->tim->CCMR1 = TIM_CCMR1_CC1S_0 |
+                     TIM_CCMR1_CC2S_1;
+  /* SMCR_TS  = 101, input is TI1FP1.
+     SMCR_SMS = 100, reset on rising edge.*/
+  icup->tim->SMCR  = TIM_SMCR_TS_2 | TIM_SMCR_TS_0 |
+                     TIM_SMCR_SMS_2;
+  /* The CCER settings depend on the selected trigger mode.
+     ICU_INPUT_ACTIVE_HIGH: Active on rising edge, idle on falling edge.
+     ICU_INPUT_ACTIVE_LOW:  Active on falling edge, idle on rising edge.*/
+  if (icup->config->mode == ICU_INPUT_ACTIVE_HIGH)
+    icup->tim->CCER = TIM_CCER_CC1E |
+                      TIM_CCER_CC2E | TIM_CCER_CC2P;
+  else
+    icup->tim->CCER = TIM_CCER_CC1E | TIM_CCER_CC1P |
+                      TIM_CCER_CC2E;
 }
 
 /**
@@ -488,20 +448,11 @@ void icu_lld_stop(ICUDriver *icup) {
  */
 void icu_lld_enable(ICUDriver *icup) {
 
-  icup->tim->SR = 0;                        /* Clear pending IRQs (if any). */
-  if (icup->config->channel == ICU_CHANNEL_1) {
-    if (icup->config->period_cb != NULL)
-      icup->tim->DIER |= TIM_DIER_CC1IE;
-    if (icup->config->width_cb != NULL)
-      icup->tim->DIER |= TIM_DIER_CC2IE;
-  } else {
-    if (icup->config->width_cb != NULL)
-      icup->tim->DIER |= TIM_DIER_CC1IE;
-    if (icup->config->period_cb != NULL)
-      icup->tim->DIER |= TIM_DIER_CC2IE;
-  }
-  if (icup->config->overflow_cb != NULL)
-    icup->tim->DIER |= TIM_DIER_UIE;
+  icup->tim->SR   = 0;                      /* Clear pending IRQs (if any). */
+  if (icup->config->period_cb != NULL)
+    icup->tim->DIER |= TIM_DIER_CC1IE;
+  if (icup->config->width_cb != NULL)
+    icup->tim->DIER |= TIM_DIER_CC2IE;
   icup->tim->CR1  = TIM_CR1_URS | TIM_CR1_CEN;
 }
 

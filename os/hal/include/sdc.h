@@ -16,6 +16,13 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+                                      ---
+
+    A special exception to the GPL can be applied should you wish to distribute
+    a combined work that includes ChibiOS/RT, without being obliged to provide
+    the source code for any proprietary components. See the file exception.txt
+    for full details of how and when the exception can be applied.
 */
 
 /**
@@ -35,6 +42,13 @@
 /* Driver constants.                                                         */
 /*===========================================================================*/
 
+#define SDC_BLOCK_SIZE                  512     /**< Fixed block size.      */
+
+/**
+ * @brief   Fixed pattern for CMD8.
+ */
+#define SDC_CMD8_PATTERN                0x000001AA
+
 /**
  * @name    SD cart types
  * @{
@@ -47,20 +61,39 @@
 /** @} */
 
 /**
- * @name    SDC bus error conditions
- * @{
+ * @brief   Mask of error bits in R1 responses.
  */
-#define SDC_NO_ERROR          0           /**< @brief No error.             */
-#define SDC_CMD_CRC_ERROR     1           /**< @brief Command CRC error.    */
-#define SDC_DATA_CRC_ERROR    2           /**< @brief Data CRC error.       */
-#define SDC_DATA_TIMEOUT      4           /**< @brief HW write timeout.     */
-#define SDC_COMMAND_TIMEOUT   8           /**< @brief HW read timeout.      */
-#define SDC_TX_UNDERRUN       16          /**< @brief TX buffer underrun.   */
-#define SDC_RX_OVERRUN        32          /**< @brief RX buffer overrun.    */
-#define SDC_STARTBIT_ERROR    64          /**< @brief Start bit missing.    */
-#define SDC_OVERFLOW_ERROR    128         /**< @brief Card overflow error.  */
-#define SDC_UNHANDLED_ERROR   0xFFFFFFFF
-/** @} */
+#define SDC_R1_ERROR_MASK               0xFDFFE008
+
+#define SDC_STS_IDLE                    0
+#define SDC_STS_READY                   1
+#define SDC_STS_IDENT                   2
+#define SDC_STS_STBY                    3
+#define SDC_STS_TRAN                    4
+#define SDC_STS_DATA                    5
+#define SDC_STS_RCV                     6
+#define SDC_STS_PRG                     7
+#define SDC_STS_DIS                     8
+
+#define SDC_CMD_GO_IDLE_STATE           0
+#define SDC_CMD_INIT                    1
+#define SDC_CMD_ALL_SEND_CID            2
+#define SDC_CMD_SEND_RELATIVE_ADDR      3
+#define SDC_CMD_SET_BUS_WIDTH           6
+#define SDC_CMD_SEL_DESEL_CARD          7
+#define SDC_CMD_SEND_IF_COND            8
+#define SDC_CMD_SEND_CSD                9
+#define SDC_CMD_STOP_TRANSMISSION       12
+#define SDC_CMD_SEND_STATUS             13
+#define SDC_CMD_SET_BLOCKLEN            16
+#define SDC_CMD_READ_SINGLE_BLOCK       17
+#define SDC_CMD_READ_MULTIPLE_BLOCK     18
+#define SDC_CMD_SET_BLOCK_COUNT         23
+#define SDC_CMD_WRITE_BLOCK             24
+#define SDC_CMD_WRITE_MULTIPLE_BLOCK    25
+#define SDC_CMD_APP_OP_COND             41
+#define SDC_CMD_LOCK_UNLOCK             42
+#define SDC_CMD_APP_CMD                 55
 
 /*===========================================================================*/
 /* Driver pre-compile time settings.                                         */
@@ -127,6 +160,32 @@ typedef enum {
 /*===========================================================================*/
 
 /**
+ * @name    R1 response utilities
+ * @{
+ */
+/**
+ * @brief   Evaluates to @p TRUE if the R1 response contains error flags.
+ *
+ * @param[in] r1        the r1 response
+ */
+#define SDC_R1_ERROR(r1)                (((r1) & SDC_R1_ERROR_MASK) != 0)
+
+/**
+ * @brief   Returns the status field of an R1 response.
+ *
+ * @param[in] r1        the r1 response
+ */
+#define SDC_R1_STS(r1)                  (((r1) >> 9) & 15)
+
+/**
+ * @brief   Evaluates to @p TRUE if the R1 response indicates a locked card.
+ *
+ * @param[in] r1        the r1 response
+ */
+#define SDC_R1_IS_CARD_LOCKED(r1)       (((r1) >> 21) & 1)
+/** @} */
+
+/**
  * @name    Macro Functions
  * @{
  */
@@ -165,22 +224,12 @@ typedef enum {
  *
  * @param[in] sdcp      pointer to the @p SDCDriver object
  * @return              The card state.
- * @retval FALSE        not write protected.
- * @retval TRUE         write protected.
+ * @retval FALSE        card not inserted.
+ * @retval TRUE         card inserted.
  *
  * @api
  */
 #define sdcIsWriteProtected(sdcp) (sdc_lld_is_write_protected(sdcp))
-
-/**
- * @brief   Returns the card capacity in blocks.
- *
- * @param[in] sdcp      pointer to the @p SDCDriver object
- * @return              The card capacity.
- *
- * @api
- */
-#define sdcGetCardCapacity(sdcp)  ((sdcp)->capacity)
 /** @} */
 
 /*===========================================================================*/
@@ -200,9 +249,6 @@ extern "C" {
                  uint8_t *buffer, uint32_t n);
   bool_t sdcWrite(SDCDriver *sdcp, uint32_t startblk,
                   const uint8_t *buffer, uint32_t n);
-  sdcflags_t sdcGetAndClearErrors(SDCDriver *sdcp);
-  bool_t sdcSync(SDCDriver *sdcp);
-  bool_t sdcGetInfo(SDCDriver *sdcp, BlockDeviceInfo *bdip);
   bool_t _sdc_wait_for_transfer_state(SDCDriver *sdcp);
 #ifdef __cplusplus
 }

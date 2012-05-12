@@ -16,6 +16,13 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+                                      ---
+
+    A special exception to the GPL can be applied should you wish to distribute
+    a combined work that includes ChibiOS/RT, without being obliged to provide
+    the source code for any proprietary components. See the file exception.txt
+    for full details of how and when the exception can be applied.
 */
 
 /**
@@ -103,7 +110,7 @@ static size_t readt(void *ip, uint8_t *bp, size_t n, systime_t time) {
   return chIQReadTimeout(&((SerialUSBDriver *)ip)->iqueue, bp, n, time);
 }
 
-static chnflags_t getflags(void *ip) {
+static ioflags_t getflags(void *ip) {
   _ch_get_and_clear_flags_impl(ip);
 }
 
@@ -133,7 +140,7 @@ static void inotify(GenericQueue *qp) {
 
     chSysLock();
     usbStartReceiveI(sdup->config->usbp, USB_CDC_DATA_AVAILABLE_EP);
-    chnAddFlagsI(sdup, CHN_INPUT_AVAILABLE);
+    chIOAddFlagsI(sdup, IO_INPUT_AVAILABLE);
     sdup->iqueue.q_rdptr = sdup->iqueue.q_buffer;
     sdup->iqueue.q_counter = n;
     while (notempty(&sdup->iqueue.q_waiting))
@@ -160,7 +167,7 @@ static void onotify(GenericQueue *qp) {
 
     chSysLock();
     usbStartTransmitI(sdup->config->usbp, USB_CDC_DATA_REQUEST_EP);
-    chnAddFlagsI(sdup, CHN_OUTPUT_EMPTY);
+    chIOAddFlagsI(sdup, IO_OUTPUT_EMPTY);
     sdup->oqueue.q_wrptr = sdup->oqueue.q_buffer;
     sdup->oqueue.q_counter = chQSizeI(&sdup->oqueue);
     while (notempty(&sdup->oqueue.q_waiting))
@@ -195,7 +202,7 @@ void sduObjectInit(SerialUSBDriver *sdup) {
 
   sdup->vmt = &vmt;
   chEvtInit(&sdup->event);
-  sdup->flags = CHN_NO_ERROR;
+  sdup->flags = IO_NO_ERROR;
   sdup->state = SDU_STOP;
   chIQInit(&sdup->iqueue, sdup->ib, SERIAL_USB_BUFFERS_SIZE, inotify);
   chOQInit(&sdup->oqueue, sdup->ob, SERIAL_USB_BUFFERS_SIZE, onotify);
@@ -312,7 +319,7 @@ void sduDataTransmitted(USBDriver *usbp, usbep_t ep) {
 
     chSysLockFromIsr();
     usbStartTransmitI(usbp, ep);
-    chnAddFlagsI(sdup, CHN_OUTPUT_EMPTY);
+    chIOAddFlagsI(sdup, IO_OUTPUT_EMPTY);
     sdup->oqueue.q_wrptr = sdup->oqueue.q_buffer;
     sdup->oqueue.q_counter = chQSizeI(&sdup->oqueue);
     while (notempty(&sdup->oqueue.q_waiting))
@@ -348,7 +355,7 @@ void sduDataReceived(USBDriver *usbp, usbep_t ep) {
 
     chSysLockFromIsr();
     usbStartReceiveI(usbp, ep);
-    chnAddFlagsI(sdup, CHN_INPUT_AVAILABLE);
+    chIOAddFlagsI(sdup, IO_INPUT_AVAILABLE);
     sdup->iqueue.q_rdptr = sdup->iqueue.q_buffer;
     sdup->iqueue.q_counter = n;
     while (notempty(&sdup->iqueue.q_waiting))

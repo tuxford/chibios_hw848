@@ -16,15 +16,22 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+                                      ---
+
+    A special exception to the GPL can be applied should you wish to distribute
+    a combined work that includes ChibiOS/RT, without being obliged to provide
+    the source code for any proprietary components. See the file exception.txt
+    for full details of how and when the exception can be applied.
 */
 
 /**
- * @file    io_channel.h
- * @brief   I/O channels access.
+ * @file    chioch.h
+ * @brief   I/O channels.
  * @details This header defines abstract interfaces useful to access generic
- *          I/O serial devices in a standardized way.
+ *          I/O resources in a standardized way.
  *
- * @addtogroup IO_CHANNEL
+ * @addtogroup io_channels
  * @details This module defines an abstract interface for I/O channels by
  *          extending the @p BaseSequentialStream interface. Note that no code
  *          is present, I/O channels are just abstract interface like
@@ -36,8 +43,8 @@
  * @{
  */
 
-#ifndef _IO_CHANNEL_H_
-#define _IO_CHANNEL_H_
+#ifndef _CHIOCH_H_
+#define _CHIOCH_H_
 
 /**
  * @brief   @p BaseChannel specific methods.
@@ -71,8 +78,8 @@
  *
  * @brief   @p BaseChannel virtual methods table.
  */
-struct BaseChannelVMT {
-  _base_channel_methods
+struct BaseChannelVMT {                                                     \
+  _base_channel_methods                                                     \
 };
 
 /**
@@ -98,7 +105,6 @@ typedef struct {
  *          block.
  *
  * @param[in] ip        pointer to a @p BaseChannel or derived class
- *
  * @return              The output queue status.
  * @retval FALSE        if the output queue has space and would not block a
  *                      write operation.
@@ -107,7 +113,7 @@ typedef struct {
  *
  * @api
  */
-#define chnPutWouldBlock(ip) ((ip)->vmt->putwouldblock(ip))
+#define chIOPutWouldBlock(ip) ((ip)->vmt->putwouldblock(ip))
 
 /**
  * @brief   Channel input check.
@@ -115,7 +121,6 @@ typedef struct {
  *          block.
  *
  * @param[in] ip        pointer to a @p BaseChannel or derived class
- *
  * @return              The input queue status.
  * @retval FALSE        if the input queue contains data and would not block a
  *                      read operation.
@@ -124,7 +129,7 @@ typedef struct {
  *
  * @api
  */
-#define chnGetWouldBlock(ip) ((ip)->vmt->getwouldblock(ip))
+#define chIOGetWouldBlock(ip) ((ip)->vmt->getwouldblock(ip))
 
 /**
  * @brief   Channel blocking byte write.
@@ -133,14 +138,13 @@ typedef struct {
  *
  * @param[in] ip        pointer to a @p BaseChannel or derived class
  * @param[in] b         the byte value to be written to the channel
- *
  * @return              The operation status.
  * @retval Q_OK         if the operation succeeded.
  * @retval Q_RESET      if the channel associated queue (if any) was reset.
  *
  * @api
  */
-#define chnPut(ip, b) ((ip)->vmt->put(ip, b, TIME_INFINITE))
+#define chIOPut(ip, b) ((ip)->vmt->put(ip, b, TIME_INFINITE))
 
 /**
  * @brief   Channel blocking byte write with timeout.
@@ -161,7 +165,7 @@ typedef struct {
  *
  * @api
  */
-#define chnPutTimeout(ip, b, time) ((ip)->vmt->put(ip, b, time))
+#define chIOPutTimeout(ip, b, time) ((ip)->vmt->put(ip, b, time))
 
 /**
  * @brief   Channel blocking byte read.
@@ -169,14 +173,13 @@ typedef struct {
  *          is not available then the calling thread is suspended.
  *
  * @param[in] ip        pointer to a @p BaseChannel or derived class
- *
  * @return              A byte value from the queue.
  * @retval Q_RESET      if the channel associated queue (if any) has been
  *                      reset.
  *
  * @api
  */
-#define chnGet(ip) ((ip)->vmt->get(ip, TIME_INFINITE))
+#define chIOGet(ip) ((ip)->vmt->get(ip, TIME_INFINITE))
 
 /**
  * @brief   Channel blocking byte read with timeout.
@@ -196,22 +199,7 @@ typedef struct {
  *
  * @api
  */
-#define chnGetTimeout(ip, time) ((ip)->vmt->get(ip, time))
-
-/**
- * @brief   Channel blocking write.
- * @details The function writes data from a buffer to a channel. If the channel
- *          is not ready to accept data then the calling thread is suspended.
- *
- * @param[in] ip        pointer to a @p BaseChannel or derived class
- * @param[out] bp       pointer to the data buffer
- * @param[in] n         the maximum amount of data to be transferred
- *
- * @return              The number of bytes transferred.
- *
- * @api
- */
-#define chnWrite(ip, bp, n) chSequentialStreamWrite(ip, bp, n)
+#define chIOGetTimeout(ip, time) ((ip)->vmt->get(ip, time))
 
 /**
  * @brief   Channel blocking write with timeout.
@@ -230,22 +218,8 @@ typedef struct {
  *
  * @api
  */
-#define chnWriteTimeout(ip, bp, n, time) ((ip)->vmt->writet(ip, bp, n, time))
-
-/**
- * @brief   Channel blocking read.
- * @details The function reads data from a channel into a buffer. If the data
- *          is not available then the calling thread is suspended.
- *
- * @param[in] ip        pointer to a @p BaseChannel or derived class
- * @param[in] bp        pointer to the data buffer
- * @param[in] n         the maximum amount of data to be transferred
- *
- * @return              The number of bytes transferred.
- *
- * @api
- */
-#define chnRead(ip, bp, n) chSequentialStreamRead(ip, bp, n)
+#define chIOWriteTimeout(ip, bp, n, time)                                   \
+  ((ip)->vmt->writet(ip, bp, n, time))
 
 /**
  * @brief   Channel blocking read with timeout.
@@ -264,7 +238,8 @@ typedef struct {
  *
  * @api
  */
-#define chnReadTimeout(ip, bp, n, time) ((ip)->vmt->readt(ip, bp, n, time))
+#define chIOReadTimeout(ip, bp, n, time)                                    \
+  ((ip)->vmt->readt(ip, bp, n, time))
 /** @} */
 
 #if CH_USE_EVENTS || defined(__DOXYGEN__)
@@ -273,23 +248,23 @@ typedef struct {
  * @{
  */
 /** @brief No pending conditions.*/
-#define CHN_NO_ERROR            0
+#define IO_NO_ERROR             0
 /** @brief Connection happened.*/
-#define ICHN_CONNECTED          1
+#define IO_CONNECTED            1
 /** @brief Disconnection happened.*/
-#define CHN_DISCONNECTED        2
+#define IO_DISCONNECTED         2
 /** @brief Data available in the input queue.*/
-#define CHN_INPUT_AVAILABLE     4
+#define IO_INPUT_AVAILABLE      4
 /** @brief Output queue empty.*/
-#define CHN_OUTPUT_EMPTY        8
+#define IO_OUTPUT_EMPTY         8
 /** @brief Transmission end.*/
-#define CHN_TRANSMISSION_END    16
+#define IO_TRANSMISSION_END     16
 /** @} */
 
 /**
  * @brief   Type of an I/O condition flags mask.
  */
-typedef uint_fast16_t chnflags_t;
+typedef uint_fast16_t ioflags_t;
 
 /**
  * @brief   @p BaseAsynchronousChannel specific methods.
@@ -297,7 +272,7 @@ typedef uint_fast16_t chnflags_t;
 #define _base_asynchronous_channel_methods                                  \
   _base_channel_methods                                                     \
   /* Channel read method with timeout specification.*/                      \
-  chnflags_t (*getflags)(void *instance);
+  ioflags_t (*getflags)(void *instance);
 
 /**
  * @brief   @p BaseAsynchronousChannel specific data.
@@ -307,7 +282,7 @@ typedef uint_fast16_t chnflags_t;
   /* I/O condition event source.*/                                          \
   EventSource           event;                                              \
   /* I/O condition flags.*/                                                 \
-  chnflags_t             flags;
+  ioflags_t             flags;
 
 /**
  * @extends BaseChannelVMT
@@ -345,7 +320,7 @@ typedef struct {
  *
  * @api
  */
-#define chnGetEventSource(ip) (&((ip)->event))
+#define chIOGetEventSource(ip) (&((ip)->event))
 
 /**
  * @brief   Adds status flags to the channel's mask.
@@ -359,7 +334,7 @@ typedef struct {
  *
  * @iclass
  */
-#define chnAddFlagsI(ip, mask) {                                            \
+#define chIOAddFlagsI(ip, mask) {                                           \
   (ip)->flags |= (mask);                                                    \
   chEvtBroadcastI(&(ip)->event);                                            \
 }
@@ -374,7 +349,7 @@ typedef struct {
  *
  * @api
  */
-#define chnGetAndClearFlags(ip) ((ip)->vmt->getflags(ip))
+#define chIOGetAndClearFlags(ip) ((ip)->vmt->getflags(ip))
 /** @} */
 
 /**
@@ -387,16 +362,16 @@ typedef struct {
  *
  * @notapi
  */
-#define _chn_get_and_clear_flags_impl(ip)                                   \
-  chnflags_t mask;                                                          \
+#define _ch_get_and_clear_flags_impl(ip)                                    \
+  ioflags_t mask;                                                           \
   chSysLock();                                                              \
   mask = ((BaseAsynchronousChannel *)(ip))->flags;                          \
-  ((BaseAsynchronousChannel *)(ip))->flags = CHN_NO_ERROR;                  \
+  ((BaseAsynchronousChannel *)(ip))->flags = IO_NO_ERROR;                   \
   chSysUnlock();                                                            \
   return mask
 
 #endif /* CH_USE_EVENTS */
 
-#endif /* _IO_CHANNEL_H_ */
+#endif /* _CHIOCH_H_ */
 
 /** @} */

@@ -16,6 +16,13 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+                                      ---
+
+    A special exception to the GPL can be applied should you wish to distribute
+    a combined work that includes ChibiOS/RT, without being obliged to provide
+    the source code for any proprietary components. See the file exception.txt
+    for full details of how and when the exception can be applied.
 */
 
 /*
@@ -55,7 +62,7 @@
 #define STM32_OTG_CLOCK_REQUIRED            TRUE
 #define STM32_OTGFSPRE                      STM32_OTGFSPRE_DIV3
 #define STM32_I2S_CLOCK_REQUIRED            FALSE
-#define STM32_MCOSEL                        STM32_MCOSEL_PLL3
+#define STM32_MCOSEL                        STM32_MCOSEL_PLL2
 #define STM32_RTCSEL                        STM32_RTCSEL_HSEDIV
 #define STM32_PVD_ENABLE                    FALSE
 #define STM32_PLS                           STM32_PLS_LEV0

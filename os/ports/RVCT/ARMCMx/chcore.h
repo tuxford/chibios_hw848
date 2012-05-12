@@ -16,6 +16,13 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+                                      ---
+
+    A special exception to the GPL can be applied should you wish to distribute
+    a combined work that includes ChibiOS/RT, without being obliged to provide
+    the source code for any proprietary components. See the file exception.txt
+    for full details of how and when the exception can be applied.
 */
 
 /**
@@ -168,7 +175,7 @@ struct intctx {};
  * @brief   Inline-able version of this kernel function.
  */
 #define chSchIsPreemptionRequired()                                         \
-  (currp->p_preempt ? firstprio(&rlist.r_queue) > currp->p_prio :           \
+  (rlist.r_preempt ? firstprio(&rlist.r_queue) > currp->p_prio :            \
                      firstprio(&rlist.r_queue) >= currp->p_prio)
 #else /* CH_TIME_QUANTUM == 0 */
 #define chSchIsPreemptionRequired()                                         \

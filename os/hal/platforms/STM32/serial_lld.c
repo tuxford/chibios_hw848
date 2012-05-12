@@ -16,6 +16,13 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+                                      ---
+
+    A special exception to the GPL can be applied should you wish to distribute
+    a combined work that includes ChibiOS/RT, without being obliged to provide
+    the source code for any proprietary components. See the file exception.txt
+    for full details of how and when the exception can be applied.
 */
 
 /**
@@ -140,7 +147,7 @@ static void usart_deinit(USART_TypeDef *u) {
  * @param[in] sr        USART SR register value
  */
 static void set_error(SerialDriver *sdp, uint16_t sr) {
-  chnflags_t sts = 0;
+  ioflags_t sts = 0;
 
   if (sr & USART_SR_ORE)
     sts |= SD_OVERRUN_ERROR;
@@ -151,7 +158,7 @@ static void set_error(SerialDriver *sdp, uint16_t sr) {
   if (sr & USART_SR_NE)
     sts |= SD_NOISE_ERROR;
   chSysLockFromIsr();
-  chnAddFlagsI(sdp, sts);
+  chIOAddFlagsI(sdp, sts);
   chSysUnlockFromIsr();
 }
 
@@ -172,7 +179,7 @@ static void serve_interrupt(SerialDriver *sdp) {
   /* Special case, LIN break detection.*/
   if (sr & USART_SR_LBD) {
     chSysLockFromIsr();
-    chnAddFlagsI(sdp, SD_BREAK_DETECTED);
+    chIOAddFlagsI(sdp, SD_BREAK_DETECTED);
     chSysUnlockFromIsr();
     u->SR &= ~USART_SR_LBD;
   }
@@ -188,7 +195,7 @@ static void serve_interrupt(SerialDriver *sdp) {
     chSysLockFromIsr();
     b = chOQGetI(&sdp->oqueue);
     if (b < Q_OK) {
-      chnAddFlagsI(sdp, CHN_OUTPUT_EMPTY);
+      chIOAddFlagsI(sdp, IO_OUTPUT_EMPTY);
       u->CR1 = (cr1 & ~USART_CR1_TXEIE) | USART_CR1_TCIE;
     }
     else
@@ -198,7 +205,7 @@ static void serve_interrupt(SerialDriver *sdp) {
   /* Physical transmission end.*/
   if (sr & USART_SR_TC) {
     chSysLockFromIsr();
-    chnAddFlagsI(sdp, CHN_TRANSMISSION_END);
+    chIOAddFlagsI(sdp, IO_TRANSMISSION_END);
     chSysUnlockFromIsr();
     u->CR1 = cr1 & ~USART_CR1_TCIE;
     u->SR &= ~USART_SR_TC;

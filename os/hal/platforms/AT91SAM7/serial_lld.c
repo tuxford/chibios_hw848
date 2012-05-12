@@ -16,6 +16,13 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+                                      ---
+
+    A special exception to the GPL can be applied should you wish to distribute
+    a combined work that includes ChibiOS/RT, without being obliged to provide
+    the source code for any proprietary components. See the file exception.txt
+    for full details of how and when the exception can be applied.
 */
 
 /**
@@ -139,7 +146,7 @@ static void usart_deinit(AT91PS_USART u) {
  * @param[in] sdp       communication channel associated to the USART
  */
 static void set_error(SerialDriver *sdp, AT91_REG csr) {
-  chnflags_t sts = 0;
+  ioflags_t sts = 0;
 
   if (csr & AT91C_US_OVRE)
     sts |= SD_OVERRUN_ERROR;
@@ -150,7 +157,7 @@ static void set_error(SerialDriver *sdp, AT91_REG csr) {
   if (csr & AT91C_US_RXBRK)
     sts |= SD_BREAK_DETECTED;
   chSysLockFromIsr();
-  chnAddFlagsI(sdp, sts);
+  chIOAddFlagsI(sdp, sts);
   chSysUnlockFromIsr();
 }
 
@@ -181,7 +188,7 @@ void sd_lld_serve_interrupt(SerialDriver *sdp) {
     chSysLockFromIsr();
     b = chOQGetI(&sdp->oqueue);
     if (b < Q_OK) {
-      chnAddFlagsI(sdp, CHN_OUTPUT_EMPTY);
+      chIOAddFlagsI(sdp, IO_OUTPUT_EMPTY);
       u->US_IDR = AT91C_US_TXRDY;
     }
     else

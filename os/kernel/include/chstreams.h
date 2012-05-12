@@ -16,6 +16,13 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+                                      ---
+
+    A special exception to the GPL can be applied should you wish to distribute
+    a combined work that includes ChibiOS/RT, without being obliged to provide
+    the source code for any proprietary components. See the file exception.txt
+    for full details of how and when the exception can be applied.
 */
 
 /**
@@ -26,11 +33,11 @@
  *
  * @addtogroup data_streams
  * @details This module define an abstract interface for generic data streams.
- *          Note that no code is present, just abstract interfaces-like
- *          structures, you should look at the system as to a set of
- *          abstract C++ classes (even if written in C). This system
- *          has then advantage to make the access to data streams
- *          independent from the implementation logic.<br>
+ *          Note that no code is present, streams are just abstract interfaces
+ *          like structures, you should look at the systems as to a set of
+ *          abstract C++ classes (even if written in C). This system has the
+ *          advantage to make the access to streams independent from the
+ *          implementation logic.<br>
  *          The stream interface can be used as base class for high level
  *          object types such as files, sockets, serial ports, pipes etc.
  * @{

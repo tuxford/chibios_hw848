@@ -16,26 +16,22 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+                                      ---
+
+    A special exception to the GPL can be applied should you wish to distribute
+    a combined work that includes ChibiOS/RT, without being obliged to provide
+    the source code for any proprietary components. See the file exception.txt
+    for full details of how and when the exception can be applied.
 */
 
 #include "ch.h"
 #include "hal.h"
 
-#include "evtimer.h"
-
-#define PERIODIC_TIMER_ID       1
-#define FRAME_RECEIVED_ID       2
-
-static const MACConfig mac_config = {NULL};
-
-static uint8_t frame[STM32_MAC_BUFFERS_SIZE];
-
 /*
  * Application entry point.
  */
 int main(void) {
-  EvTimer evt;
-  EventListener el0, el1;
 
   /*
    * System initializations.
@@ -50,30 +46,13 @@ int main(void) {
   /*
    * Activates the MAC driver 1.
    */
-  macStart(&ETHD1, &mac_config);
-
-  /* Setup event sources.*/
-  evtInit(&evt, S2ST(5));
-  evtStart(&evt);
-  chEvtRegisterMask(&evt.et_es, &el0, PERIODIC_TIMER_ID);
-  chEvtRegisterMask(macGetReceiveEventSource(&ETHD1), &el1, FRAME_RECEIVED_ID);
-  chEvtAddFlags(PERIODIC_TIMER_ID | FRAME_RECEIVED_ID);
+/*  macStart(&ETHD1, NULL);*/
 
   /*
-   * Normal main() thread activity, the Ethernet status is polled every
-   * 5 seconds, incoming frames are read.
+   * Normal main() thread activity, in this demo it enables and disables the
+   * button EXT channel using 5 seconds intervals.
    */
   while (TRUE) {
-    eventmask_t mask = chEvtWaitAny(ALL_EVENTS);
-    if (mask & PERIODIC_TIMER_ID)
-      (void)macPollLinkStatus(&ETHD1);
-    if (mask & FRAME_RECEIVED_ID) {
-      MACReceiveDescriptor rd;
-
-      if (macWaitReceiveDescriptor(&ETHD1, &rd, TIME_IMMEDIATE) == RDY_OK) {
-        macReadReceiveDescriptor(&rd, frame, STM32_MAC_BUFFERS_SIZE);
-        macReleaseReceiveDescriptor(&rd);
-      }
-    }
+    chThdSleepMilliseconds(500);
   }
 }
