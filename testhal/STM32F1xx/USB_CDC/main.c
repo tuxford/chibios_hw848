@@ -16,6 +16,13 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+                                      ---
+
+    A special exception to the GPL can be applied should you wish to distribute
+    a combined work that includes ChibiOS/RT, without being obliged to provide
+    the source code for any proprietary components. See the file exception.txt
+    for full details of how and when the exception can be applied.
 */
 
 #include <stdio.h>
@@ -226,62 +233,44 @@ static const USBDescriptor *get_descriptor(USBDriver *usbp,
 }
 
 /**
- * @brief   IN EP1 state.
- */
-static USBInEndpointState ep1instate;
-
-/**
  * @brief   EP1 initialization structure (IN only).
  */
 static const USBEndpointConfig ep1config = {
-  USB_EP_MODE_TYPE_BULK,
+  USB_EP_MODE_TYPE_BULK | USB_EP_MODE_PACKET,
   NULL,
   sduDataTransmitted,
   NULL,
   0x0040,
   0x0000,
-  &ep1instate,
   NULL,
   NULL
 };
 
 /**
- * @brief   OUT EP2 state.
- */
-USBOutEndpointState ep2outstate;
-
-/**
  * @brief   EP2 initialization structure (IN only).
  */
 static const USBEndpointConfig ep2config = {
-  USB_EP_MODE_TYPE_INTR,
+  USB_EP_MODE_TYPE_INTR | USB_EP_MODE_PACKET,
   NULL,
   sduInterruptTransmitted,
   NULL,
   0x0010,
   0x0000,
   NULL,
-  &ep2outstate,
   NULL
 };
-
-/**
- * @brief   OUT EP3 state.
- */
-USBOutEndpointState ep3outstate;
 
 /**
  * @brief   EP3 initialization structure (OUT only).
  */
 static const USBEndpointConfig ep3config = {
-  USB_EP_MODE_TYPE_BULK,
+  USB_EP_MODE_TYPE_BULK | USB_EP_MODE_PACKET,
   NULL,
   NULL,
   sduDataReceived,
   0x0000,
   0x0040,
   NULL,
-  &ep3outstate,
   NULL
 };
 
@@ -335,7 +324,7 @@ static const SerialUSBConfig serusbcfg = {
 #define SHELL_WA_SIZE   THD_WA_SIZE(2048)
 #define TEST_WA_SIZE    THD_WA_SIZE(256)
 
-static void cmd_mem(BaseSequentialStream *chp, int argc, char *argv[]) {
+static void cmd_mem(BaseChannel *chp, int argc, char *argv[]) {
   size_t n, size;
 
   (void)argv;
@@ -349,7 +338,7 @@ static void cmd_mem(BaseSequentialStream *chp, int argc, char *argv[]) {
   chprintf(chp, "heap free total  : %u bytes\r\n", size);
 }
 
-static void cmd_threads(BaseSequentialStream *chp, int argc, char *argv[]) {
+static void cmd_threads(BaseChannel *chp, int argc, char *argv[]) {
   static const char *states[] = {THD_STATE_NAMES};
   Thread *tp;
 
@@ -369,7 +358,7 @@ static void cmd_threads(BaseSequentialStream *chp, int argc, char *argv[]) {
   } while (tp != NULL);
 }
 
-static void cmd_test(BaseSequentialStream *chp, int argc, char *argv[]) {
+static void cmd_test(BaseChannel *chp, int argc, char *argv[]) {
   Thread *tp;
 
   (void)argv;
@@ -394,7 +383,7 @@ static const ShellCommand commands[] = {
 };
 
 static const ShellConfig shell_cfg1 = {
-  (BaseSequentialStream *)&SDU1,
+  (BaseChannel *)&SDU1,
   commands
 };
 
@@ -437,8 +426,6 @@ int main(void) {
   /*
    * Activates the USB driver and then the USB bus pull-up on D+.
    */
-  usbDisconnectBus(serusbcfg.usbp);
-  chThdSleepMilliseconds(1000);
   sduObjectInit(&SDU1);
   sduStart(&SDU1, &serusbcfg);
   usbConnectBus(serusbcfg.usbp);

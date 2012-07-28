@@ -16,6 +16,13 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+                                      ---
+
+    A special exception to the GPL can be applied should you wish to distribute
+    a combined work that includes ChibiOS/RT, without being obliged to provide
+    the source code for any proprietary components. See the file exception.txt
+    for full details of how and when the exception can be applied.
 */
 
 #include <string.h>
@@ -30,84 +37,7 @@
 #include "ff.h"
 
 /*===========================================================================*/
-/* Card insertion monitor.                                                   */
-/*===========================================================================*/
-
-#define POLLING_INTERVAL                10
-#define POLLING_DELAY                   10
-
-/**
- * @brief   Card monitor timer.
- */
-static VirtualTimer tmr;
-
-/**
- * @brief   Debounce counter.
- */
-static unsigned cnt;
-
-/**
- * @brief   Card event sources.
- */
-static EventSource inserted_event, removed_event;
-
-/**
- * @brief   Insertion monitor timer callback function.
- *
- * @param[in] p         pointer to the @p BaseBlockDevice object
- *
- * @notapi
- */
-static void tmrfunc(void *p) {
-  BaseBlockDevice *bbdp = p;
-
-  /* The presence check is performed only while the driver is not in a
-     transfer state because it is often performed by changing the mode of
-     the pin connected to the CS/D3 contact of the card, this could disturb
-     the transfer.*/
-  blkstate_t state = blkGetDriverState(bbdp);
-  chSysLockFromIsr();
-  if ((state != BLK_READING) && (state != BLK_WRITING)) {
-    /* Safe to perform the check.*/
-    if (cnt > 0) {
-      if (blkIsInserted(bbdp)) {
-        if (--cnt == 0) {
-          chEvtBroadcastI(&inserted_event);
-        }
-      }
-      else
-        cnt = POLLING_INTERVAL;
-    }
-    else {
-      if (!blkIsInserted(bbdp)) {
-        cnt = POLLING_INTERVAL;
-        chEvtBroadcastI(&removed_event);
-      }
-    }
-  }
-  chVTSetI(&tmr, MS2ST(POLLING_DELAY), tmrfunc, bbdp);
-  chSysUnlockFromIsr();
-}
-
-/**
- * @brief   Polling monitor start.
- *
- * @param[in] p         pointer to an object implementing @p BaseBlockDevice
- *
- * @notapi
- */
-static void tmr_init(void *p) {
-
-  chEvtInit(&inserted_event);
-  chEvtInit(&removed_event);
-  chSysLock();
-  cnt = POLLING_INTERVAL;
-  chVTSetI(&tmr, MS2ST(POLLING_DELAY), tmrfunc, p);
-  chSysUnlock();
-}
-
-/*===========================================================================*/
-/* FatFs related.                                                            */
+/* MMC/SPI related.                                                          */
 /*===========================================================================*/
 
 /**
@@ -130,13 +60,16 @@ static SPIConfig hs_spicfg = {NULL, IOPORT2, GPIOB_SPI2NSS, 0};
 static SPIConfig ls_spicfg = {NULL, IOPORT2, GPIOB_SPI2NSS,
                               SPI_CR1_BR_2 | SPI_CR1_BR_1};
 
-/* MMC/SD over SPI driver configuration.*/
-static MMCConfig mmccfg = {&SPID2, &ls_spicfg, &hs_spicfg};
+/* Card insertion verification.*/
+static bool_t mmc_is_inserted(void) {return palReadPad(IOPORT3, GPIOC_MMCCP);}
+
+/* Card protection verification.*/
+static bool_t mmc_is_protected(void) {return !palReadPad(IOPORT3, GPIOC_MMCWP);}
 
 /* Generic large buffer.*/
 uint8_t fbuff[1024];
 
-static FRESULT scan_files(BaseSequentialStream *chp, char *path) {
+static FRESULT scan_files(BaseChannel *chp, char *path) {
   FRESULT res;
   FILINFO fno;
   DIR dir;
@@ -176,7 +109,7 @@ static FRESULT scan_files(BaseSequentialStream *chp, char *path) {
 #define SHELL_WA_SIZE   THD_WA_SIZE(2048)
 #define TEST_WA_SIZE    THD_WA_SIZE(256)
 
-static void cmd_mem(BaseSequentialStream *chp, int argc, char *argv[]) {
+static void cmd_mem(BaseChannel *chp, int argc, char *argv[]) {
   size_t n, size;
 
   (void)argv;
@@ -190,7 +123,7 @@ static void cmd_mem(BaseSequentialStream *chp, int argc, char *argv[]) {
   chprintf(chp, "heap free total  : %u bytes\r\n", size);
 }
 
-static void cmd_threads(BaseSequentialStream *chp, int argc, char *argv[]) {
+static void cmd_threads(BaseChannel *chp, int argc, char *argv[]) {
   static const char *states[] = {THD_STATE_NAMES};
   Thread *tp;
 
@@ -210,7 +143,7 @@ static void cmd_threads(BaseSequentialStream *chp, int argc, char *argv[]) {
   } while (tp != NULL);
 }
 
-static void cmd_test(BaseSequentialStream *chp, int argc, char *argv[]) {
+static void cmd_test(BaseChannel *chp, int argc, char *argv[]) {
   Thread *tp;
 
   (void)argv;
@@ -227,7 +160,7 @@ static void cmd_test(BaseSequentialStream *chp, int argc, char *argv[]) {
   chThdWait(tp);
 }
 
-static void cmd_tree(BaseSequentialStream *chp, int argc, char *argv[]) {
+static void cmd_tree(BaseChannel *chp, int argc, char *argv[]) {
   FRESULT err;
   uint32_t clusters;
   FATFS *fsp;
@@ -263,13 +196,9 @@ static const ShellCommand commands[] = {
 };
 
 static const ShellConfig shell_cfg1 = {
-  (BaseSequentialStream *)&SD2,
+  (BaseChannel *)&SD2,
   commands
 };
-
-/*===========================================================================*/
-/* Main and generic code.                                                    */
-/*===========================================================================*/
 
 /*
  * Red LEDs blinker thread, times are in milliseconds.
@@ -316,7 +245,6 @@ static void InsertHandler(eventid_t id) {
 static void RemoveHandler(eventid_t id) {
 
   (void)id;
-  mmcDisconnect(&MMCD1);
   fs_ready = FALSE;
 }
 
@@ -356,13 +284,10 @@ int main(void) {
    */
   palSetPadMode(IOPORT2, GPIOB_SPI2NSS, PAL_MODE_OUTPUT_PUSHPULL);
   palSetPad(IOPORT2, GPIOB_SPI2NSS);
-  mmcObjectInit(&MMCD1);
-  mmcStart(&MMCD1, &mmccfg);
-
-  /*
-   * Activates the card insertion monitor.
-   */
-  tmr_init(&MMCD1);
+  mmcObjectInit(&MMCD1, &SPID2,
+                &ls_spicfg, &hs_spicfg,
+                mmc_is_protected, mmc_is_inserted);
+  mmcStart(&MMCD1, NULL);
 
   /*
    * Creates the blinker thread.
@@ -373,8 +298,8 @@ int main(void) {
    * Normal main() thread activity, in this demo it does nothing except
    * sleeping in a loop and listen for events.
    */
-  chEvtRegister(&inserted_event, &el0, 0);
-  chEvtRegister(&removed_event, &el1, 1);
+  chEvtRegister(&MMCD1.inserted_event, &el0, 0);
+  chEvtRegister(&MMCD1.removed_event, &el1, 1);
   while (TRUE) {
     if (!shelltp)
       shelltp = shellCreate(&shell_cfg1, SHELL_WA_SIZE, NORMALPRIO);
@@ -382,7 +307,7 @@ int main(void) {
       chThdRelease(shelltp);    /* Recovers memory of the previous shell.   */
       shelltp = NULL;           /* Triggers spawning of a new shell.        */
     }
-    chEvtDispatch(evhndl, chEvtWaitOneTimeout(ALL_EVENTS, MS2ST(500)));
+    chEvtDispatch(evhndl, chEvtWaitOne(ALL_EVENTS));
   }
   return 0;
 }
