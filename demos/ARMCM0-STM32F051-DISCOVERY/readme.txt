@@ -1,5 +1,5 @@
 *****************************************************************************
-** ChibiOS/RT port for ARM-Cortex-M0 STM32F051.                            **
+** Nil RTOS port for ARM-Cortex-M0 STM32F051.                             **
 *****************************************************************************
 
 ** TARGET **
@@ -17,9 +17,9 @@ different GCC toolchains.
 
 ** Notes **
 
-Some files used by the demo are not part of ChibiOS/RT but are copyright of
+Some files used by the demo are not part of Nil RTOS but are copyright of
 ST Microelectronics and are licensed under a different license.
 Also note that not all the files present in the ST library are distributed
-with ChibiOS/RT, you can find the whole library on the ST web site:
+with Nil RTOS, you can find the whole library on the ST web site:
 
                              http://www.st.com

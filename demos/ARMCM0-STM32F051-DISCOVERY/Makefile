@@ -5,7 +5,7 @@
 
 # Compiler options here.
 ifeq ($(USE_OPT),)
-  USE_OPT = -O2 -ggdb -fomit-frame-pointer -falign-functions=16
+  USE_OPT = -Os -ggdb -fomit-frame-pointer
 endif
 
 # C specific options here (added to USE_OPT).
@@ -20,7 +20,7 @@ endif
 
 # Enable this if you want the linker to remove unused code and data
 ifeq ($(USE_LINK_GC),)
-  USE_LINK_GC = yes
+  USE_LINK_GC = no
 endif
 
 # If enabled, this option allows to compile the application in THUMB mode.
@@ -55,16 +55,12 @@ endif
 #
 
 # Define project name here
-PROJECT = ch
+PROJECT = nil
 
 # Imported source files and paths
-CHIBIOS = ../..
-include $(CHIBIOS)/boards/ST_STM32F0_DISCOVERY/board.mk
-include $(CHIBIOS)/os/hal/platforms/STM32F0xx/platform.mk
-include $(CHIBIOS)/os/hal/hal.mk
-include $(CHIBIOS)/os/ports/GCC/ARMCMx/STM32F0xx/port.mk
-include $(CHIBIOS)/os/kernel/kernel.mk
-include $(CHIBIOS)/test/test.mk
+NILRTOS = ../..
+include $(NILRTOS)/os/ports/GCC/ARMCM0/STM32F0xx/port.mk
+include $(NILRTOS)/os/kernel/kernel.mk
 
 # Define linker script file here
 LDSCRIPT= $(PORTLD)/STM32F051x8.ld
@@ -73,11 +69,7 @@ LDSCRIPT= $(PORTLD)/STM32F051x8.ld
 # setting.
 CSRC = $(PORTSRC) \
        $(KERNSRC) \
-       $(TESTSRC) \
-       $(HALSRC) \
-       $(PLATFORMSRC) \
-       $(BOARDSRC) \
-       main.c
+       hwinit.c main.c
 
 # C++ sources that can be compiled in ARM or THUMB mode depending on the global
 # setting.
@@ -106,9 +98,7 @@ TCPPSRC =
 # List ASM source files here
 ASMSRC = $(PORTASM)
 
-INCDIR = $(PORTINC) $(KERNINC) $(TESTINC) \
-         $(HALINC) $(PLATFORMINC) $(BOARDINC) \
-         $(CHIBIOS)/os/various
+INCDIR = $(PORTINC) $(KERNINC)
 
 #
 # Project, sources and paths
@@ -198,10 +188,10 @@ ULIBS =
 ##############################################################################
 
 ifeq ($(USE_FWLIB),yes)
-  include $(CHIBIOS)/ext/stm32lib/stm32lib.mk
+  include $(NILRTOS)/ext/stm32lib/stm32lib.mk
   CSRC += $(STM32SRC)
   INCDIR += $(STM32INC)
   USE_OPT += -DUSE_STDPERIPH_DRIVER
 endif
 
-include $(CHIBIOS)/os/ports/GCC/ARMCMx/rules.mk
+include $(NILRTOS)/os/ports/GCC/ARMCM0/rules.mk

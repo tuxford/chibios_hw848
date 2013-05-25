@@ -1,6 +1,8 @@
-# List of the ChibiOS/RT MSP430 port files.
-PORTSRC =
+# List of the Nil RTOS MSP430 port files.
+PORTSRC = $(NILRTOS)/os/ports/GCC/MSP430/nilcore.c
 
-PORTASM = ${CHIBIOS}/os/ports/GCC/MSP430/chcoreasm.s 
+PORTASM =
 
-PORTINC = ${CHIBIOS}/os/ports/GCC/MSP430
+PORTINC = ${NILRTOS}/os/ports/GCC/MSP430
+
+PORTLD  =
