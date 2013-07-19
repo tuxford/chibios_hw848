@@ -113,8 +113,8 @@ void chIQResetI(InputQueue *iqp) {
 
   iqp->q_rdptr = iqp->q_wrptr = iqp->q_buffer;
   iqp->q_counter = 0;
-  while (notempty(&iqp->q_waiting))
-    chSchReadyI(fifo_remove(&iqp->q_waiting))->p_u.rdymsg = Q_RESET;
+  while (queue_notempty(&iqp->q_waiting))
+    chSchReadyI(queue_fifo_remove(&iqp->q_waiting))->p_u.rdymsg = Q_RESET;
 }
 
 /**
@@ -142,8 +142,8 @@ msg_t chIQPutI(InputQueue *iqp, uint8_t b) {
   if (iqp->q_wrptr >= iqp->q_top)
     iqp->q_wrptr = iqp->q_buffer;
 
-  if (notempty(&iqp->q_waiting))
-    chSchReadyI(fifo_remove(&iqp->q_waiting))->p_u.rdymsg = Q_OK;
+  if (queue_notempty(&iqp->q_waiting))
+    chSchReadyI(queue_fifo_remove(&iqp->q_waiting))->p_u.rdymsg = Q_OK;
 
   return Q_OK;
 }
@@ -293,8 +293,8 @@ void chOQResetI(OutputQueue *oqp) {
 
   oqp->q_rdptr = oqp->q_wrptr = oqp->q_buffer;
   oqp->q_counter = chQSizeI(oqp);
-  while (notempty(&oqp->q_waiting))
-    chSchReadyI(fifo_remove(&oqp->q_waiting))->p_u.rdymsg = Q_RESET;
+  while (queue_notempty(&oqp->q_waiting))
+    chSchReadyI(queue_fifo_remove(&oqp->q_waiting))->p_u.rdymsg = Q_RESET;
 }
 
 /**
@@ -366,8 +366,8 @@ msg_t chOQGetI(OutputQueue *oqp) {
   if (oqp->q_rdptr >= oqp->q_top)
     oqp->q_rdptr = oqp->q_buffer;
 
-  if (notempty(&oqp->q_waiting))
-    chSchReadyI(fifo_remove(&oqp->q_waiting))->p_u.rdymsg = Q_OK;
+  if (queue_notempty(&oqp->q_waiting))
+    chSchReadyI(queue_fifo_remove(&oqp->q_waiting))->p_u.rdymsg = Q_OK;
 
   return b;
 }

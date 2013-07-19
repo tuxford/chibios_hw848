@@ -441,7 +441,6 @@ ROMCONST struct testcase testbmk8 = {
   bmk8_execute
 };
 
-#if CH_USE_QUEUES || defined(__DOXYGEN__)
 /**
  * @page test_benchmarks_009 I/O Queues throughput
  *
@@ -488,7 +487,6 @@ ROMCONST struct testcase testbmk9 = {
   NULL,
   bmk9_execute
 };
-#endif /* CH_USE_QUEUES */
 
 /**
  * @page test_benchmarks_010 Virtual Timers set/reset performance
@@ -531,7 +529,6 @@ ROMCONST struct testcase testbmk10 = {
   bmk10_execute
 };
 
-#if CH_USE_SEMAPHORES || defined(__DOXYGEN__)
 /**
  * @page test_benchmarks_011 Semaphores wait/signal performance
  *
@@ -577,7 +574,6 @@ ROMCONST struct testcase testbmk11 = {
   NULL,
   bmk11_execute
 };
-#endif /* CH_USE_SEMAPHORES */
 
 #if CH_USE_MUTEXES || defined(__DOXYGEN__)
 /**
@@ -649,11 +645,9 @@ static void bmk13_execute(void) {
   test_print("--- Timer : ");
   test_printn(sizeof(VirtualTimer));
   test_println(" bytes");
-#if CH_USE_SEMAPHORES || defined(__DOXYGEN__)
   test_print("--- Semaph: ");
   test_printn(sizeof(Semaphore));
   test_println(" bytes");
-#endif
 #if CH_USE_EVENTS || defined(__DOXYGEN__)
   test_print("--- EventS: ");
   test_printn(sizeof(EventSource));
@@ -704,13 +698,9 @@ ROMCONST struct testcase * ROMCONST patternbmk[] = {
   &testbmk6,
   &testbmk7,
   &testbmk8,
-#if CH_USE_QUEUES || defined(__DOXYGEN__)
   &testbmk9,
-#endif
   &testbmk10,
-#if CH_USE_SEMAPHORES || defined(__DOXYGEN__)
   &testbmk11,
-#endif
 #if CH_USE_MUTEXES || defined(__DOXYGEN__)
   &testbmk12,
 #endif

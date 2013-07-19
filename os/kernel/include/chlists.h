@@ -20,10 +20,7 @@
 
 /**
  * @file    chlists.h
- * @brief   Thread queues/lists macros and structures.
- * @note    All the macros present in this module, while public, are not
- *          an OS API and should not be directly used in the user applications
- *          code.
+ * @brief   Thread queues/lists inlined code.
  *
  * @addtogroup internals
  * @{
@@ -32,37 +29,25 @@
 #ifndef _CHLISTS_H_
 #define _CHLISTS_H_
 
-typedef struct Thread Thread;
+/*===========================================================================*/
+/* Module constants.                                                         */
+/*===========================================================================*/
 
-/**
- * @brief   Threads queue initialization.
- *
- * @notapi
- */
-#define queue_init(tqp) ((tqp)->p_next = (tqp)->p_prev = (Thread *)(tqp));
+/*===========================================================================*/
+/* Module pre-compile time settings.                                         */
+/*===========================================================================*/
 
-/**
- * @brief   Threads list initialization.
- *
- * @notapi
- */
-#define list_init(tlp) ((tlp)->p_next = (Thread *)(tlp))
+/*===========================================================================*/
+/* Derived constants and error checks.                                       */
+/*===========================================================================*/
 
-/**
- * @brief   Evaluates to @p TRUE if the specified threads queue or list is
- * empty.
- *
- * @notapi
- */
-#define isempty(p)      ((p)->p_next == (Thread *)(p))
+/*===========================================================================*/
+/* Module data structures and types.                                         */
+/*===========================================================================*/
 
-/**
- * @brief   Evaluates to @p TRUE if the specified threads queue or list is
- *          not empty.
- *
- * @notapi
- */
-#define notempty(p)     ((p)->p_next != (Thread *)(p))
+/*===========================================================================*/
+/* Module macros.                                                            */
+/*===========================================================================*/
 
 /**
  * @brief   Data part of a static threads queue initializer.
@@ -82,46 +67,128 @@ typedef struct Thread Thread;
  */
 #define THREADSQUEUE_DECL(name) ThreadsQueue name = _THREADSQUEUE_DATA(name)
 
+/*===========================================================================*/
+/* External declarations.                                                    */
+/*===========================================================================*/
+
+/*===========================================================================*/
+/* Module inline functions.                                                  */
+/*===========================================================================*/
+
 /**
- * @extends ThreadsList
+ * @brief   Threads list initialization.
  *
- * @brief   Generic threads bidirectional linked list header and element.
+ * @notapi
  */
-typedef struct {
-  Thread                *p_next;        /**< First @p Thread in the queue, or
-                                             @p ThreadQueue when empty.     */
-  Thread                *p_prev;        /**< Last @p Thread in the queue, or
-                                             @p ThreadQueue when empty.     */
-} ThreadsQueue;
+static inline void list_init(ThreadsList *tlp) {
+
+  tlp->p_next = (Thread *)tlp;
+}
 
 /**
- * @brief   Generic threads single link list, it works like a stack.
+ * @brief   Evaluates to @p TRUE if the specified threads list is empty.
+ *
+ * @notapi
  */
-typedef struct {
+static inline bool_t list_isempty(ThreadsList *tlp) {
 
-  Thread            *p_next;            /**< Last pushed @p Thread on the stack
-                                             list, or pointer to itself if
-                                             empty.                         */
-} ThreadsList;
-
-#if !CH_OPTIMIZE_SPEED
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-  void prio_insert(Thread *tp, ThreadsQueue *tqp);
-  void queue_insert(Thread *tp, ThreadsQueue *tqp);
-  Thread *fifo_remove(ThreadsQueue *tqp);
-  Thread *lifo_remove(ThreadsQueue *tqp);
-  Thread *dequeue(Thread *tp);
-  void list_insert(Thread *tp, ThreadsList *tlp);
-  Thread *list_remove(ThreadsList *tlp);
-#ifdef __cplusplus
+  return (bool_t)(tlp->p_next == (Thread *)tlp);
 }
-#endif
 
-#endif /* !CH_OPTIMIZE_SPEED */
+/**
+ * @brief   Evaluates to @p TRUE if the specified threads list is not empty.
+ *
+ * @notapi
+ */
+static inline bool_t list_notempty(ThreadsList *tlp) {
+
+  return (bool_t)(tlp->p_next != (Thread *)tlp);
+}
+
+/**
+ * @brief   Threads queue initialization.
+ *
+ * @notapi
+ */
+static inline void queue_init(ThreadsQueue *tqp) {
+
+  tqp->p_next = tqp->p_prev = (Thread *)tqp;
+}
+
+/**
+ * @brief   Evaluates to @p TRUE if the specified threads queue is empty.
+ *
+ * @notapi
+ */
+static inline bool_t queue_isempty(ThreadsQueue *tqp) {
+
+  return (bool_t)(tqp->p_next == (Thread *)tqp);
+}
+
+/**
+ * @brief   Evaluates to @p TRUE if the specified threads queue is not empty.
+ *
+ * @notapi
+ */
+static inline bool_t queue_notempty(ThreadsQueue *tqp) {
+
+  return (bool_t)(tqp->p_next != (Thread *)tqp);
+}
+
+/* If the performance code path has been chosen then all the following
+   functions are inlined into the various kernel modules.*/
+#if CH_OPTIMIZE_SPEED
+static inline void list_insert(Thread *tp, ThreadsList *tlp) {
+
+  tp->p_next = tlp->p_next;
+  tlp->p_next = tp;
+}
+
+static inline Thread *list_remove(ThreadsList *tlp) {
+
+  Thread *tp = tlp->p_next;
+  tlp->p_next = tp->p_next;
+  return tp;
+}
+
+static inline void queue_prio_insert(Thread *tp, ThreadsQueue *tqp) {
+
+  Thread *cp = (Thread *)tqp;
+  do {
+    cp = cp->p_next;
+  } while ((cp != (Thread *)tqp) && (cp->p_prio >= tp->p_prio));
+  tp->p_next = cp;
+  tp->p_prev = cp->p_prev;
+  tp->p_prev->p_next = cp->p_prev = tp;
+}
+
+static inline void queue_insert(Thread *tp, ThreadsQueue *tqp) {
+
+  tp->p_next = (Thread *)tqp;
+  tp->p_prev = tqp->p_prev;
+  tp->p_prev->p_next = tqp->p_prev = tp;
+}
+
+static inline Thread *queue_fifo_remove(ThreadsQueue *tqp) {
+  Thread *tp = tqp->p_next;
+
+  (tqp->p_next = tp->p_next)->p_prev = (Thread *)tqp;
+  return tp;
+}
+
+static inline Thread *queue_lifo_remove(ThreadsQueue *tqp) {
+  Thread *tp = tqp->p_prev;
+
+  (tqp->p_prev = tp->p_prev)->p_next = (Thread *)tqp;
+  return tp;
+}
+
+static inline Thread *queue_dequeue(Thread *tp) {
+
+  tp->p_prev->p_next = tp->p_next;
+  tp->p_next->p_prev = tp->p_prev;
+  return tp;
+}
+#endif /* CH_OPTIMIZE_SPEED */
 
 #endif /* _CHLISTS_H_ */
-
-/** @} */

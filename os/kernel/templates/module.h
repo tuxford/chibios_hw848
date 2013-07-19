@@ -19,24 +19,23 @@
 */
 
 /**
- * @file    SPC560BCxx/vectors.h
- * @brief   ISR vector module header.
+ * @file    chXxx.h
+ * @brief   XXX Module macros and structures.
  *
- * @addtogroup PPC_CORE
+ * @addtogroup XXX
  * @{
  */
 
-#ifndef _VECTORS_H_
-#define _VECTORS_H_
+#ifndef _CHXXX_H_
+#define _CHXXX_H_
+
+#include "ch.h"
+
+#if CH_USE_XXX || defined(__DOXYGEN__)
 
 /*===========================================================================*/
 /* Module constants.                                                         */
 /*===========================================================================*/
-
-/**
- * @brief   Number of ISR vectors available.
- */
-#define VECTORS_NUMBER                      155
 
 /*===========================================================================*/
 /* Module pre-compile time settings.                                         */
@@ -58,22 +57,21 @@
 /* External declarations.                                                    */
 /*===========================================================================*/
 
-#if !defined(_FROM_ASM_)
-
-#if !defined(__DOXYGEN__)
-extern uint32_t _vectors[VECTORS_NUMBER];
-#endif
-
 #ifdef __cplusplus
 extern "C" {
 #endif
-  void _unhandled_irq(void);
+  void chXxxInit(void);
+  void chXxxObjectInit(xxx_t *xxxp);
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* !defined(_FROM_ASM_) */
+#endif /* CH_USE_XXX */
 
-#endif /* _OSAL_H_ */
+#endif /* _CHXXX_H_ */
+
+/*===========================================================================*/
+/* Module inline functions.                                                  */
+/*===========================================================================*/
 
 /** @} */

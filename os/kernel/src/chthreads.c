@@ -56,6 +56,30 @@
 
 #include "ch.h"
 
+/*===========================================================================*/
+/* Module local definitions.                                                 */
+/*===========================================================================*/
+
+/*===========================================================================*/
+/* Module exported variables.                                                */
+/*===========================================================================*/
+
+/*===========================================================================*/
+/* Module local types.                                                       */
+/*===========================================================================*/
+
+/*===========================================================================*/
+/* Module local variables.                                                   */
+/*===========================================================================*/
+
+/*===========================================================================*/
+/* Module local functions.                                                   */
+/*===========================================================================*/
+
+/*===========================================================================*/
+/* Module exported functions.                                                */
+/*===========================================================================*/
+
 /**
  * @brief   Initializes a thread structure.
  * @note    This is an internal functions, do not use it in application code.
@@ -302,7 +326,7 @@ void chThdSleep(systime_t time) {
 void chThdSleepUntil(systime_t time) {
 
   chSysLock();
-  if ((time -= chTimeNow()) > 0)
+  if ((time -= chVTGetSystemTimeI()) > 0)
     chThdSleepS(time);
   chSysUnlock();
 }
@@ -364,7 +388,7 @@ void chThdExitS(msg_t msg) {
   THREAD_EXT_EXIT_HOOK(tp);
 #endif
 #if CH_USE_WAITEXIT
-  while (notempty(&tp->p_waiting))
+  while (list_notempty(&tp->p_waiting))
     chSchReadyI(list_remove(&tp->p_waiting));
 #endif
 #if CH_USE_REGISTRY

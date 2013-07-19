@@ -100,13 +100,21 @@
 #endif
 /** @} */
 
+/* Forward declaration of the thread structure, it is used in most
+   modules.*/
+typedef struct Thread Thread;
+
+/* Inclusion of all the kernel sub-headers.*/
 #include "chconf.h"
 #include "chtypes.h"
-#include "chlists.h"
+#include "chdebug.h"
 #include "chcore.h"
+#include "chthreads.h"
+#include "chlists.h"
 #include "chsys.h"
 #include "chvt.h"
 #include "chschd.h"
+#include "chregistry.h"
 #include "chsem.h"
 #include "chbsem.h"
 #include "chmtx.h"
@@ -117,14 +125,10 @@
 #include "chmemcore.h"
 #include "chheap.h"
 #include "chmempools.h"
-#include "chthreads.h"
 #include "chdynamic.h"
-#include "chregistry.h"
-#include "chinline.h"
 #include "chqueues.h"
 #include "chstreams.h"
 #include "chfiles.h"
-#include "chdebug.h"
 
 #if !defined(__DOXYGEN__)
 extern WORKING_AREA(_idle_thread_wa, PORT_IDLE_THREAD_STACK_SIZE);

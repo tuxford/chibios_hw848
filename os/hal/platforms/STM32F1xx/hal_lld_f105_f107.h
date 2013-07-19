@@ -696,7 +696,8 @@
 #endif
 
 /* PLL2 activation conditions.*/
-#if ((STM32_PREDIV1SRC == STM32_PREDIV1SRC_PLL2) && STM32_ACTIVATE_PLL1) || \
+#if STM32_OTG_CLOCK_REQUIRED ||                                             \
+    (STM32_PREDIV1SRC == STM32_PREDIV1SRC_PLL2) ||                          \
     (STM32_MCOSEL == STM32_MCOSEL_PLL2DIV2) ||                              \
     defined(__DOXYGEN__)
 /**

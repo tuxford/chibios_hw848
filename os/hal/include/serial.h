@@ -145,6 +145,7 @@ struct SerialDriver {
  *          checks directly the output queue. This is faster but cannot
  *          be used to check different channels implementations.
  *
+ * @see     chIOPutWouldBlock()
  * @deprecated
  *
  * @api
@@ -157,6 +158,7 @@ struct SerialDriver {
  *          checks directly the input queue. This is faster but cannot
  *          be used to check different channels implementations.
  *
+ * @see     chIOGetWouldBlock()
  * @deprecated
  *
  * @api
@@ -169,7 +171,7 @@ struct SerialDriver {
  *          writes directly on the output queue. This is faster but cannot
  *          be used to write to different channels implementations.
  *
- * @see     chnPutTimeout()
+ * @see     chIOPut()
  *
  * @api
  */
@@ -181,7 +183,7 @@ struct SerialDriver {
  *          writes directly on the output queue. This is faster but cannot
  *          be used to write to different channels implementations.
  *
- * @see     chnPutTimeout()
+ * @see     chIOPutTimeout()
  *
  * @api
  */
@@ -193,7 +195,7 @@ struct SerialDriver {
  *          reads directly from the input queue. This is faster but cannot
  *          be used to read from different channels implementations.
  *
- * @see     chnGetTimeout()
+ * @see     chIOGet()
  *
  * @api
  */
@@ -205,7 +207,7 @@ struct SerialDriver {
  *          reads directly from the input queue. This is faster but cannot
  *          be used to read from different channels implementations.
  *
- * @see     chnGetTimeout()
+ * @see     chIOGetTimeout()
  *
  * @api
  */
@@ -217,7 +219,7 @@ struct SerialDriver {
  *          writes directly to the output queue. This is faster but cannot
  *          be used to write from different channels implementations.
  *
- * @see     chnWrite()
+ * @see     chIOWriteTimeout()
  *
  * @api
  */
@@ -231,7 +233,7 @@ struct SerialDriver {
  *          writes directly to the output queue. This is faster but cannot
  *          be used to write to different channels implementations.
  *
- * @see     chnWriteTimeout()
+ * @see     chIOWriteTimeout()
  *
  * @api
  */
@@ -244,7 +246,7 @@ struct SerialDriver {
  *          writes directly to the output queue. This is faster but cannot
  *          be used to write to different channels implementations.
  *
- * @see     chnWriteTimeout()
+ * @see     chIOWriteTimeout()
  *
  * @api
  */
@@ -257,7 +259,7 @@ struct SerialDriver {
  *          reads directly from the input queue. This is faster but cannot
  *          be used to read from different channels implementations.
  *
- * @see     chnRead()
+ * @see     chIOReadTimeout()
  *
  * @api
  */
@@ -271,7 +273,7 @@ struct SerialDriver {
  *          reads directly from the input queue. This is faster but cannot
  *          be used to read from different channels implementations.
  *
- * @see     chnReadTimeout()
+ * @see     chIOReadTimeout()
  *
  * @api
  */
@@ -284,7 +286,7 @@ struct SerialDriver {
  *          reads directly from the input queue. This is faster but cannot
  *          be used to read from different channels implementations.
  *
- * @see     chnReadTimeout()
+ * @see     chIOReadTimeout()
  *
  * @api
  */

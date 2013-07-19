@@ -191,7 +191,7 @@ static void mtx2_execute(void) {
   systime_t time;
 
   test_wait_tick();
-  time = chTimeNow();
+  time = chVTGetSystemTime();
   threads[0] = chThdCreateStatic(wa[0], WA_SIZE, chThdGetPriority()-1, thread2H, 0);
   threads[1] = chThdCreateStatic(wa[1], WA_SIZE, chThdGetPriority()-2, thread2M, 0);
   threads[2] = chThdCreateStatic(wa[2], WA_SIZE, chThdGetPriority()-3, thread2L, 0);
@@ -309,7 +309,7 @@ static void mtx3_execute(void) {
   systime_t time;
 
   test_wait_tick();
-  time = chTimeNow();
+  time = chVTGetSystemTime();
   threads[0] = chThdCreateStatic(wa[0], WA_SIZE, chThdGetPriority()-5, thread3LL, 0);
   threads[1] = chThdCreateStatic(wa[1], WA_SIZE, chThdGetPriority()-4, thread3L, 0);
   threads[2] = chThdCreateStatic(wa[2], WA_SIZE, chThdGetPriority()-3, thread3M, 0);
@@ -446,13 +446,13 @@ static void mtx5_execute(void) {
   chMtxUnlockS();
   chSysUnlock();
 
-  test_assert(3, isempty(&m1.m_queue), "queue not empty");
+  test_assert(3, queue_isempty(&m1.m_queue), "queue not empty");
   test_assert(4, m1.m_owner == NULL, "still owned");
   test_assert(5, chThdGetPriority() == prio, "wrong priority level");
   
   chMtxLock(&m1);
   chMtxUnlockAll();
-  test_assert(6, isempty(&m1.m_queue), "queue not empty");
+  test_assert(6, queue_isempty(&m1.m_queue), "queue not empty");
   test_assert(7, m1.m_owner == NULL, "still owned");
 }
 
