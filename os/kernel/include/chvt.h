@@ -16,6 +16,13 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+                                      ---
+
+    A special exception to the GPL can be applied should you wish to distribute
+    a combined work that includes ChibiOS/RT, without being obliged to provide
+    the source code for any proprietary components. See the file exception.txt
+    for full details of how and when the exception can be applied.
 */
 
 /**
@@ -57,8 +64,7 @@
  * @api
  */
 #define MS2ST(msec)                                                         \
-  ((systime_t)(((((uint32_t)(msec)) * ((uint32_t)CH_FREQUENCY) - 1UL) /     \
-                1000UL) + 1UL))
+  ((systime_t)((((msec) * CH_FREQUENCY - 1L) / 1000L) + 1L))
 
 /**
  * @brief   Microseconds to system ticks.
@@ -71,8 +77,7 @@
  * @api
  */
 #define US2ST(usec)                                                         \
-  ((systime_t)(((((uint32_t)(usec)) * ((uint32_t)CH_FREQUENCY) - 1UL) /     \
-                1000000UL) + 1UL))
+  ((systime_t)((((usec) * CH_FREQUENCY - 1L) / 1000000L) + 1L))
 /** @} */
 
 /**

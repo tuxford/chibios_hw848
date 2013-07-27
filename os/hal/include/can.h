@@ -16,6 +16,13 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+                                      ---
+
+    A special exception to the GPL can be applied should you wish to distribute
+    a combined work that includes ChibiOS/RT, without being obliged to provide
+    the source code for any proprietary components. See the file exception.txt
+    for full details of how and when the exception can be applied.
 */
 
 /**
@@ -122,6 +129,16 @@ typedef enum {
  * @brief   Converts a mailbox index to a bit mask.
  */
 #define CAN_MAILBOX_TO_MASK(mbx) (1 << ((mbx) - 1))
+
+/**
+ * @brief   Adds some flags to the CAN status mask.
+ *
+ * @param[in] canp      pointer to the @p CANDriver object
+ * @param[in] mask      flags to be added to the status mask
+ *
+ * @iclass
+ */
+#define canAddFlagsI(canp, mask) ((canp)->status |= (mask))
 /** @} */
 
 /*===========================================================================*/

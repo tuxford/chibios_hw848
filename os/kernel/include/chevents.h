@@ -16,6 +16,13 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+                                      ---
+
+    A special exception to the GPL can be applied should you wish to distribute
+    a combined work that includes ChibiOS/RT, without being obliged to provide
+    the source code for any proprietary components. See the file exception.txt
+    for full details of how and when the exception can be applied.
 */
 /*
    Concepts and parts of this file have been contributed by Scott (skute).
@@ -120,7 +127,7 @@ typedef void (*evhandler_t)(eventid_t);
  * @note    This function can be invoked before the kernel is initialized
  *          because it just prepares a @p EventSource structure.
  *
- * @param[out] esp      pointer to the @p EventSource structure
+ * @param[in] esp       pointer to the @p EventSource structure
  *
  * @init
  */
