@@ -36,37 +36,18 @@
  * @note    The name does not follow the convention used in the other ports
  *          (COMn) because a name conflict with the AVR headers.
  */
-#if AVR_SERIAL_USE_USART0 || defined(__DOXYGEN__)
+#if USE_AVR_USART0 || defined(__DOXYGEN__)
 SerialDriver SD1;
-
-  /* USARTs are not consistently named across the AVR range */
-  #ifdef USART0_RX_vect
-    #define AVR_SD1_RX_VECT USART0_RX_vect
-    #define AVR_SD1_TX_VECT USART0_UDRE_vect
-  #elif defined(USART_RX_vect)
-    #define AVR_SD1_RX_VECT USART_RX_vect
-    #define AVR_SD1_TX_VECT USART_UDRE_vect
-  #else
-    #error "Cannot find USART to use for SD1"
-  #endif 
-#endif /* AVR_SERIAL_USE_USART0 */
+#endif
 
 /**
  * @brief   USART1 serial driver identifier.
  * @note    The name does not follow the convention used in the other ports
  *          (COMn) because a name conflict with the AVR headers.
  */
-#if AVR_SERIAL_USE_USART1 || defined(__DOXYGEN__)
+#if USE_AVR_USART1 || defined(__DOXYGEN__)
 SerialDriver SD2;
-
-  /* Check if USART1 exists for this MCU */
-  #ifdef USART1_RX_vect
-    #define AVR_SD2_RX_VECT USART1_RX_vect
-    #define AVR_SD2_TX_VECT USART1_UDRE_vect
-  #else
-    #error "Cannot find USART to use for SD2"
-  #endif
-#endif /* AVR_SERIAL_USE_USART1 */
+#endif
 
 /*===========================================================================*/
 /* Driver local variables and types.                                         */
@@ -90,7 +71,7 @@ static void set_error(uint8_t sra, SerialDriver *sdp) {
   uint8_t upe = 0;
   uint8_t fe = 0;
 
-#if AVR_SERIAL_USE_USART0
+#if USE_AVR_USART0
   if (&SD1 == sdp) {
     dor = (1 << DOR0);
     upe = (1 << UPE0);
@@ -98,7 +79,7 @@ static void set_error(uint8_t sra, SerialDriver *sdp) {
   }
 #endif
 
-#if AVR_SERIAL_USE_USART1
+#if USE_AVR_USART1
   if (&SD2 == sdp) {
     dor = (1 << DOR1);
     upe = (1 << UPE1);
@@ -117,7 +98,7 @@ static void set_error(uint8_t sra, SerialDriver *sdp) {
   chSysUnlockFromIsr();
 }
 
-#if AVR_SERIAL_USE_USART0 || defined(__DOXYGEN__)
+#if USE_AVR_USART0 || defined(__DOXYGEN__)
 static void notify1(GenericQueue *qp) {
 
   (void)qp;
@@ -166,7 +147,7 @@ static void usart0_deinit(void) {
 }
 #endif
 
-#if AVR_SERIAL_USE_USART1 || defined(__DOXYGEN__)
+#if USE_AVR_USART1 || defined(__DOXYGEN__)
 static void notify2(GenericQueue *qp) {
 
   (void)qp;
@@ -219,13 +200,13 @@ static void usart1_deinit(void) {
 /* Driver interrupt handlers.                                                */
 /*===========================================================================*/
 
-#if AVR_SERIAL_USE_USART0 || defined(__DOXYGEN__)
+#if USE_AVR_USART0 || defined(__DOXYGEN__)
 /**
  * @brief   USART0 RX interrupt handler.
  *
  * @isr
  */
-CH_IRQ_HANDLER(AVR_SD1_RX_VECT) {
+CH_IRQ_HANDLER(USART0_RX_vect) {
   uint8_t sra;
 
   CH_IRQ_PROLOGUE();
@@ -245,7 +226,7 @@ CH_IRQ_HANDLER(AVR_SD1_RX_VECT) {
  *
  * @isr
  */
-CH_IRQ_HANDLER(AVR_SD1_TX_VECT) {
+CH_IRQ_HANDLER(USART0_UDRE_vect) {
   msg_t b;
 
   CH_IRQ_PROLOGUE();
@@ -260,15 +241,15 @@ CH_IRQ_HANDLER(AVR_SD1_TX_VECT) {
 
   CH_IRQ_EPILOGUE();
 }
-#endif /* AVR_SERIAL_USE_USART0 */
+#endif /* USE_AVR_USART0 */
 
-#if AVR_SERIAL_USE_USART1 || defined(__DOXYGEN__)
+#if USE_AVR_USART1 || defined(__DOXYGEN__)
 /**
  * @brief   USART1 RX interrupt handler.
  *
  * @isr
  */
-CH_IRQ_HANDLER(AVR_SD2_RX_VECT) {
+CH_IRQ_HANDLER(USART1_RX_vect) {
   uint8_t sra;
 
   CH_IRQ_PROLOGUE();
@@ -288,7 +269,7 @@ CH_IRQ_HANDLER(AVR_SD2_RX_VECT) {
  *
  * @isr
  */
-CH_IRQ_HANDLER(AVR_SD2_TX_VECT) {
+CH_IRQ_HANDLER(USART1_UDRE_vect) {
   msg_t b;
 
   CH_IRQ_PROLOGUE();
@@ -303,7 +284,7 @@ CH_IRQ_HANDLER(AVR_SD2_TX_VECT) {
 
   CH_IRQ_EPILOGUE();
 }
-#endif /* AVR_SERIAL_USE_USART1 */
+#endif /* USE_AVR_USART1 */
 
 /*===========================================================================*/
 /* Driver exported functions.                                                */
@@ -316,10 +297,10 @@ CH_IRQ_HANDLER(AVR_SD2_TX_VECT) {
  */
 void sd_lld_init(void) {
 
-#if AVR_SERIAL_USE_USART0
+#if USE_AVR_USART0
   sdObjectInit(&SD1, NULL, notify1);
 #endif
-#if AVR_SERIAL_USE_USART1
+#if USE_AVR_USART1
   sdObjectInit(&SD2, NULL, notify2);
 #endif
 }
@@ -339,13 +320,13 @@ void sd_lld_start(SerialDriver *sdp, const SerialConfig *config) {
   if (config == NULL)
     config = &default_config;
 
-#if AVR_SERIAL_USE_USART0
+#if USE_AVR_USART0
   if (&SD1 == sdp) {
     usart0_init(config);
     return;
   }
 #endif
-#if AVR_SERIAL_USE_USART1
+#if USE_AVR_USART1
   if (&SD2 == sdp) {
     usart1_init(config);
     return;
@@ -364,11 +345,11 @@ void sd_lld_start(SerialDriver *sdp, const SerialConfig *config) {
  */
 void sd_lld_stop(SerialDriver *sdp) {
 
-#if AVR_SERIAL_USE_USART0
+#if USE_AVR_USART0
   if (&SD1 == sdp)
     usart0_deinit();
 #endif
-#if AVR_SERIAL_USE_USART1
+#if USE_AVR_USART1
   if (&SD2 == sdp)
     usart1_deinit();
 #endif
