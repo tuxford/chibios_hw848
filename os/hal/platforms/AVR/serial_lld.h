@@ -1,17 +1,28 @@
 /*
-    ChibiOS/RT - Copyright (C) 2006-2013 Giovanni Di Sirio
+    ChibiOS/RT - Copyright (C) 2006,2007,2008,2009,2010,
+                 2011,2012 Giovanni Di Sirio.
 
-    Licensed under the Apache License, Version 2.0 (the "License");
-    you may not use this file except in compliance with the License.
-    You may obtain a copy of the License at
+    This file is part of ChibiOS/RT.
 
-        http://www.apache.org/licenses/LICENSE-2.0
+    ChibiOS/RT is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 3 of the License, or
+    (at your option) any later version.
 
-    Unless required by applicable law or agreed to in writing, software
-    distributed under the License is distributed on an "AS IS" BASIS,
-    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-    See the License for the specific language governing permissions and
-    limitations under the License.
+    ChibiOS/RT is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+                                      ---
+
+    A special exception to the GPL can be applied should you wish to distribute
+    a combined work that includes ChibiOS/RT, without being obliged to provide
+    the source code for any proprietary components. See the file exception.txt
+    for full details of how and when the exception can be applied.
 */
 
 /**
@@ -40,8 +51,8 @@
  * @details If set to @p TRUE the support for USART0 is included.
  * @note    The default is @p FALSE.
  */
-#if !defined(AVR_SERIAL_USE_USART0) || defined(__DOXYGEN__)
-  #define AVR_SERIAL_USE_USART0              TRUE
+#if !defined(USE_AVR_USART0) || defined(__DOXYGEN__)
+#define USE_AVR_USART0              TRUE
 #endif
 
 /**
@@ -49,8 +60,8 @@
  * @details If set to @p TRUE the support for USART1 is included.
  * @note    The default is @p TRUE.
  */
-#if !defined(AVR_SERIAL_USE_USART1) || defined(__DOXYGEN__)
-#define AVR_SERIAL_USE_USART1              TRUE
+#if !defined(USE_AVR_USART1) || defined(__DOXYGEN__)
+#define USE_AVR_USART1              TRUE
 #endif
 
 /*===========================================================================*/
@@ -72,9 +83,9 @@ typedef struct {
    */
   uint16_t                  sc_brr;
   /**
-   * @brief Number of bits per character (USART_CHAR_SIZE_5 to USART_CHAR_SIZE_9).
+   * @brief Initialization value for the CSRC register.
    */
-  uint8_t                   sc_bits_per_char;
+  uint8_t                   sc_csrc;
 } SerialConfig;
 
 /**
@@ -108,7 +119,7 @@ typedef struct {
  * @brief   Macro for baud rate computation when U2Xn == 1.
  * @note    Make sure the final baud rate is within tolerance.
  */
-#define UBRR2x(b)    (((F_CPU / b) >> 3) - 1)
+#define UBRR2(b)    (((F_CPU / b) >> 3) - 1)
 
 /**
 * @brief   Macro for baud rate computation.
@@ -122,22 +133,16 @@ typedef struct {
 * @note    Make sure the final baud rate is within tolerance.
 * @note    This version uses floating point math for greater accuracy.
 */
-#define UBRR2x_F(b)  ((((double) F_CPU / (double) b) / 8.0) - 0.5)
-
-#define USART_CHAR_SIZE_5      0
-#define USART_CHAR_SIZE_6      1
-#define USART_CHAR_SIZE_7      2
-#define USART_CHAR_SIZE_8      3
-#define USART_CHAR_SIZE_9      4
+#define UBRR2_F(b)  ((((double) F_CPU / (double) b) / 8.0) - 0.5)
 
 /*===========================================================================*/
 /* External declarations.                                                    */
 /*===========================================================================*/
 
-#if AVR_SERIAL_USE_USART0 && !defined(__DOXYGEN__)
+#if USE_AVR_USART0 && !defined(__DOXYGEN__)
 extern SerialDriver SD1;
 #endif
-#if AVR_SERIAL_USE_USART1 && !defined(__DOXYGEN__)
+#if USE_AVR_USART1 && !defined(__DOXYGEN__)
 extern SerialDriver SD2;
 #endif
 

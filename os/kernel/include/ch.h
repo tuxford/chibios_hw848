@@ -1,6 +1,6 @@
 /*
     ChibiOS/RT - Copyright (C) 2006,2007,2008,2009,2010,
-                 2011,2012,2013 Giovanni Di Sirio.
+                 2011,2012 Giovanni Di Sirio.
 
     This file is part of ChibiOS/RT.
 
@@ -16,6 +16,13 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+                                      ---
+
+    A special exception to the GPL can be applied should you wish to distribute
+    a combined work that includes ChibiOS/RT, without being obliged to provide
+    the source code for any proprietary components. See the file exception.txt
+    for full details of how and when the exception can be applied.
 */
 
 /**
@@ -40,7 +47,7 @@
 /**
  * @brief   Kernel version string.
  */
-#define CH_KERNEL_VERSION       "2.7.0unstable"
+#define CH_KERNEL_VERSION       "2.4.5"
 
 /**
  * @name    Kernel version
@@ -54,51 +61,23 @@
 /**
  * @brief   Kernel version minor number.
  */
-#define CH_KERNEL_MINOR         7
+#define CH_KERNEL_MINOR         4
 
 /**
  * @brief   Kernel version patch number.
  */
-#define CH_KERNEL_PATCH         0
+#define CH_KERNEL_PATCH         5
 /** @} */
 
-/**
- * @name    Common constants
+/*
+ * Common values.
  */
-/**
- * @brief   Generic 'false' boolean constant.
- */
-#if !defined(FALSE) || defined(__DOXYGEN__)
-#define FALSE                   0
+#ifndef FALSE
+#define FALSE       0
 #endif
-
-/**
- * @brief   Generic 'true' boolean constant.
- */
-#if !defined(TRUE) || defined(__DOXYGEN__)
-#define TRUE                    (!FALSE)
+#ifndef TRUE
+#define TRUE        (!FALSE)
 #endif
-
-/**
- * @brief   Generic success constant.
- * @details This constant is functionally equivalent to @p FALSE but more
- *          readable, it can be used as return value of all those functions
- *          returning a @p bool_t as a status indicator.
- */
-#if !defined(CH_SUCCESS) || defined(__DOXYGEN__)
-#define CH_SUCCESS              FALSE
-#endif
-
-/**
- * @brief   Generic failure constant.
- * @details This constant is functionally equivalent to @p TRUE but more
- *          readable, it can be used as return value of all those functions
- *          returning a @p bool_t as a status indicator.
- */
-#if !defined(CH_FAILED) || defined(__DOXYGEN__)
-#define CH_FAILED               TRUE
-#endif
-/** @} */
 
 #include "chconf.h"
 #include "chtypes.h"
@@ -123,6 +102,7 @@
 #include "chinline.h"
 #include "chqueues.h"
 #include "chstreams.h"
+#include "chioch.h"
 #include "chfiles.h"
 #include "chdebug.h"
 
