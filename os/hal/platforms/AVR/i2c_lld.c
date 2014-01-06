@@ -36,8 +36,8 @@
 /*===========================================================================*/
 
 /** @brief I2C driver identifier.*/
-#if AVR_I2C_USE_I2C1 || defined(__DOXYGEN__)
-I2CDriver I2CD1;
+#if USE_AVR_I2C || defined(__DOXYGEN__)
+I2CDriver I2CD;
 #endif
 
 /*===========================================================================*/
@@ -71,7 +71,7 @@ I2CDriver I2CD1;
 /* Driver interrupt handlers.                                                */
 /*===========================================================================*/
 
-#if AVR_I2C_USE_I2C1 || defined(__DOXYGEN__)
+#if USE_AVR_I2C || defined(__DOXYGEN__)
 /**
  * @brief   I2C event interrupt handler.
  *
@@ -80,7 +80,7 @@ I2CDriver I2CD1;
 CH_IRQ_HANDLER(TWI_vect) {
   CH_IRQ_PROLOGUE();
 
-  I2CDriver *i2cp = &I2CD1;
+  I2CDriver *i2cp = &I2CD;
 
   switch (TWSR & 0xF8) {
   case TWI_START:
@@ -148,7 +148,7 @@ CH_IRQ_HANDLER(TWI_vect) {
 
   CH_IRQ_EPILOGUE();
 }
-#endif /* AVR_I2C_USE_I2C1 */
+#endif /* USE_AVR_I2C */
 
 /*===========================================================================*/
 /* Driver exported functions.                                                */
@@ -160,7 +160,7 @@ CH_IRQ_HANDLER(TWI_vect) {
  * @notapi
  */
 void i2c_lld_init(void) {
-  i2cObjectInit(&I2CD1);
+  i2cObjectInit(&I2CD);
 }
 
 /**

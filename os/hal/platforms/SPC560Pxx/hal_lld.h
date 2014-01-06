@@ -46,11 +46,7 @@
  * @name    Platform identification
  * @{
  */
-#if defined(_SPC560PXX_LARGE_) || defined(__DOXYGEN__)
-#define PLATFORM_NAME               "SPC56APxx Chassis and Safety"
-#else
 #define PLATFORM_NAME               "SPC560Pxx Chassis and Safety"
-#endif
 /** @} */
 
 /**
@@ -94,13 +90,11 @@
 
 /**
  * @brief   Maximum FMPLL1 output clock frequency.
- * @note    FMPLL1 is not present on all devices.
  */
 #define SPC5_FMPLL1_CLK_MAX         120000000
 
 /**
  * @brief   Maximum FMPLL1 1D1 output clock frequency.
- * @note    FMPLL1 is not present on all devices.
  */
 #define SPC5_FMPLL1_1D1_CLK_MAX     80000000
 /** @} */
@@ -387,6 +381,7 @@
                                              SPC5_ME_MC_IRCON |             \
                                              SPC5_ME_MC_XOSC0ON |           \
                                              SPC5_ME_MC_PLL0ON |            \
+                                             SPC5_ME_MC_PLL1ON |            \
                                              SPC5_ME_MC_CFLAON_NORMAL |     \
                                              SPC5_ME_MC_DFLAON_NORMAL |     \
                                              SPC5_ME_MC_MVRON)
@@ -407,6 +402,7 @@
                                              SPC5_ME_MC_IRCON |             \
                                              SPC5_ME_MC_XOSC0ON |           \
                                              SPC5_ME_MC_PLL0ON |            \
+                                             SPC5_ME_MC_PLL1ON |            \
                                              SPC5_ME_MC_CFLAON_NORMAL |     \
                                              SPC5_ME_MC_DFLAON_NORMAL |     \
                                              SPC5_ME_MC_MVRON)
@@ -420,6 +416,7 @@
                                              SPC5_ME_MC_IRCON |             \
                                              SPC5_ME_MC_XOSC0ON |           \
                                              SPC5_ME_MC_PLL0ON |            \
+                                             SPC5_ME_MC_PLL1ON |            \
                                              SPC5_ME_MC_CFLAON_NORMAL |     \
                                              SPC5_ME_MC_DFLAON_NORMAL |     \
                                              SPC5_ME_MC_MVRON)
@@ -433,6 +430,7 @@
                                              SPC5_ME_MC_IRCON |             \
                                              SPC5_ME_MC_XOSC0ON |           \
                                              SPC5_ME_MC_PLL0ON |            \
+                                             SPC5_ME_MC_PLL1ON |            \
                                              SPC5_ME_MC_CFLAON_NORMAL |     \
                                              SPC5_ME_MC_DFLAON_NORMAL |     \
                                              SPC5_ME_MC_MVRON)
@@ -446,6 +444,7 @@
                                              SPC5_ME_MC_IRCON |             \
                                              SPC5_ME_MC_XOSC0ON |           \
                                              SPC5_ME_MC_PLL0ON |            \
+                                             SPC5_ME_MC_PLL1ON |            \
                                              SPC5_ME_MC_CFLAON_NORMAL |     \
                                              SPC5_ME_MC_DFLAON_NORMAL |     \
                                              SPC5_ME_MC_MVRON)
@@ -459,6 +458,7 @@
                                              SPC5_ME_MC_IRCON |             \
                                              SPC5_ME_MC_XOSC0ON |           \
                                              SPC5_ME_MC_PLL0ON |            \
+                                             SPC5_ME_MC_PLL1ON |            \
                                              SPC5_ME_MC_CFLAON_NORMAL |     \
                                              SPC5_ME_MC_DFLAON_NORMAL |     \
                                              SPC5_ME_MC_MVRON)
@@ -472,6 +472,7 @@
                                              SPC5_ME_MC_IRCON |             \
                                              SPC5_ME_MC_XOSC0ON |           \
                                              SPC5_ME_MC_PLL0ON |            \
+                                             SPC5_ME_MC_PLL1ON |            \
                                              SPC5_ME_MC_CFLAON_NORMAL |     \
                                              SPC5_ME_MC_DFLAON_NORMAL |     \
                                              SPC5_ME_MC_MVRON)
@@ -485,6 +486,7 @@
                                              SPC5_ME_MC_IRCON |             \
                                              SPC5_ME_MC_XOSC0ON |           \
                                              SPC5_ME_MC_PLL0ON |            \
+                                             SPC5_ME_MC_PLL1ON |            \
                                              SPC5_ME_MC_CFLAON_NORMAL |     \
                                              SPC5_ME_MC_DFLAON_NORMAL |     \
                                              SPC5_ME_MC_MVRON)
@@ -736,7 +738,6 @@
 #error "SPC5_FMPLL0_CLK outside acceptable range (0...SPC5_FMPLL0_CLK_MAX)"
 #endif
 
-#if SPC5_HAS_FMPLL1
 /* Check on SPC5_FMPLL1_IDF_VALUE.*/
 #if (SPC5_FMPLL1_IDF_VALUE < 1) || (SPC5_FMPLL1_IDF_VALUE > 15)
 #error "invalid SPC5_FMPLL1_IDF_VALUE value specified"
@@ -782,9 +783,7 @@
 #if (SPC5_FMPLL1_CLK > SPC5_FMPLL1_CLK_MAX) && !SPC5_ALLOW_OVERCLOCK
 #error "SPC5_FMPLL1_CLK outside acceptable range (0...SPC5_FMPLL1_CLK_MAX)"
 #endif
-#endif /* SPC5_HAS_FMPLL1 */
 
-#if SPC5_HAS_AC0 || defined(__DOXYGEN__)
 /**
  * @brief   AUX0 clock point.
  */
@@ -798,10 +797,6 @@
 #define SPC5_AUX0_CLK           SPC5_FMPLL1_CLK
 #else
 #error "invalid SPC5_AUX0CLK_SRC value specified"
-#endif
-
-#if !SPC5_HAS_FMPLL1 && (SPC5_AUX0CLK_SRC == SPC5_CGM_SS_FMPLL1)
-#error "SPC5_AUX0CLK_SRC, FMPLL1 not present"
 #endif
 
 /* Check on the AUX0 divider 0 settings.*/
@@ -821,9 +816,7 @@
 #else
 #define SPC5_MCONTROL_CLK       0
 #endif
-#endif /* #if SPC5_HAS_AC0 */
 
-#if SPC5_HAS_AC1 || defined(__DOXYGEN__)
 /**
  * @brief   AUX1 clock point.
  */
@@ -831,10 +824,6 @@
 #define SPC5_AUX1_CLK           SPC5_FMPLL1_CLK
 #else
 #error "invalid SPC5_AUX1CLK_SRC value specified"
-#endif
-
-#if !SPC5_HAS_FMPLL1
-#error "SPC5_AUX1_CLK, FMPLL1 not present"
 #endif
 
 /* Check on the AUX1 divider 0 settings.*/
@@ -854,9 +843,7 @@
 #else
 #define SPC5_FMPLL1_DIV_CLK     0
 #endif
-#endif /* SPC5_HAS_AC1 */
 
-#if SPC5_HAS_AC2 || defined(__DOXYGEN__)
 /**
  * @brief   AUX2 clock point.
  */
@@ -872,11 +859,6 @@
 #define SPC5_AUX2_CLK           SPC5_FMPLL1_1D1_CLK
 #else
 #error "invalid SPC5_AUX2CLK_SRC value specified"
-#endif
-
-#if !SPC5_HAS_FMPLL1 && ((SPC5_AUX2_CLK == SPC5_CGM_SS_FMPLL1) ||           \
-                         (SPC5_AUX2_CLK == SPC5_CGM_SS_FMPLL1_1D1))
-#error "SPC5_AUX2_CLK, FMPLL1 not present"
 #endif
 
 /* Check on the AUX2 divider 0 settings.*/
@@ -896,9 +878,7 @@
 #else
 #define SPC5_SP_CLK             0
 #endif
-#endif /* SPC5_HAS_AC2 */
 
-#if SPC5_HAS_AC3 || defined(__DOXYGEN__)
 /**
  * @brief   AUX3 clock point.
  */
@@ -914,11 +894,6 @@
 #define SPC5_AUX3_CLK           SPC5_FMPLL1_1D1_CLK
 #else
 #error "invalid SPC5_AUX3CLK_SRC value specified"
-#endif
-
-#if !SPC5_HAS_FMPLL1 && ((SPC5_AUX2_CLK == SPC5_AUX3_CLK) ||           \
-                         (SPC5_AUX3_CLK == SPC5_CGM_SS_FMPLL1_1D1))
-#error "SPC5_AUX3_CLK, FMPLL1 not present"
 #endif
 
 /* Check on the AUX3 divider 0 settings.*/
@@ -938,7 +913,6 @@
 #else
 #define SPC5_FR_CLK             0
 #endif
-#endif /* SPC5_HAS_AC3 */
 
 /*===========================================================================*/
 /* Driver data structures and types.                                         */
