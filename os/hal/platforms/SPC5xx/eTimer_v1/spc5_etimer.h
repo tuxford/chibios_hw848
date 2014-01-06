@@ -295,7 +295,7 @@ struct spc5_etimer {
 /*===========================================================================*/
 
 /**
- * @name    eTimer units references
+ * @name    FlexPWM units references
  * @{
  */
 #if SPC5_HAS_ETIMER0
