@@ -147,7 +147,7 @@ DLIBS =
 #
 
 # List all user C define here, like -D_DEBUG=1
-UDEFS = -D_SPC560P50L5_
+UDEFS =
 
 # Define ASM defines here
 UADEFS =
