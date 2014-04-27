@@ -16,6 +16,13 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+                                      ---
+
+    A special exception to the GPL can be applied should you wish to distribute
+    a combined work that includes ChibiOS/RT, without being obliged to provide
+    the source code for any proprietary components. See the file exception.txt
+    for full details of how and when the exception can be applied.
 */
 
 /**
@@ -69,8 +76,8 @@
  */
 ioportmask_t palReadBus(IOBus *bus) {
 
-  chDbgCheck((bus != NULL) && (bus->offset < PAL_IOPORTS_WIDTH),
-             "palReadBus");
+  chDbgCheck((bus != NULL) &&
+             (bus->offset < PAL_IOPORTS_WIDTH), "palReadBus");
 
   return palReadGroup(bus->portid, bus->mask, bus->offset);
 }
@@ -95,8 +102,8 @@ ioportmask_t palReadBus(IOBus *bus) {
  */
 void palWriteBus(IOBus *bus, ioportmask_t bits) {
 
-  chDbgCheck((bus != NULL) && (bus->offset < PAL_IOPORTS_WIDTH),
-             "palWriteBus");
+  chDbgCheck((bus != NULL) &&
+             (bus->offset < PAL_IOPORTS_WIDTH), "palWriteBus");
 
   palWriteGroup(bus->portid, bus->mask, bus->offset, bits);
 }
@@ -119,8 +126,8 @@ void palWriteBus(IOBus *bus, ioportmask_t bits) {
  */
 void palSetBusMode(IOBus *bus, iomode_t mode) {
 
-  chDbgCheck((bus != NULL) && (bus->offset < PAL_IOPORTS_WIDTH),
-             "palSetBusMode");
+  chDbgCheck((bus != NULL) &&
+             (bus->offset < PAL_IOPORTS_WIDTH), "palSetBusMode");
 
   palSetGroupMode(bus->portid, bus->mask, bus->offset, mode);
 }
