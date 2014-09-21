@@ -1,10 +1,10 @@
 /*
-    ChibiOS/HAL - Copyright (C) 2006,2007,2008,2009,2010,
-                  2011,2012,2013,2014 Giovanni Di Sirio.
+    ChibiOS/RT - Copyright (C) 2006,2007,2008,2009,2010,
+                 2011,2012,2013 Giovanni Di Sirio.
 
-    This file is part of ChibiOS/HAL 
+    This file is part of ChibiOS/RT.
 
-    ChibiOS/HAL is free software; you can redistribute it and/or modify
+    ChibiOS/RT is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.
@@ -16,6 +16,13 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+                                      ---
+
+    A special exception to the GPL can be applied should you wish to distribute
+    a combined work that includes ChibiOS/RT, without being obliged to provide
+    the source code for any proprietary components. See the file exception.txt
+    for full details of how and when the exception can be applied.
 */
 /*
    Concepts and parts of this file have been contributed by Uladzimir Pylinsky
@@ -39,20 +46,19 @@
 /* Driver constants.                                                         */
 /*===========================================================================*/
 
-/* TODO: To be reviewed, too STM32-centric.*/
 /**
  * @name    I2C bus error conditions
  * @{
  */
-#define I2C_NO_ERROR               0x00    /**< @brief No error.            */
-#define I2C_BUS_ERROR              0x01    /**< @brief Bus Error.           */
-#define I2C_ARBITRATION_LOST       0x02    /**< @brief Arbitration Lost.    */
-#define I2C_ACK_FAILURE            0x04    /**< @brief Acknowledge Failure. */
-#define I2C_OVERRUN                0x08    /**< @brief Overrun/Underrun.    */
-#define I2C_PEC_ERROR              0x10    /**< @brief PEC Error in
+#define I2CD_NO_ERROR               0x00   /**< @brief No error.            */
+#define I2CD_BUS_ERROR              0x01   /**< @brief Bus Error.           */
+#define I2CD_ARBITRATION_LOST       0x02   /**< @brief Arbitration Lost.    */
+#define I2CD_ACK_FAILURE            0x04   /**< @brief Acknowledge Failure. */
+#define I2CD_OVERRUN                0x08   /**< @brief Overrun/Underrun.    */
+#define I2CD_PEC_ERROR              0x10   /**< @brief PEC Error in
                                                 reception.                  */
-#define I2C_TIMEOUT                0x20    /**< @brief Hardware timeout.    */
-#define I2C_SMB_ALERT              0x40    /**< @brief SMBus Alert.         */
+#define I2CD_TIMEOUT                0x20   /**< @brief Hardware timeout.    */
+#define I2CD_SMB_ALERT              0x40   /**< @brief SMBus Alert.         */
 /** @} */
 
 /*===========================================================================*/
@@ -69,6 +75,10 @@
 /*===========================================================================*/
 /* Derived constants and error checks.                                       */
 /*===========================================================================*/
+
+#if I2C_USE_MUTUAL_EXCLUSION && !CH_USE_MUTEXES && !CH_USE_SEMAPHORES
+#error "I2C_USE_MUTUAL_EXCLUSION requires CH_USE_MUTEXES and/or CH_USE_SEMAPHORES"
+#endif
 
 /*===========================================================================*/
 /* Driver data structures and types.                                         */
@@ -91,32 +101,6 @@ typedef enum {
 /*===========================================================================*/
 /* Driver macros.                                                            */
 /*===========================================================================*/
-
-/**
- * @brief   Wakes up the waiting thread notifying no errors.
- *
- * @param[in] i2cp      pointer to the @p I2CDriver object
- *
- * @notapi
- */
-#define _i2c_wakeup_isr(i2cp) do {                                          \
-  osalSysLockFromISR();                                                     \
-  osalThreadResumeI(&(i2cp)->thread, MSG_OK);                               \
-  osalSysUnlockFromISR();                                                   \
-} while(0)
-
-/**
- * @brief   Wakes up the waiting thread notifying errors.
- *
- * @param[in] i2cp      pointer to the @p I2CDriver object
- *
- * @notapi
- */
-#define _i2c_wakeup_error_isr(i2cp) do {                                    \
-  osalSysLockFromISR();                                                     \
-  osalThreadResumeI(&(i2cp)->thread, MSG_RESET);                            \
-  osalSysUnlockFromISR();                                                   \
-} while(0)
 
 /**
  * @brief   Wrap i2cMasterTransmitTimeout function with TIME_INFINITE timeout.

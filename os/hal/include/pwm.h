@@ -1,10 +1,10 @@
 /*
-    ChibiOS/HAL - Copyright (C) 2006,2007,2008,2009,2010,
-                  2011,2012,2013,2014 Giovanni Di Sirio.
+    ChibiOS/RT - Copyright (C) 2006,2007,2008,2009,2010,
+                 2011,2012,2013 Giovanni Di Sirio.
 
-    This file is part of ChibiOS/HAL 
+    This file is part of ChibiOS/RT.
 
-    ChibiOS/HAL is free software; you can redistribute it and/or modify
+    ChibiOS/RT is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.
@@ -16,6 +16,13 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+                                      ---
+
+    A special exception to the GPL can be applied should you wish to distribute
+    a combined work that includes ChibiOS/RT, without being obliged to provide
+    the source code for any proprietary components. See the file exception.txt
+    for full details of how and when the exception can be applied.
 */
 
 /**
@@ -87,7 +94,7 @@ typedef enum {
 typedef struct PWMDriver PWMDriver;
 
 /**
- * @brief   Type of a PWM notification callback.
+ * @brief   PWM notification callback type.
  *
  * @param[in] pwmp      pointer to a @p PWMDriver object
  */
@@ -169,13 +176,13 @@ typedef void (*pwmcallback_t)(PWMDriver *pwmp);
  *          guaranteed.
  *
  * @param[in] pwmp      pointer to a @p PWMDriver object
- * @param[in] period    new cycle time in ticks
+ * @param[in] value     new cycle time in ticks
  *
  * @iclass
  */
-#define pwmChangePeriodI(pwmp, period) {                                    \
-  (pwmp)->period = (period);                                                \
-  pwm_lld_change_period(pwmp, period);                                      \
+#define pwmChangePeriodI(pwmp, value) {                                     \
+  (pwmp)->period = (value);                                                 \
+  pwm_lld_change_period(pwmp, value);                                       \
 }
 
 /**
@@ -187,15 +194,13 @@ typedef void (*pwmcallback_t)(PWMDriver *pwmp);
  *          or immediately (fallback implementation).
  *
  * @param[in] pwmp      pointer to a @p PWMDriver object
- * @param[in] channel   PWM channel identifier (0...channels-1)
+ * @param[in] channel   PWM channel identifier (0...PWM_CHANNELS-1)
  * @param[in] width     PWM pulse width as clock pulses number
  *
  * @iclass
  */
-#define pwmEnableChannelI(pwmp, channel, width) do {                        \
-  (pwmp)->enabled |= 1 << (channel);                                        \
-  pwm_lld_enable_channel(pwmp, channel, width);                             \
-} while (0)
+#define pwmEnableChannelI(pwmp, channel, width)                             \
+  pwm_lld_enable_channel(pwmp, channel, width)
 
 /**
  * @brief   Disables a PWM channel.
@@ -207,26 +212,24 @@ typedef void (*pwmcallback_t)(PWMDriver *pwmp);
  *          or immediately (fallback implementation).
  *
  * @param[in] pwmp      pointer to a @p PWMDriver object
- * @param[in] channel   PWM channel identifier (0...channels-1)
+ * @param[in] channel   PWM channel identifier (0...PWM_CHANNELS-1)
  *
  * @iclass
  */
-#define pwmDisableChannelI(pwmp, channel) do {                              \
-  (pwmp)->enabled &= ~(1 << (channel));                                     \
-  pwm_lld_disable_channel(pwmp, channel);                                   \
-} while (0)
+#define pwmDisableChannelI(pwmp, channel)                                   \
+  pwm_lld_disable_channel(pwmp, channel)
 
 /**
  * @brief   Returns a PWM channel status.
  * @pre     The PWM unit must have been activated using @p pwmStart().
  *
  * @param[in] pwmp      pointer to a @p PWMDriver object
- * @param[in] channel   PWM channel identifier (0...channels-1)
+ * @param[in] channel   PWM channel identifier (0...PWM_CHANNELS-1)
  *
  * @iclass
  */
 #define pwmIsChannelEnabledI(pwmp, channel)                                 \
-  ((bool)((pwmp)->enabled & (1 << (channel))))
+  pwm_lld_is_channel_enabled(pwmp, channel)
 /** @} */
 
 /*===========================================================================*/
@@ -245,10 +248,6 @@ extern "C" {
                         pwmchannel_t channel,
                         pwmcnt_t width);
   void pwmDisableChannel(PWMDriver *pwmp, pwmchannel_t channel);
-  void pwmEnablePeriodicNotification(PWMDriver *pwmp);
-  void pwmDisablePeriodicNotification(PWMDriver *pwmp);
-  void pwmEnableChannelNotification(PWMDriver *pwmp, pwmchannel_t channel);
-  void pwmDisableChannelNotification(PWMDriver *pwmp, pwmchannel_t channel);
 #ifdef __cplusplus
 }
 #endif

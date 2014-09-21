@@ -5,6 +5,7 @@
 /* disk I/O modules and attach it to FatFs module with common interface. */
 /*-----------------------------------------------------------------------*/
 
+#include "ch.h"
 #include "hal.h"
 #include "ffconf.h"
 #include "diskio.h"
@@ -38,12 +39,12 @@ extern RTCDriver RTCD1;
 /* Inidialize a Drive                                                    */
 
 DSTATUS disk_initialize (
-    BYTE pdrv                /* Physical drive nmuber (0..) */
+    BYTE drv                /* Physical drive nmuber (0..) */
 )
 {
   DSTATUS stat;
 
-  switch (pdrv) {
+  switch (drv) {
 #if HAL_USE_MMC_SPI
   case MMC:
     stat = 0;
@@ -64,7 +65,7 @@ DSTATUS disk_initialize (
     return stat;
 #endif
   }
-  return STA_NOINIT;
+  return STA_NODISK;
 }
 
 
@@ -73,12 +74,12 @@ DSTATUS disk_initialize (
 /* Return Disk Status                                                    */
 
 DSTATUS disk_status (
-    BYTE pdrv        /* Physical drive nmuber (0..) */
+    BYTE drv        /* Physical drive nmuber (0..) */
 )
 {
   DSTATUS stat;
 
-  switch (pdrv) {
+  switch (drv) {
 #if HAL_USE_MMC_SPI
   case MMC:
     stat = 0;
@@ -99,7 +100,7 @@ DSTATUS disk_status (
     return stat;
 #endif
   }
-  return STA_NOINIT;
+  return STA_NODISK;
 }
 
 
@@ -108,13 +109,13 @@ DSTATUS disk_status (
 /* Read Sector(s)                                                        */
 
 DRESULT disk_read (
-    BYTE pdrv,        /* Physical drive nmuber (0..) */
+    BYTE drv,        /* Physical drive nmuber (0..) */
     BYTE *buff,        /* Data buffer to store read data */
     DWORD sector,    /* Sector address (LBA) */
-    UINT count        /* Number of sectors to read (1..255) */
+    BYTE count        /* Number of sectors to read (1..255) */
 )
 {
-  switch (pdrv) {
+  switch (drv) {
 #if HAL_USE_MMC_SPI
   case MMC:
     if (blkGetDriverState(&MMCD1) != BLK_READY)
@@ -147,15 +148,15 @@ DRESULT disk_read (
 /*-----------------------------------------------------------------------*/
 /* Write Sector(s)                                                       */
 
-#if _USE_WRITE
+#if _READONLY == 0
 DRESULT disk_write (
-    BYTE pdrv,            /* Physical drive nmuber (0..) */
+    BYTE drv,            /* Physical drive nmuber (0..) */
     const BYTE *buff,    /* Data to be written */
     DWORD sector,        /* Sector address (LBA) */
-    UINT count            /* Number of sectors to write (1..255) */
+    BYTE count            /* Number of sectors to write (1..255) */
 )
 {
-  switch (pdrv) {
+  switch (drv) {
 #if HAL_USE_MMC_SPI
   case MMC:
     if (blkGetDriverState(&MMCD1) != BLK_READY)
@@ -184,24 +185,23 @@ DRESULT disk_write (
   }
   return RES_PARERR;
 }
-#endif /* _USE_WRITE */
+#endif /* _READONLY */
 
 
 
 /*-----------------------------------------------------------------------*/
 /* Miscellaneous Functions                                               */
 
-#if _USE_IOCTL
 DRESULT disk_ioctl (
-    BYTE pdrv,        /* Physical drive nmuber (0..) */
-    BYTE cmd,        /* Control code */
+    BYTE drv,        /* Physical drive nmuber (0..) */
+    BYTE ctrl,        /* Control code */
     void *buff        /* Buffer to send/receive control data */
 )
 {
-  switch (pdrv) {
+  switch (drv) {
 #if HAL_USE_MMC_SPI
   case MMC:
-    switch (cmd) {
+    switch (ctrl) {
     case CTRL_SYNC:
         return RES_OK;
     case GET_SECTOR_SIZE:
@@ -217,7 +217,7 @@ DRESULT disk_ioctl (
     }
 #else
   case SDC:
-    switch (cmd) {
+    switch (ctrl) {
     case CTRL_SYNC:
         return RES_OK;
     case GET_SECTOR_COUNT:
@@ -241,7 +241,6 @@ DRESULT disk_ioctl (
   }
   return RES_PARERR;
 }
-#endif /* _USE_IOCTL */
 
 DWORD get_fattime(void) {
 #if HAL_USE_RTC
@@ -250,3 +249,6 @@ DWORD get_fattime(void) {
     return ((uint32_t)0 | (1 << 16)) | (1 << 21); /* wrong but valid time */
 #endif
 }
+
+
+

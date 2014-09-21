@@ -1,10 +1,10 @@
 /*
-    ChibiOS/HAL - Copyright (C) 2006,2007,2008,2009,2010,
-                  2011,2012,2013,2014 Giovanni Di Sirio.
+    ChibiOS/RT - Copyright (C) 2006,2007,2008,2009,2010,
+                 2011,2012,2013 Giovanni Di Sirio.
 
-    This file is part of ChibiOS/HAL 
+    This file is part of ChibiOS/RT.
 
-    ChibiOS/HAL is free software; you can redistribute it and/or modify
+    ChibiOS/RT is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.
@@ -16,6 +16,13 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+                                      ---
+
+    A special exception to the GPL can be applied should you wish to distribute
+    a combined work that includes ChibiOS/RT, without being obliged to provide
+    the source code for any proprietary components. See the file exception.txt
+    for full details of how and when the exception can be applied.
 */
 
 /**
@@ -325,7 +332,7 @@ typedef void (*usbeventcb_t)(USBDriver *usbp, usbevent_t event);
  * @retval FALSE        Request not recognized by the handler.
  * @retval TRUE         Request handled.
  */
-typedef bool (*usbreqhandler_t)(USBDriver *usbp);
+typedef bool_t (*usbreqhandler_t)(USBDriver *usbp);
 
 /**
  * @brief   Type of an USB descriptor-retrieving callback.
@@ -556,13 +563,13 @@ extern "C" {
   void usbPrepareTransmit(USBDriver *usbp, usbep_t ep,
                           const uint8_t *buf, size_t n);
   void usbPrepareQueuedReceive(USBDriver *usbp, usbep_t ep,
-                               input_queue_t *iqp, size_t n);
+                               InputQueue *iqp, size_t n);
   void usbPrepareQueuedTransmit(USBDriver *usbp, usbep_t ep,
-                                output_queue_t *oqp, size_t n);
-  bool usbStartReceiveI(USBDriver *usbp, usbep_t ep);
-  bool usbStartTransmitI(USBDriver *usbp, usbep_t ep);
-  bool usbStallReceiveI(USBDriver *usbp, usbep_t ep);
-  bool usbStallTransmitI(USBDriver *usbp, usbep_t ep);
+                                OutputQueue *oqp, size_t n);
+  bool_t usbStartReceiveI(USBDriver *usbp, usbep_t ep);
+  bool_t usbStartTransmitI(USBDriver *usbp, usbep_t ep);
+  bool_t usbStallReceiveI(USBDriver *usbp, usbep_t ep);
+  bool_t usbStallTransmitI(USBDriver *usbp, usbep_t ep);
   void _usb_reset(USBDriver *usbp);
   void _usb_ep0setup(USBDriver *usbp, usbep_t ep);
   void _usb_ep0in(USBDriver *usbp, usbep_t ep);

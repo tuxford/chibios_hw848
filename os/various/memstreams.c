@@ -1,5 +1,5 @@
 /*
-    ChibiOS - Copyright (C) 2006-2014 Giovanni Di Sirio
+    ChibiOS/RT - Copyright (C) 2006-2013 Giovanni Di Sirio
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -67,10 +67,10 @@ static msg_t put(void *ip, uint8_t b) {
   MemoryStream *msp = ip;
 
   if (msp->size - msp->eos <= 0)
-    return MSG_RESET;
+    return RDY_RESET;
   *(msp->buffer + msp->eos) = b;
   msp->eos += 1;
-  return MSG_OK;
+  return RDY_OK;
 }
 
 static msg_t get(void *ip) {
@@ -78,7 +78,7 @@ static msg_t get(void *ip) {
   MemoryStream *msp = ip;
 
   if (msp->eos - msp->offset <= 0)
-    return MSG_RESET;
+    return RDY_RESET;
   b = *(msp->buffer + msp->offset);
   msp->offset += 1;
   return b;

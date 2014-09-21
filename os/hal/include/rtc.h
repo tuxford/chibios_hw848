@@ -1,10 +1,10 @@
 /*
-    ChibiOS/HAL - Copyright (C) 2006,2007,2008,2009,2010,
-                  2011,2012,2013,2014 Giovanni Di Sirio.
+    ChibiOS/RT - Copyright (C) 2006,2007,2008,2009,2010,
+                 2011,2012,2013 Giovanni Di Sirio.
 
-    This file is part of ChibiOS/HAL 
+    This file is part of ChibiOS/RT.
 
-    ChibiOS/HAL is free software; you can redistribute it and/or modify
+    ChibiOS/RT is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.
@@ -16,6 +16,13 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+                                      ---
+
+    A special exception to the GPL can be applied should you wish to distribute
+    a combined work that includes ChibiOS/RT, without being obliged to provide
+    the source code for any proprietary components. See the file exception.txt
+    for full details of how and when the exception can be applied.
 */
 /*
    Concepts and parts of this file have been contributed by Uladzimir Pylinsky
@@ -40,34 +47,15 @@
 /*===========================================================================*/
 
 /**
- * @brief   Base year of the calendar.
- */
-#define RTC_BASE_YEAR               1980
-
-/**
- * @name    Date/Time bit masks for FAT format
+ * @name    Date/Time bit masks
  * @{
  */
-#define RTC_FAT_TIME_SECONDS_MASK   0x0000001F
-#define RTC_FAT_TIME_MINUTES_MASK   0x000007E0
-#define RTC_FAT_TIME_HOURS_MASK     0x0000F800
-#define RTC_FAT_DATE_DAYS_MASK      0x001F0000
-#define RTC_FAT_DATE_MONTHS_MASK    0x01E00000
-#define RTC_FAT_DATE_YEARS_MASK     0xFE000000
-/** @} */
-
-/**
- * @name    Day of week encoding
- * @{
- */
-#define RTC_DAY_CATURDAY            0
-#define RTC_DAY_MONDAY              1
-#define RTC_DAY_TUESDAY             2
-#define RTC_DAY_WEDNESDAY           3
-#define RTC_DAY_THURSDAY            4
-#define RTC_DAY_FRIDAY              5
-#define RTC_DAY_SATURDAY            6
-#define RTC_DAY_SUNDAY              7
+#define RTC_TIME_SECONDS_MASK   0x0000001F  /* @brief Seconds mask.         */
+#define RTC_TIME_MINUTES_MASK   0x000007E0  /* @brief Minutes mask.         */
+#define RTC_TIME_HOURS_MASK     0x0000F800  /* @brief Hours mask.           */
+#define RTC_DATE_DAYS_MASK      0x001F0000  /* @brief Days mask.            */
+#define RTC_DATE_MONTHS_MASK    0x01E00000  /* @brief Months mask.          */
+#define RTC_DATE_YEARS_MASK     0xFE000000  /* @brief Years mask.           */
 /** @} */
 
 /*===========================================================================*/
@@ -88,16 +76,9 @@
 typedef struct RTCDriver RTCDriver;
 
 /**
- * @brief   Type of a structure representing an RTC date/time stamp.
+ * @brief   Type of a structure representing an RTC time stamp.
  */
-typedef struct {
-  uint32_t      year:8;             /**< @brief Years since 1980.           */
-  uint32_t      month: 4;           /**< @brief Months 1..12.               */
-  uint32_t      dstflag: 1;         /**< @brief DST correction flag.        */
-  uint32_t      dayofweek: 3;       /**< @brief Day of week 1..7.           */
-  uint32_t      day: 5;             /**< @brief Day of the month 1..31.     */
-  uint32_t      millisecond: 27;    /**< @brief Milliseconds since midnight.*/
-} RTCDateTime;
+typedef struct RTCTime RTCTime;
 
 #include "rtc_lld.h"
 
@@ -109,23 +90,21 @@ typedef struct {
  * @brief   Set current time.
  *
  * @param[in] rtcp      pointer to RTC driver structure
- * @param[in] timespec  pointer to a @p RTCDateTime structure
+ * @param[in] timespec  pointer to a @p RTCTime structure
  *
  * @iclass
  */
-#define rtcSetTimeI(rtcp, timespec)                                         \
-  rtc_lld_set_time(rtcp, timespec)
+#define rtcSetTimeI(rtcp, timespec) rtc_lld_set_time(rtcp, timespec)
 
 /**
  * @brief   Get current time.
  *
  * @param[in] rtcp      pointer to RTC driver structure
- * @param[out] timespec pointer to a @p RTCDateTime structure
+ * @param[out] timespec pointer to a @p RTCTime structure
  *
  * @iclass
  */
-#define rtcGetTimeI(rtcp, timespec)                                         \
-  rtc_lld_get_time(rtcp, timespec)
+#define rtcGetTimeI(rtcp, timespec) rtc_lld_get_time(rtcp, timespec)
 
 #if (RTC_ALARMS > 0) || defined(__DOXYGEN__)
 /**
@@ -166,8 +145,7 @@ typedef struct {
  *
  * @iclass
  */
-#define rtcSetCallbackI(rtcp, callback)                                     \
-  rtc_lld_set_callback(rtcp, callback)
+#define rtcSetCallbackI(rtcp, callback) rtc_lld_set_callback(rtcp, callback)
 #endif /* RTC_SUPPORTS_CALLBACKS */
 
 /*===========================================================================*/
@@ -178,18 +156,18 @@ typedef struct {
 extern "C" {
 #endif
   void rtcInit(void);
-  void rtcSetTime(RTCDriver *rtcp, const RTCDateTime *timespec);
-  void rtcGetTime(RTCDriver *rtcp, RTCDateTime *timespec);
-#if STM32_RTC_NUM_ALARMS > 0
+  void rtcSetTime(RTCDriver *rtcp, const RTCTime *timespec);
+  void rtcGetTime(RTCDriver *rtcp, RTCTime *timespec);
+#if RTC_ALARMS > 0
   void rtcSetAlarm(RTCDriver *rtcp,
                    rtcalarm_t alarm,
                    const RTCAlarm *alarmspec);
   void rtcGetAlarm(RTCDriver *rtcp, rtcalarm_t alarm, RTCAlarm *alarmspec);
 #endif
+  uint32_t rtcGetTimeFat(RTCDriver *rtcp);
 #if RTC_SUPPORTS_CALLBACKS
   void rtcSetCallback(RTCDriver *rtcp, rtccb_t callback);
 #endif
-  uint32_t rtcConvertDateTimeToFAT(RTCDateTime *timespec);
 #ifdef __cplusplus
 }
 #endif

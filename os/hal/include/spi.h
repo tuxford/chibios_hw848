@@ -1,10 +1,10 @@
 /*
-    ChibiOS/HAL - Copyright (C) 2006,2007,2008,2009,2010,
-                  2011,2012,2013,2014 Giovanni Di Sirio.
+    ChibiOS/RT - Copyright (C) 2006,2007,2008,2009,2010,
+                 2011,2012,2013 Giovanni Di Sirio.
 
-    This file is part of ChibiOS/HAL 
+    This file is part of ChibiOS/RT.
 
-    ChibiOS/HAL is free software; you can redistribute it and/or modify
+    ChibiOS/RT is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.
@@ -16,6 +16,13 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+                                      ---
+
+    A special exception to the GPL can be applied should you wish to distribute
+    a combined work that includes ChibiOS/RT, without being obliged to provide
+    the source code for any proprietary components. See the file exception.txt
+    for full details of how and when the exception can be applied.
 */
 
 /**
@@ -63,6 +70,10 @@
 /*===========================================================================*/
 /* Derived constants and error checks.                                       */
 /*===========================================================================*/
+
+#if SPI_USE_MUTUAL_EXCLUSION && !CH_USE_MUTEXES && !CH_USE_SEMAPHORES
+#error "SPI_USE_MUTUAL_EXCLUSION requires CH_USE_MUTEXES and/or CH_USE_SEMAPHORES"
+#endif
 
 /*===========================================================================*/
 /* Driver data structures and types.                                         */
@@ -225,7 +236,12 @@ typedef enum {
  *
  * @notapi
  */
-#define _spi_wait_s(spip) osalThreadSuspendS(&(spip)->thread)
+#define _spi_wait_s(spip) {                                                 \
+  chDbgAssert((spip)->thread == NULL,                                       \
+              "_spi_wait(), #1", "already waiting");                        \
+  (spip)->thread = chThdSelf();                                             \
+  chSchGoSleepS(THD_STATE_SUSPENDED);                                       \
+}
 
 /**
  * @brief   Wakes up the waiting thread.
@@ -235,9 +251,14 @@ typedef enum {
  * @notapi
  */
 #define _spi_wakeup_isr(spip) {                                             \
-  osalSysLockFromISR();                                                     \
-  osalThreadResumeI(&(spip)->thread, MSG_OK);                               \
-  osalSysUnlockFromISR();                                                   \
+  chSysLockFromIsr();                                                       \
+  if ((spip)->thread != NULL) {                                             \
+    Thread *tp = (spip)->thread;                                            \
+    (spip)->thread = NULL;                                                  \
+    tp->p_u.rdymsg = RDY_OK;                                                \
+    chSchReadyI(tp);                                                        \
+  }                                                                         \
+  chSysUnlockFromIsr();                                                     \
 }
 #else /* !SPI_USE_WAIT */
 #define _spi_wait_s(spip)

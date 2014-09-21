@@ -1,10 +1,10 @@
 /*
-    ChibiOS/HAL - Copyright (C) 2006,2007,2008,2009,2010,
-                  2011,2012,2013,2014 Giovanni Di Sirio.
+    ChibiOS/RT - Copyright (C) 2006,2007,2008,2009,2010,
+                 2011,2012,2013 Giovanni Di Sirio.
 
-    This file is part of ChibiOS/HAL 
+    This file is part of ChibiOS/RT.
 
-    ChibiOS/HAL is free software; you can redistribute it and/or modify
+    ChibiOS/RT is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.
@@ -16,6 +16,13 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+                                      ---
+
+    A special exception to the GPL can be applied should you wish to distribute
+    a combined work that includes ChibiOS/RT, without being obliged to provide
+    the source code for any proprietary components. See the file exception.txt
+    for full details of how and when the exception can be applied.
 */
 /*
    Concepts and parts of this file have been contributed by Uladzimir Pylinsky
@@ -30,6 +37,7 @@
  * @{
  */
 
+#include "ch.h"
 #include "hal.h"
 
 #if HAL_USE_RTC || defined(__DOXYGEN__)
@@ -70,34 +78,34 @@ void rtcInit(void) {
  * @brief   Set current time.
  *
  * @param[in] rtcp      pointer to RTC driver structure
- * @param[in] timespec  pointer to a @p RTCDateTime structure
+ * @param[in] timespec  pointer to a @p RTCTime structure
  *
  * @api
  */
-void rtcSetTime(RTCDriver *rtcp, const RTCDateTime *timespec) {
+void rtcSetTime(RTCDriver *rtcp, const RTCTime *timespec) {
 
-  osalDbgCheck((rtcp != NULL) && (timespec != NULL));
+  chDbgCheck((rtcp != NULL) && (timespec != NULL), "rtcSetTime");
 
-  osalSysLock();
+  chSysLock();
   rtcSetTimeI(rtcp, timespec);
-  osalSysUnlock();
+  chSysUnlock();
 }
 
 /**
  * @brief   Get current time.
  *
  * @param[in] rtcp      pointer to RTC driver structure
- * @param[out] timespec pointer to a @p RTCDateTime structure
+ * @param[out] timespec pointer to a @p RTCTime structure
  *
  * @api
  */
-void rtcGetTime(RTCDriver *rtcp, RTCDateTime *timespec) {
+void rtcGetTime(RTCDriver *rtcp, RTCTime *timespec) {
 
-  osalDbgCheck((rtcp != NULL) && (timespec != NULL));
+  chDbgCheck((rtcp != NULL) && (timespec != NULL), "rtcGetTime");
 
-  osalSysLock();
+  chSysLock();
   rtcGetTimeI(rtcp, timespec);
-  osalSysUnlock();
+  chSysUnlock();
 }
 
 #if (RTC_ALARMS > 0) || defined(__DOXYGEN__)
@@ -114,11 +122,11 @@ void rtcSetAlarm(RTCDriver *rtcp,
                  rtcalarm_t alarm,
                  const RTCAlarm *alarmspec) {
 
-  osalDbgCheck((rtcp != NULL) && (alarm < RTC_ALARMS));
+  chDbgCheck((rtcp != NULL) && (alarm < RTC_ALARMS), "rtcSetAlarm");
 
-  osalSysLock();
+  chSysLock();
   rtcSetAlarmI(rtcp, alarm, alarmspec);
-  osalSysUnlock();
+  chSysUnlock();
 }
 
 /**
@@ -136,11 +144,12 @@ void rtcGetAlarm(RTCDriver *rtcp,
                  rtcalarm_t alarm,
                  RTCAlarm *alarmspec) {
 
-  osalDbgCheck((rtcp != NULL) && (alarm < RTC_ALARMS) && (alarmspec != NULL));
+  chDbgCheck((rtcp != NULL) && (alarm < RTC_ALARMS) && (alarmspec != NULL),
+             "rtcGetAlarm");
 
-  osalSysLock();
+  chSysLock();
   rtcGetAlarmI(rtcp, alarm, alarmspec);
-  osalSysUnlock();
+  chSysUnlock();
 }
 #endif /* RTC_ALARMS > 0 */
 
@@ -157,28 +166,26 @@ void rtcGetAlarm(RTCDriver *rtcp,
  */
 void rtcSetCallback(RTCDriver *rtcp, rtccb_t callback) {
 
-  osalDbgCheck(rtcp != NULL);
+  chDbgCheck((rtcp != NULL), "rtcSetCallback");
 
-  osalSysLock();
+  chSysLock();
   rtcSetCallbackI(rtcp, callback);
-  osalSysUnlock();
+  chSysUnlock();
 }
 #endif /* RTC_SUPPORTS_CALLBACKS */
 
 /**
- * @brief   Get current time in format suitable for usage in FAT file system.
+ * @brief   Get current time in format suitable for usage in FatFS.
  *
- * @param[out] timespec pointer to a @p RTCDateTime structure
- * @return              FAT date/time value.
+ * @param[in] rtcp      pointer to RTC driver structure
+ * @return              FAT time value.
  *
  * @api
  */
-uint32_t rtcConvertDateTimeToFAT(RTCDateTime *timespec) {
+uint32_t rtcGetTimeFat(RTCDriver *rtcp) {
 
-  osalDbgCheck(timespec != NULL);
-
-  /* TODO: Implement.*/
-  return 0;
+  chDbgCheck((rtcp != NULL), "rtcSetTime");
+  return rtc_lld_get_time_fat(rtcp);
 }
 
 #endif /* HAL_USE_RTC */
