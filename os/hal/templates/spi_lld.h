@@ -1,5 +1,5 @@
 /*
-    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio
+    ChibiOS/RT - Copyright (C) 2006-2013 Giovanni Di Sirio
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
 */
 
 /**
- * @file    spi_lld.h
- * @brief   PLATFORM SPI subsystem low level driver header.
+ * @file    templates/spi_lld.h
+ * @brief   SPI Driver subsystem low level driver header template.
  *
  * @addtogroup SPI
  * @{
@@ -36,14 +36,15 @@
 /*===========================================================================*/
 
 /**
- * @name    PLATFORM configuration options
+ * @name    Configuration options
  * @{
  */
 /**
- * @brief   SPI1 driver enable switch.
+ * @brief   SPI driver enable switch.
+ * @details If set to @p TRUE the support for SPI1 is included.
  */
 #if !defined(PLATFORM_SPI_USE_SPI1) || defined(__DOXYGEN__)
-#define PLATFORM_SPI_USE_SPI1                  FALSE
+#define PLATFORM_SPI_USE_SPI1               FALSE
 #endif
 /** @} */
 
@@ -75,9 +76,9 @@ typedef void (*spicallback_t)(SPIDriver *spip);
  */
 typedef struct {
   /**
-   * @brief Operation complete callback or @p NULL.
+   * @brief Operation complete callback.
    */
-  spicallback_t             end_cb;
+  spicallback_t         end_cb;
   /* End of the mandatory fields.*/
 } SPIConfig;
 
@@ -90,22 +91,26 @@ struct SPIDriver {
   /**
    * @brief Driver state.
    */
-  spistate_t                state;
+  spistate_t            state;
   /**
    * @brief Current configuration data.
    */
-  const SPIConfig           *config;
+  const SPIConfig       *config;
 #if SPI_USE_WAIT || defined(__DOXYGEN__)
   /**
-   * @brief   Waiting thread.
+   * @brief Waiting thread.
    */
-  thread_reference_t        thread;
+  Thread                *thread;
 #endif /* SPI_USE_WAIT */
 #if SPI_USE_MUTUAL_EXCLUSION || defined(__DOXYGEN__)
+#if CH_USE_MUTEXES || defined(__DOXYGEN__)
   /**
-   * @brief   Mutex protecting the peripheral.
+   * @brief Mutex protecting the bus.
    */
-  mutex_t                   mutex;
+  Mutex                 mutex;
+#elif CH_USE_SEMAPHORES
+  Semaphore             semaphore;
+#endif
 #endif /* SPI_USE_MUTUAL_EXCLUSION */
 #if defined(SPI_DRIVER_EXT_FIELDS)
   SPI_DRIVER_EXT_FIELDS

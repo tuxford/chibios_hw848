@@ -1,5 +1,5 @@
 /*
-    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio
+    ChibiOS/RT - Copyright (C) 2006-2013 Giovanni Di Sirio
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
 */
 
 /**
- * @file    usb_lld.h
- * @brief   PLATFORM USB subsystem low level driver header.
+ * @file    templates/usb_lld.h
+ * @brief   USB Driver subsystem low level driver header template.
  *
  * @addtogroup USB
  * @{
@@ -37,21 +37,16 @@
 #define USB_MAX_ENDPOINTS                   4
 
 /**
- * @brief   Status stage handling method.
- */
-#define USB_EP0_STATUS_STAGE                USB_EP0_STATUS_STAGE_SW
-
-/**
  * @brief   The address can be changed immediately upon packet reception.
  */
-#define USB_SET_ADDRESS_MODE                USB_LATE_SET_ADDRESS
+#define USB_SET_ADDRESS_MODE                USB_EARLY_SET_ADDRESS
 
 /*===========================================================================*/
 /* Driver pre-compile time settings.                                         */
 /*===========================================================================*/
 
 /**
- * @name    PLATFORM configuration options
+ * @name    Configuration options
  * @{
  */
 /**
@@ -59,7 +54,7 @@
  * @details If set to @p TRUE the support for USB1 is included.
  */
 #if !defined(PLATFORM_USB_USE_USB1) || defined(__DOXYGEN__)
-#define PLATFORM_USB_USE_USB1                  FALSE
+#define PLATFORM_USB_USE_USB1               FALSE
 #endif
 /** @} */
 
@@ -78,7 +73,7 @@ typedef struct {
   /**
    * @brief   Buffer mode, queue or linear.
    */
-  bool                          txqueued;
+  bool_t                        txqueued;
   /**
    * @brief   Requested transmit transfer size.
    */
@@ -98,9 +93,8 @@ typedef struct {
       /**
        * @brief   Pointer to the output queue.
        */
-      output_queue_t            *txqueue;
+      OutputQueue               *txqueue;
     } queue;
-    /* End of the mandatory fields.*/
   } mode;
 } USBInEndpointState;
 
@@ -111,7 +105,7 @@ typedef struct {
   /**
    * @brief   Buffer mode, queue or linear.
    */
-  bool                          rxqueued;
+  bool_t                        rxqueued;
   /**
    * @brief   Requested receive transfer size.
    */
@@ -131,10 +125,9 @@ typedef struct {
       /**
        * @brief   Pointer to the input queue.
        */
-      input_queue_t            *rxqueue;
+      InputQueue               *rxqueue;
     } queue;
   } mode;
-  /* End of the mandatory fields.*/
 } USBOutEndpointState;
 
 /**
@@ -300,16 +293,6 @@ struct USBDriver {
 /*===========================================================================*/
 /* Driver macros.                                                            */
 /*===========================================================================*/
-
-/**
- * @brief   Returns the current frame number.
- *
- * @param[in] usbp      pointer to the @p USBDriver object
- * @return              The current frame number.
- *
- * @notapi
- */
-#define usb_lld_get_frame_number(usbp) 0
 
 /**
  * @brief   Returns the exact size of a receive transaction.

@@ -1,5 +1,5 @@
 /*
-    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio
+    ChibiOS/RT - Copyright (C) 2006-2013 Giovanni Di Sirio
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -15,13 +15,14 @@
 */
 
 /**
- * @file    ext_lld.c
- * @brief   PLATFORM EXT subsystem low level driver source.
+ * @file    templates/ext_lld.c
+ * @brief   EXT Driver subsystem low level driver source template.
  *
  * @addtogroup EXT
  * @{
  */
 
+#include "ch.h"
 #include "hal.h"
 
 #if HAL_USE_EXT || defined(__DOXYGEN__)

@@ -1,5 +1,5 @@
 /*
-    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio
+    ChibiOS/RT - Copyright (C) 2006-2013 Giovanni Di Sirio
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
 */
 
 /**
- * @file    pal_lld.h
- * @brief   PLATFORM PAL subsystem low level driver header.
+ * @file    templates/pal_lld.h
+ * @brief   PAL subsystem low level driver header template.
  *
  * @addtogroup PAL
  * @{
@@ -186,8 +186,7 @@ typedef uint32_t ioportid_t;
  *
  * @notapi
  */
-#define pal_lld_readgroup(port, mask, offset)                               \
-  (void)port,(void)mask,(void)offset,0
+#define pal_lld_readgroup(port, mask, offset) 0
 
 /**
  * @brief   Writes a group of bits.
@@ -203,8 +202,7 @@ typedef uint32_t ioportid_t;
  *
  * @notapi
  */
-#define pal_lld_writegroup(port, mask, offset, bits)                        \
-  (void)port,(void)mask,(void)offset,(void)bits
+#define pal_lld_writegroup(port, mask, offset, bits) (void)bits
 
 /**
  * @brief   Pads group mode setup.

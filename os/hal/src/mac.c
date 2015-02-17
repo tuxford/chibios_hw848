@@ -1,20 +1,28 @@
 /*
-    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio.
+    ChibiOS/RT - Copyright (C) 2006,2007,2008,2009,2010,
+                 2011,2012,2013 Giovanni Di Sirio.
 
-    This file is part of ChibiOS.
+    This file is part of ChibiOS/RT.
 
-    ChibiOS is free software; you can redistribute it and/or modify
+    ChibiOS/RT is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.
 
-    ChibiOS is distributed in the hope that it will be useful,
+    ChibiOS/RT is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+                                      ---
+
+    A special exception to the GPL can be applied should you wish to distribute
+    a combined work that includes ChibiOS/RT, without being obliged to provide
+    the source code for any proprietary components. See the file exception.txt
+    for full details of how and when the exception can be applied.
 */
 
 /**
@@ -25,6 +33,7 @@
  * @{
  */
 
+#include "ch.h"
 #include "hal.h"
 
 #if HAL_USE_MAC || defined(__DOXYGEN__)
@@ -80,10 +89,10 @@ void macObjectInit(MACDriver *macp) {
 
   macp->state  = MAC_STOP;
   macp->config = NULL;
-  osalThreadQueueObjectInit(&macp->tdqueue);
-  osalThreadQueueObjectInit(&macp->rdqueue);
+  chSemInit(&macp->tdsem, 0);
+  chSemInit(&macp->rdsem, 0);
 #if MAC_USE_EVENTS
-  osalEventObjectInit(&macp->rdevent);
+  chEvtInit(&macp->rdevent);
 #endif
 }
 
@@ -97,15 +106,15 @@ void macObjectInit(MACDriver *macp) {
  */
 void macStart(MACDriver *macp, const MACConfig *config) {
 
-  osalDbgCheck((macp != NULL) && (config != NULL));
+  chDbgCheck((macp != NULL) && (config != NULL), "macStart");
 
-  osalSysLock();
-  osalDbgAssert(macp->state == MAC_STOP,
-                "invalid state");
+  chSysLock();
+  chDbgAssert(macp->state == MAC_STOP,
+              "macStart(), #1", "invalid state");
   macp->config = config;
   mac_lld_start(macp);
   macp->state = MAC_ACTIVE;
-  osalSysUnlock();
+  chSysUnlock();
 }
 
 /**
@@ -117,14 +126,14 @@ void macStart(MACDriver *macp, const MACConfig *config) {
  */
 void macStop(MACDriver *macp) {
 
-  osalDbgCheck(macp != NULL);
+  chDbgCheck(macp != NULL, "macStop");
 
-  osalSysLock();
-  osalDbgAssert((macp->state == MAC_STOP) || (macp->state == MAC_ACTIVE),
-                "invalid state");
+  chSysLock();
+  chDbgAssert((macp->state == MAC_STOP) || (macp->state == MAC_ACTIVE),
+              "macStop(), #1", "invalid state");
   mac_lld_stop(macp);
   macp->state = MAC_STOP;
-  osalSysUnlock();
+  chSysUnlock();
 }
 
 /**
@@ -152,21 +161,21 @@ msg_t macWaitTransmitDescriptor(MACDriver *macp,
   msg_t msg;
   systime_t now;
 
-  osalDbgCheck((macp != NULL) && (tdp != NULL));
-  osalDbgAssert(macp->state == MAC_ACTIVE, "not active");
+  chDbgCheck((macp != NULL) && (tdp != NULL), "macWaitTransmitDescriptor");
+  chDbgAssert(macp->state == MAC_ACTIVE, "macWaitTransmitDescriptor(), #1",
+              "not active");
 
-  while (((msg = mac_lld_get_transmit_descriptor(macp, tdp)) != MSG_OK) &&
+  while (((msg = mac_lld_get_transmit_descriptor(macp, tdp)) != RDY_OK) &&
          (time > 0)) {
-    osalSysLock();
-    now = osalOsGetSystemTimeX();
-    msg = osalThreadEnqueueTimeoutS(&macp->tdqueue, time);
-    if (msg == MSG_TIMEOUT) {
-      osalSysUnlock();
+    chSysLock();
+    now = chTimeNow();
+    if ((msg = chSemWaitTimeoutS(&macp->tdsem, time)) == RDY_TIMEOUT) {
+      chSysUnlock();
       break;
     }
     if (time != TIME_INFINITE)
-      time -= (osalOsGetSystemTimeX() - now);
-    osalSysUnlock();
+      time -= (chTimeNow() - now);
+    chSysUnlock();
   }
   return msg;
 }
@@ -181,7 +190,7 @@ msg_t macWaitTransmitDescriptor(MACDriver *macp,
  */
 void macReleaseTransmitDescriptor(MACTransmitDescriptor *tdp) {
 
-  osalDbgCheck(tdp != NULL);
+  chDbgCheck((tdp != NULL), "macReleaseTransmitDescriptor");
 
   mac_lld_release_transmit_descriptor(tdp);
 }
@@ -211,21 +220,21 @@ msg_t macWaitReceiveDescriptor(MACDriver *macp,
   msg_t msg;
   systime_t now;
 
-  osalDbgCheck((macp != NULL) && (rdp != NULL));
-  osalDbgAssert(macp->state == MAC_ACTIVE, "not active");
+  chDbgCheck((macp != NULL) && (rdp != NULL), "macWaitReceiveDescriptor");
+  chDbgAssert(macp->state == MAC_ACTIVE, "macWaitReceiveDescriptor(), #1",
+              "not active");
 
-  while (((msg = mac_lld_get_receive_descriptor(macp, rdp)) != MSG_OK) &&
+  while (((msg = mac_lld_get_receive_descriptor(macp, rdp)) != RDY_OK) &&
          (time > 0)) {
-    osalSysLock();
-    now = osalOsGetSystemTimeX();
-    msg = osalThreadEnqueueTimeoutS(&macp->rdqueue, time);
-    if (msg == MSG_TIMEOUT) {
-      osalSysUnlock();
+    chSysLock();
+    now = chTimeNow();
+    if ((msg = chSemWaitTimeoutS(&macp->rdsem, time)) == RDY_TIMEOUT) {
+      chSysUnlock();
       break;
     }
     if (time != TIME_INFINITE)
-      time -= (osalOsGetSystemTimeX() - now);
-    osalSysUnlock();
+      time -= (chTimeNow() - now);
+    chSysUnlock();
   }
   return msg;
 }
@@ -241,7 +250,7 @@ msg_t macWaitReceiveDescriptor(MACDriver *macp,
  */
 void macReleaseReceiveDescriptor(MACReceiveDescriptor *rdp) {
 
-  osalDbgCheck(rdp != NULL);
+  chDbgCheck((rdp != NULL), "macReleaseReceiveDescriptor");
 
   mac_lld_release_receive_descriptor(rdp);
 }
@@ -251,15 +260,16 @@ void macReleaseReceiveDescriptor(MACReceiveDescriptor *rdp) {
  *
  * @param[in] macp      pointer to the @p MACDriver object
  * @return              The link status.
- * @retval true         if the link is active.
- * @retval false        if the link is down.
+ * @retval TRUE         if the link is active.
+ * @retval FALSE        if the link is down.
  *
  * @api
  */
-bool macPollLinkStatus(MACDriver *macp) {
+bool_t macPollLinkStatus(MACDriver *macp) {
 
-  osalDbgCheck(macp != NULL);
-  osalDbgAssert(macp->state == MAC_ACTIVE, "not active");
+  chDbgCheck((macp != NULL), "macPollLinkStatus");
+  chDbgAssert(macp->state == MAC_ACTIVE, "macPollLinkStatus(), #1",
+              "not active");
 
   return mac_lld_poll_link_status(macp);
 }

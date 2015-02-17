@@ -1,20 +1,28 @@
 /*
-    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio.
+    ChibiOS/RT - Copyright (C) 2006,2007,2008,2009,2010,
+                 2011,2012,2013 Giovanni Di Sirio.
 
-    This file is part of ChibiOS.
+    This file is part of ChibiOS/RT.
 
-    ChibiOS is free software; you can redistribute it and/or modify
+    ChibiOS/RT is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.
 
-    ChibiOS is distributed in the hope that it will be useful,
+    ChibiOS/RT is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+                                      ---
+
+    A special exception to the GPL can be applied should you wish to distribute
+    a combined work that includes ChibiOS/RT, without being obliged to provide
+    the source code for any proprietary components. See the file exception.txt
+    for full details of how and when the exception can be applied.
 */
 
 /**
@@ -33,9 +41,6 @@
 /*===========================================================================*/
 /* Driver constants.                                                         */
 /*===========================================================================*/
-
-#define USB_ENDPOINT_OUT(ep)                (ep)
-#define USB_ENDPOINT_IN(ep)                 ((ep) | 0x80)
 
 #define USB_RTYPE_DIR_MASK                  0x80
 #define USB_RTYPE_DIR_HOST2DEV              0x00
@@ -114,11 +119,6 @@
   (uint8_t)((bcd) & 255),                                                   \
   (uint8_t)(((bcd) >> 8) & 255)
 
-/*
- * @define  Device Descriptor size.
- */
-#define USB_DESC_DEVICE_SIZE                18
-
 /**
  * @brief   Device Descriptor helper macro.
  */
@@ -126,7 +126,7 @@
                         bDeviceProtocol, bMaxPacketSize, idVendor,          \
                         idProduct, bcdDevice, iManufacturer,                \
                         iProduct, iSerialNumber, bNumConfigurations)        \
-  USB_DESC_BYTE(USB_DESC_DEVICE_SIZE),                                      \
+  USB_DESC_BYTE(18),                                                        \
   USB_DESC_BYTE(USB_DESCRIPTOR_DEVICE),                                     \
   USB_DESC_BCD(bcdUSB),                                                     \
   USB_DESC_BYTE(bDeviceClass),                                              \
@@ -142,17 +142,12 @@
   USB_DESC_BYTE(bNumConfigurations)
 
 /**
- * @brief   Configuration Descriptor size.
- */
-#define USB_DESC_CONFIGURATION_SIZE         9
-
-/**
  * @brief   Configuration Descriptor helper macro.
  */
 #define USB_DESC_CONFIGURATION(wTotalLength, bNumInterfaces,                \
                                bConfigurationValue, iConfiguration,         \
                                bmAttributes, bMaxPower)                     \
-  USB_DESC_BYTE(USB_DESC_CONFIGURATION_SIZE),                               \
+  USB_DESC_BYTE(9),                                                         \
   USB_DESC_BYTE(USB_DESCRIPTOR_CONFIGURATION),                              \
   USB_DESC_WORD(wTotalLength),                                              \
   USB_DESC_BYTE(bNumInterfaces),                                            \
@@ -162,18 +157,13 @@
   USB_DESC_BYTE(bMaxPower)
 
 /**
- * @brief   Interface Descriptor size.
- */
-#define USB_DESC_INTERFACE_SIZE             9
-
-/**
  * @brief   Interface Descriptor helper macro.
  */
 #define USB_DESC_INTERFACE(bInterfaceNumber, bAlternateSetting,             \
                            bNumEndpoints, bInterfaceClass,                  \
                            bInterfaceSubClass, bInterfaceProtocol,          \
                            iInterface)                                      \
-  USB_DESC_BYTE(USB_DESC_INTERFACE_SIZE),                                   \
+  USB_DESC_BYTE(9),                                                         \
   USB_DESC_BYTE(USB_DESCRIPTOR_INTERFACE),                                  \
   USB_DESC_BYTE(bInterfaceNumber),                                          \
   USB_DESC_BYTE(bAlternateSetting),                                         \
@@ -184,18 +174,13 @@
   USB_DESC_INDEX(iInterface)
 
 /**
- * @brief   Interface Association Descriptor size.
- */
-#define USB_DESC_INTERFACE_ASSOCIATION_SIZE 8
-
-/**
  * @brief   Interface Association Descriptor helper macro.
  */
 #define USB_DESC_INTERFACE_ASSOCIATION(bFirstInterface,                     \
                            bInterfaceCount, bFunctionClass,                 \
                            bFunctionSubClass, bFunctionProcotol,            \
                            iInterface)                                      \
-  USB_DESC_BYTE(USB_DESC_INTERFACE_ASSOCIATION_SIZE),                       \
+  USB_DESC_BYTE(8),                                                         \
   USB_DESC_BYTE(USB_DESCRIPTOR_INTERFACE_ASSOCIATION),                      \
   USB_DESC_BYTE(bFirstInterface),                                           \
   USB_DESC_BYTE(bInterfaceCount),                                           \
@@ -205,16 +190,11 @@
   USB_DESC_INDEX(iInterface)
 
 /**
- * @brief   Endpoint Descriptor size.
- */
-#define USB_DESC_ENDPOINT_SIZE              7
-
-/**
  * @brief   Endpoint Descriptor helper macro.
  */
 #define USB_DESC_ENDPOINT(bEndpointAddress, bmAttributes, wMaxPacketSize,   \
                           bInterval)                                        \
-  USB_DESC_BYTE(USB_DESC_ENDPOINT_SIZE),                                    \
+  USB_DESC_BYTE(7),                                                         \
   USB_DESC_BYTE(USB_DESCRIPTOR_ENDPOINT),                                   \
   USB_DESC_BYTE(bEndpointAddress),                                          \
   USB_DESC_BYTE(bmAttributes),                                              \
@@ -349,10 +329,10 @@ typedef void (*usbeventcb_t)(USBDriver *usbp, usbevent_t event);
  * @param[in] usbp      pointer to the @p USBDriver object triggering the
  *                      callback
  * @return              The request handling exit code.
- * @retval false        Request not recognized by the handler.
- * @retval true         Request handled.
+ * @retval FALSE        Request not recognized by the handler.
+ * @retval TRUE         Request handled.
  */
-typedef bool (*usbreqhandler_t)(USBDriver *usbp);
+typedef bool_t (*usbreqhandler_t)(USBDriver *usbp);
 
 /**
  * @brief   Type of an USB descriptor-retrieving callback.
@@ -425,8 +405,8 @@ typedef const USBDescriptor * (*usbgetdescriptor_t)(USBDriver *usbp,
  * @param[in] usbp      pointer to the @p USBDriver object
  * @param[in] ep        endpoint number
  * @return              The operation status.
- * @retval false        Endpoint ready.
- * @retval true         Endpoint transmitting.
+ * @retval FALSE        Endpoint ready.
+ * @retval TRUE         Endpoint transmitting.
  *
  * @iclass
  */
@@ -438,8 +418,8 @@ typedef const USBDescriptor * (*usbgetdescriptor_t)(USBDriver *usbp,
  * @param[in] usbp      pointer to the @p USBDriver object
  * @param[in] ep        endpoint number
  * @return              The operation status.
- * @retval false        Endpoint ready.
- * @retval true         Endpoint receiving.
+ * @retval FALSE        Endpoint ready.
+ * @retval TRUE         Endpoint receiving.
  *
  * @iclass
  */
@@ -496,7 +476,7 @@ typedef const USBDescriptor * (*usbgetdescriptor_t)(USBDriver *usbp,
 /** @} */
 
 /**
- * @name    Low level driver helper macros
+ * @name    Low Level driver helper macros
  * @{
  */
 /**
@@ -583,13 +563,13 @@ extern "C" {
   void usbPrepareTransmit(USBDriver *usbp, usbep_t ep,
                           const uint8_t *buf, size_t n);
   void usbPrepareQueuedReceive(USBDriver *usbp, usbep_t ep,
-                               input_queue_t *iqp, size_t n);
+                               InputQueue *iqp, size_t n);
   void usbPrepareQueuedTransmit(USBDriver *usbp, usbep_t ep,
-                                output_queue_t *oqp, size_t n);
-  bool usbStartReceiveI(USBDriver *usbp, usbep_t ep);
-  bool usbStartTransmitI(USBDriver *usbp, usbep_t ep);
-  bool usbStallReceiveI(USBDriver *usbp, usbep_t ep);
-  bool usbStallTransmitI(USBDriver *usbp, usbep_t ep);
+                                OutputQueue *oqp, size_t n);
+  bool_t usbStartReceiveI(USBDriver *usbp, usbep_t ep);
+  bool_t usbStartTransmitI(USBDriver *usbp, usbep_t ep);
+  bool_t usbStallReceiveI(USBDriver *usbp, usbep_t ep);
+  bool_t usbStallTransmitI(USBDriver *usbp, usbep_t ep);
   void _usb_reset(USBDriver *usbp);
   void _usb_ep0setup(USBDriver *usbp, usbep_t ep);
   void _usb_ep0in(USBDriver *usbp, usbep_t ep);

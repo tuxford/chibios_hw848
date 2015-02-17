@@ -1,20 +1,28 @@
 /*
-    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio.
+    ChibiOS/RT - Copyright (C) 2006,2007,2008,2009,2010,
+                 2011,2012,2013 Giovanni Di Sirio.
 
-    This file is part of ChibiOS.
+    This file is part of ChibiOS/RT.
 
-    ChibiOS is free software; you can redistribute it and/or modify
+    ChibiOS/RT is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.
 
-    ChibiOS is distributed in the hope that it will be useful,
+    ChibiOS/RT is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+                                      ---
+
+    A special exception to the GPL can be applied should you wish to distribute
+    a combined work that includes ChibiOS/RT, without being obliged to provide
+    the source code for any proprietary components. See the file exception.txt
+    for full details of how and when the exception can be applied.
 */
 
 /*-*
@@ -155,7 +163,6 @@
 #define MII_STE101P_ID    0x00061C50
 #define MII_DP83848I_ID   0x20005C90
 #define MII_LAN8710A_ID   0x0007C0F1
-#define MII_LAN8720_ID    0x0007C0F0
 
 #endif /* _MII_H_ */
 

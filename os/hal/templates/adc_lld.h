@@ -1,5 +1,5 @@
 /*
-    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio
+    ChibiOS/RT - Copyright (C) 2006-2013 Giovanni Di Sirio
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
 */
 
 /**
- * @file    adc_lld.h
- * @brief   PLATFORM ADC subsystem low level driver header.
+ * @file    templates/adc_lld.h
+ * @brief   ADC Driver subsystem low level driver header template.
  *
  * @addtogroup ADC
  * @{
@@ -36,7 +36,7 @@
 /*===========================================================================*/
 
 /**
- * @name    PLATFORM configuration options
+ * @name    Configuration options
  * @{
  */
 /**
@@ -45,7 +45,7 @@
  * @note    The default is @p FALSE.
  */
 #if !defined(PLATFORM_ADC_USE_ADC1) || defined(__DOXYGEN__)
-#define PLATFORM_ADC_USE_ADC1                  FALSE
+#define PLATFORM_ADC_USE_ADC1               FALSE
 #endif
 /** @} */
 
@@ -74,8 +74,7 @@ typedef uint16_t adc_channels_num_t;
  */
 typedef enum {
   ADC_ERR_DMAFAILURE = 0,                   /**< DMA operations failure.    */
-  ADC_ERR_OVERFLOW = 1,                     /**< ADC overflow condition.    */
-  ADC_ERR_AWD = 2                           /**< Analog watchdog triggered. */
+  ADC_ERR_OVERFLOW = 1                      /**< ADC overflow condition.    */
 } adcerror_t;
 
 /**
@@ -106,15 +105,14 @@ typedef void (*adcerrorcallback_t)(ADCDriver *adcp, adcerror_t err);
  * @brief   Conversion group configuration structure.
  * @details This implementation-dependent structure describes a conversion
  *          operation.
- * @note    The use of this configuration structure requires knowledge of
- *          PLATFORM ADC cell registers interface, please refer to the PLATFORM
- *          reference manual for details.
+ * @note    Implementations may extend this structure to contain more,
+ *          architecture dependent, fields.
  */
 typedef struct {
   /**
    * @brief   Enables the circular buffer mode for the group.
    */
-  bool                      circular;
+  bool_t                    circular;
   /**
    * @brief   Number of the analog channels belonging to the conversion group.
    */
@@ -143,36 +141,40 @@ typedef struct {
  */
 struct ADCDriver {
   /**
-   * @brief Driver state.
+   * @brief   Driver state.
    */
   adcstate_t                state;
   /**
-   * @brief Current configuration data.
+   * @brief   Current configuration data.
    */
   const ADCConfig           *config;
   /**
-   * @brief Current samples buffer pointer or @p NULL.
+   * @brief   Current samples buffer pointer or @p NULL.
    */
   adcsample_t               *samples;
   /**
-   * @brief Current samples buffer depth or @p 0.
+   * @brief   Current samples buffer depth or @p 0.
    */
   size_t                    depth;
   /**
-   * @brief Current conversion group pointer or @p NULL.
+   * @brief   Current conversion group pointer or @p NULL.
    */
   const ADCConversionGroup  *grpp;
 #if ADC_USE_WAIT || defined(__DOXYGEN__)
   /**
-   * @brief Waiting thread.
+   * @brief   Waiting thread.
    */
-  thread_reference_t        thread;
+  Thread                    *thread;
 #endif
 #if ADC_USE_MUTUAL_EXCLUSION || defined(__DOXYGEN__)
+#if CH_USE_MUTEXES || defined(__DOXYGEN__)
   /**
-   * @brief Mutex protecting the peripheral.
+   * @brief   Mutex protecting the peripheral.
    */
-  mutex_t                   mutex;
+  Mutex                     mutex;
+#elif CH_USE_SEMAPHORES
+  Semaphore                 semaphore;
+#endif
 #endif /* ADC_USE_MUTUAL_EXCLUSION */
 #if defined(ADC_DRIVER_EXT_FIELDS)
   ADC_DRIVER_EXT_FIELDS

@@ -1,5 +1,5 @@
 /*
-    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio
+    ChibiOS/RT - Copyright (C) 2006-2013 Giovanni Di Sirio
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -15,13 +15,14 @@
 */
 
 /**
- * @file    pal_lld.c
- * @brief   PLATFORM PAL subsystem low level driver source.
+ * @file    templates/pal_lld.c
+ * @brief   PAL subsystem low level driver template.
  *
  * @addtogroup PAL
  * @{
  */
 
+#include "ch.h"
 #include "hal.h"
 
 #if HAL_USE_PAL || defined(__DOXYGEN__)

@@ -1,20 +1,28 @@
 /*
-    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio.
+    ChibiOS/RT - Copyright (C) 2006,2007,2008,2009,2010,
+                 2011,2012,2013 Giovanni Di Sirio.
 
-    This file is part of ChibiOS.
+    This file is part of ChibiOS/RT.
 
-    ChibiOS is free software; you can redistribute it and/or modify
+    ChibiOS/RT is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.
 
-    ChibiOS is distributed in the hope that it will be useful,
+    ChibiOS/RT is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+                                      ---
+
+    A special exception to the GPL can be applied should you wish to distribute
+    a combined work that includes ChibiOS/RT, without being obliged to provide
+    the source code for any proprietary components. See the file exception.txt
+    for full details of how and when the exception can be applied.
 */
 
 /**
@@ -25,6 +33,7 @@
  * @{
  */
 
+#include "ch.h"
 #include "hal.h"
 
 #if HAL_USE_EXT || defined(__DOXYGEN__)
@@ -86,15 +95,15 @@ void extObjectInit(EXTDriver *extp) {
  */
 void extStart(EXTDriver *extp, const EXTConfig *config) {
 
-  osalDbgCheck((extp != NULL) && (config != NULL));
+  chDbgCheck((extp != NULL) && (config != NULL), "extStart");
 
-  osalSysLock();
-  osalDbgAssert((extp->state == EXT_STOP) || (extp->state == EXT_ACTIVE),
-                "invalid state");
+  chSysLock();
+  chDbgAssert((extp->state == EXT_STOP) || (extp->state == EXT_ACTIVE),
+              "extStart(), #1", "invalid state");
   extp->config = config;
   ext_lld_start(extp);
   extp->state = EXT_ACTIVE;
-  osalSysUnlock();
+  chSysUnlock();
 }
 
 /**
@@ -106,14 +115,14 @@ void extStart(EXTDriver *extp, const EXTConfig *config) {
  */
 void extStop(EXTDriver *extp) {
 
-  osalDbgCheck(extp != NULL);
+  chDbgCheck(extp != NULL, "extStop");
 
-  osalSysLock();
-  osalDbgAssert((extp->state == EXT_STOP) || (extp->state == EXT_ACTIVE),
-                "invalid state");
+  chSysLock();
+  chDbgAssert((extp->state == EXT_STOP) || (extp->state == EXT_ACTIVE),
+              "extStop(), #1", "invalid state");
   ext_lld_stop(extp);
   extp->state = EXT_STOP;
-  osalSysUnlock();
+  chSysUnlock();
 }
 
 /**
@@ -127,15 +136,16 @@ void extStop(EXTDriver *extp) {
  */
 void extChannelEnable(EXTDriver *extp, expchannel_t channel) {
 
-  osalDbgCheck((extp != NULL) && (channel < EXT_MAX_CHANNELS));
+  chDbgCheck((extp != NULL) && (channel < EXT_MAX_CHANNELS),
+             "extChannelEnable");
 
-  osalSysLock();
-  osalDbgAssert((extp->state == EXT_ACTIVE) &&
-                ((extp->config->channels[channel].mode &
-                  EXT_CH_MODE_EDGES_MASK) != EXT_CH_MODE_DISABLED),
-                "invalid state");
+  chSysLock();
+  chDbgAssert((extp->state == EXT_ACTIVE) &&
+              ((extp->config->channels[channel].mode &
+                EXT_CH_MODE_EDGES_MASK) != EXT_CH_MODE_DISABLED),
+              "extChannelEnable(), #1", "invalid state");
   extChannelEnableI(extp, channel);
-  osalSysUnlock();
+  chSysUnlock();
 }
 
 /**
@@ -149,15 +159,16 @@ void extChannelEnable(EXTDriver *extp, expchannel_t channel) {
  */
 void extChannelDisable(EXTDriver *extp, expchannel_t channel) {
 
-  osalDbgCheck((extp != NULL) && (channel < EXT_MAX_CHANNELS));
+  chDbgCheck((extp != NULL) && (channel < EXT_MAX_CHANNELS),
+             "extChannelDisable");
 
-  osalSysLock();
-  osalDbgAssert((extp->state == EXT_ACTIVE) &&
-                ((extp->config->channels[channel].mode &
-                  EXT_CH_MODE_EDGES_MASK) != EXT_CH_MODE_DISABLED),
-                "invalid state");
+  chSysLock();
+  chDbgAssert((extp->state == EXT_ACTIVE) &&
+              ((extp->config->channels[channel].mode &
+                EXT_CH_MODE_EDGES_MASK) != EXT_CH_MODE_DISABLED),
+              "extChannelDisable(), #1", "invalid state");
   extChannelDisableI(extp, channel);
-  osalSysUnlock();
+  chSysUnlock();
 }
 
 /**
@@ -182,11 +193,11 @@ void extSetChannelModeI(EXTDriver *extp,
                         const EXTChannelConfig *extcp) {
   EXTChannelConfig *oldcp;
 
-  osalDbgCheck((extp != NULL) &&
-               (channel < EXT_MAX_CHANNELS) &&
-               (extcp != NULL));
+  chDbgCheck((extp != NULL) && (channel < EXT_MAX_CHANNELS) &&
+             (extcp != NULL), "extSetChannelModeI");
 
-  osalDbgAssert(extp->state == EXT_ACTIVE, "invalid state");
+  chDbgAssert(extp->state == EXT_ACTIVE,
+              "extSetChannelModeI(), #1", "invalid state");
 
   /* Note that here the access is enforced as non-const, known access
      violation.*/

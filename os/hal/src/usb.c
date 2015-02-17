@@ -1,20 +1,28 @@
 /*
-    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio.
+    ChibiOS/RT - Copyright (C) 2006,2007,2008,2009,2010,
+                 2011,2012,2013 Giovanni Di Sirio.
 
-    This file is part of ChibiOS.
+    This file is part of ChibiOS/RT.
 
-    ChibiOS is free software; you can redistribute it and/or modify
+    ChibiOS/RT is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 3 of the License, or
     (at your option) any later version.
 
-    ChibiOS is distributed in the hope that it will be useful,
+    ChibiOS/RT is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+                                      ---
+
+    A special exception to the GPL can be applied should you wish to distribute
+    a combined work that includes ChibiOS/RT, without being obliged to provide
+    the source code for any proprietary components. See the file exception.txt
+    for full details of how and when the exception can be applied.
 */
 
 /**
@@ -27,7 +35,9 @@
 
 #include <string.h>
 
+#include "ch.h"
 #include "hal.h"
+#include "usb.h"
 
 #if HAL_USE_USB || defined(__DOXYGEN__)
 
@@ -73,10 +83,10 @@ static void set_address(USBDriver *usbp) {
  *
  * @param[in] usbp      pointer to the @p USBDriver object
  * @return              The request handling exit code.
- * @retval false        Request not recognized by the handler or error.
- * @retval true         Request handled.
+ * @retval FALSE        Request not recognized by the handler or error.
+ * @retval TRUE         Request handled.
  */
-static bool default_handler(USBDriver *usbp) {
+static bool_t default_handler(USBDriver *usbp) {
   const USBDescriptor *dp;
 
   /* Decoding the request.*/
@@ -86,25 +96,25 @@ static bool default_handler(USBDriver *usbp) {
   case USB_RTYPE_RECIPIENT_DEVICE | (USB_REQ_GET_STATUS << 8):
     /* Just returns the current status word.*/
     usbSetupTransfer(usbp, (uint8_t *)&usbp->status, 2, NULL);
-    return true;
+    return TRUE;
   case USB_RTYPE_RECIPIENT_DEVICE | (USB_REQ_CLEAR_FEATURE << 8):
     /* Only the DEVICE_REMOTE_WAKEUP is handled here, any other feature
        number is handled as an error.*/
     if (usbp->setup[2] == USB_FEATURE_DEVICE_REMOTE_WAKEUP) {
       usbp->status &= ~2;
       usbSetupTransfer(usbp, NULL, 0, NULL);
-      return true;
+      return TRUE;
     }
-    return false;
+    return FALSE;
   case USB_RTYPE_RECIPIENT_DEVICE | (USB_REQ_SET_FEATURE << 8):
     /* Only the DEVICE_REMOTE_WAKEUP is handled here, any other feature
        number is handled as an error.*/
     if (usbp->setup[2] == USB_FEATURE_DEVICE_REMOTE_WAKEUP) {
       usbp->status |= 2;
       usbSetupTransfer(usbp, NULL, 0, NULL);
-      return true;
+      return TRUE;
     }
-    return false;
+    return FALSE;
   case USB_RTYPE_RECIPIENT_DEVICE | (USB_REQ_SET_ADDRESS << 8):
     /* The SET_ADDRESS handling can be performed here or postponed after
        the status packed depending on the USB_SET_ADDRESS_MODE low
@@ -117,20 +127,20 @@ static bool default_handler(USBDriver *usbp) {
 #else
     usbSetupTransfer(usbp, NULL, 0, set_address);
 #endif
-    return true;
+    return TRUE;
   case USB_RTYPE_RECIPIENT_DEVICE | (USB_REQ_GET_DESCRIPTOR << 8):
     /* Handling descriptor requests from the host.*/
     dp = usbp->config->get_descriptor_cb(
            usbp, usbp->setup[3], usbp->setup[2],
            usbFetchWord(&usbp->setup[4]));
     if (dp == NULL)
-      return false;
+      return FALSE;
     usbSetupTransfer(usbp, (uint8_t *)dp->ud_string, dp->ud_size, NULL);
-    return true;
+    return TRUE;
   case USB_RTYPE_RECIPIENT_DEVICE | (USB_REQ_GET_CONFIGURATION << 8):
     /* Returning the last selected configuration.*/
     usbSetupTransfer(usbp, &usbp->configuration, 1, NULL);
-    return true;
+    return TRUE;
   case USB_RTYPE_RECIPIENT_DEVICE | (USB_REQ_SET_CONFIGURATION << 8):
     /* Handling configuration selection from the host.*/
     usbp->configuration = usbp->setup[2];
@@ -140,43 +150,43 @@ static bool default_handler(USBDriver *usbp) {
       usbp->state = USB_ACTIVE;
     _usb_isr_invoke_event_cb(usbp, USB_EVENT_CONFIGURED);
     usbSetupTransfer(usbp, NULL, 0, NULL);
-    return true;
+    return TRUE;
   case USB_RTYPE_RECIPIENT_INTERFACE | (USB_REQ_GET_STATUS << 8):
   case USB_RTYPE_RECIPIENT_ENDPOINT | (USB_REQ_SYNCH_FRAME << 8):
     /* Just sending two zero bytes, the application can change the behavior
        using a hook..*/
     usbSetupTransfer(usbp, (uint8_t *)zero_status, 2, NULL);
-    return true;
+    return TRUE;
   case USB_RTYPE_RECIPIENT_ENDPOINT | (USB_REQ_GET_STATUS << 8):
     /* Sending the EP status.*/
     if (usbp->setup[4] & 0x80) {
       switch (usb_lld_get_status_in(usbp, usbp->setup[4] & 0x0F)) {
       case EP_STATUS_STALLED:
         usbSetupTransfer(usbp, (uint8_t *)halted_status, 2, NULL);
-        return true;
+        return TRUE;
       case EP_STATUS_ACTIVE:
         usbSetupTransfer(usbp, (uint8_t *)active_status, 2, NULL);
-        return true;
+        return TRUE;
       default:
-        return false;
+        return FALSE;
       }
     }
     else {
       switch (usb_lld_get_status_out(usbp, usbp->setup[4] & 0x0F)) {
       case EP_STATUS_STALLED:
         usbSetupTransfer(usbp, (uint8_t *)halted_status, 2, NULL);
-        return true;
+        return TRUE;
       case EP_STATUS_ACTIVE:
         usbSetupTransfer(usbp, (uint8_t *)active_status, 2, NULL);
-        return true;
+        return TRUE;
       default:
-        return false;
+        return FALSE;
       }
     }
   case USB_RTYPE_RECIPIENT_ENDPOINT | (USB_REQ_CLEAR_FEATURE << 8):
     /* Only ENDPOINT_HALT is handled as feature.*/
     if (usbp->setup[2] != USB_FEATURE_ENDPOINT_HALT)
-      return false;
+      return FALSE;
     /* Clearing the EP status, not valid for EP0, it is ignored in that case.*/
     if ((usbp->setup[4] & 0x0F) > 0) {
       if (usbp->setup[4] & 0x80)
@@ -185,11 +195,11 @@ static bool default_handler(USBDriver *usbp) {
         usb_lld_clear_out(usbp, usbp->setup[4] & 0x0F);
     }
     usbSetupTransfer(usbp, NULL, 0, NULL);
-    return true;
+    return TRUE;
   case USB_RTYPE_RECIPIENT_ENDPOINT | (USB_REQ_SET_FEATURE << 8):
     /* Only ENDPOINT_HALT is handled as feature.*/
     if (usbp->setup[2] != USB_FEATURE_ENDPOINT_HALT)
-      return false;
+      return FALSE;
     /* Stalling the EP, not valid for EP0, it is ignored in that case.*/
     if ((usbp->setup[4] & 0x0F) > 0) {
       if (usbp->setup[4] & 0x80)
@@ -198,7 +208,7 @@ static bool default_handler(USBDriver *usbp) {
         usb_lld_stall_out(usbp, usbp->setup[4] & 0x0F);
     }
     usbSetupTransfer(usbp, NULL, 0, NULL);
-    return true;
+    return TRUE;
   case USB_RTYPE_RECIPIENT_DEVICE | (USB_REQ_SET_DESCRIPTOR << 8):
   case USB_RTYPE_RECIPIENT_INTERFACE | (USB_REQ_CLEAR_FEATURE << 8):
   case USB_RTYPE_RECIPIENT_INTERFACE | (USB_REQ_SET_FEATURE << 8):
@@ -207,7 +217,7 @@ static bool default_handler(USBDriver *usbp) {
     /* All the above requests are not handled here, if you need them then
        use the hook mechanism and provide handling.*/
   default:
-    return false;
+    return FALSE;
   }
 }
 
@@ -258,17 +268,17 @@ void usbObjectInit(USBDriver *usbp) {
 void usbStart(USBDriver *usbp, const USBConfig *config) {
   unsigned i;
 
-  osalDbgCheck((usbp != NULL) && (config != NULL));
+  chDbgCheck((usbp != NULL) && (config != NULL), "usbStart");
 
-  osalSysLock();
-  osalDbgAssert((usbp->state == USB_STOP) || (usbp->state == USB_READY),
-                "invalid state");
+  chSysLock();
+  chDbgAssert((usbp->state == USB_STOP) || (usbp->state == USB_READY),
+              "usbStart(), #1", "invalid state");
   usbp->config = config;
   for (i = 0; i <= USB_MAX_ENDPOINTS; i++)
     usbp->epc[i] = NULL;
   usb_lld_start(usbp);
   usbp->state = USB_READY;
-  osalSysUnlock();
+  chSysUnlock();
 }
 
 /**
@@ -280,15 +290,15 @@ void usbStart(USBDriver *usbp, const USBConfig *config) {
  */
 void usbStop(USBDriver *usbp) {
 
-  osalDbgCheck(usbp != NULL);
+  chDbgCheck(usbp != NULL, "usbStop");
 
-  osalSysLock();
-  osalDbgAssert((usbp->state == USB_STOP) || (usbp->state == USB_READY) ||
-                (usbp->state == USB_SELECTED) || (usbp->state == USB_ACTIVE),
-                "invalid state");
+  chSysLock();
+  chDbgAssert((usbp->state == USB_STOP) || (usbp->state == USB_READY) ||
+              (usbp->state == USB_SELECTED) || (usbp->state == USB_ACTIVE),
+              "usbStop(), #1", "invalid state");
   usb_lld_stop(usbp);
   usbp->state = USB_STOP;
-  osalSysUnlock();
+  chSysUnlock();
 }
 
 /**
@@ -307,11 +317,12 @@ void usbStop(USBDriver *usbp) {
 void usbInitEndpointI(USBDriver *usbp, usbep_t ep,
                       const USBEndpointConfig *epcp) {
 
-  osalDbgCheckClassI();
-  osalDbgCheck((usbp != NULL) && (epcp != NULL));
-  osalDbgAssert(usbp->state == USB_ACTIVE,
-                "invalid state");
-  osalDbgAssert(usbp->epc[ep] == NULL, "already initialized");
+  chDbgCheckClassI();
+  chDbgCheck((usbp != NULL) && (epcp != NULL), "usbInitEndpointI");
+  chDbgAssert(usbp->state == USB_ACTIVE,
+              "usbEnableEndpointI(), #1", "invalid state");
+  chDbgAssert(usbp->epc[ep] == NULL,
+              "usbEnableEndpointI(), #2", "already initialized");
 
   /* Logically enabling the endpoint in the USBDriver structure.*/
   if (epcp->in_state != NULL)
@@ -339,9 +350,10 @@ void usbInitEndpointI(USBDriver *usbp, usbep_t ep,
 void usbDisableEndpointsI(USBDriver *usbp) {
   unsigned i;
 
-  osalDbgCheckClassI();
-  osalDbgCheck(usbp != NULL);
-  osalDbgAssert(usbp->state == USB_SELECTED, "invalid state");
+  chDbgCheckClassI();
+  chDbgCheck(usbp != NULL, "usbDisableEndpointsI");
+  chDbgAssert(usbp->state == USB_SELECTED,
+              "usbDisableEndpointsI(), #1", "invalid state");
 
   usbp->transmitting &= ~1;
   usbp->receiving    &= ~1;
@@ -367,7 +379,7 @@ void usbDisableEndpointsI(USBDriver *usbp) {
 void usbPrepareReceive(USBDriver *usbp, usbep_t ep, uint8_t *buf, size_t n) {
   USBOutEndpointState *osp = usbp->epc[ep]->out_state;
 
-  osp->rxqueued           = false;
+  osp->rxqueued           = FALSE;
   osp->mode.linear.rxbuf  = buf;
   osp->rxsize             = n;
   osp->rxcnt              = 0;
@@ -393,7 +405,7 @@ void usbPrepareTransmit(USBDriver *usbp, usbep_t ep,
                         const uint8_t *buf, size_t n) {
   USBInEndpointState *isp = usbp->epc[ep]->in_state;
 
-  isp->txqueued           = false;
+  isp->txqueued           = FALSE;
   isp->mode.linear.txbuf  = buf;
   isp->txsize             = n;
   isp->txcnt              = 0;
@@ -419,10 +431,10 @@ void usbPrepareTransmit(USBDriver *usbp, usbep_t ep,
  * @special
  */
 void usbPrepareQueuedReceive(USBDriver *usbp, usbep_t ep,
-                             input_queue_t *iqp, size_t n) {
+                             InputQueue *iqp, size_t n) {
   USBOutEndpointState *osp = usbp->epc[ep]->out_state;
 
-  osp->rxqueued           = true;
+  osp->rxqueued           = TRUE;
   osp->mode.queue.rxqueue = iqp;
   osp->rxsize             = n;
   osp->rxcnt              = 0;
@@ -445,10 +457,10 @@ void usbPrepareQueuedReceive(USBDriver *usbp, usbep_t ep,
  * @special
  */
 void usbPrepareQueuedTransmit(USBDriver *usbp, usbep_t ep,
-                              output_queue_t *oqp, size_t n) {
+                              OutputQueue *oqp, size_t n) {
   USBInEndpointState *isp = usbp->epc[ep]->in_state;
 
-  isp->txqueued           = true;
+  isp->txqueued           = TRUE;
   isp->mode.queue.txqueue = oqp;
   isp->txsize             = n;
   isp->txcnt              = 0;
@@ -465,22 +477,22 @@ void usbPrepareQueuedTransmit(USBDriver *usbp, usbep_t ep,
  * @param[in] ep        endpoint number
  *
  * @return              The operation status.
- * @retval false        Operation started successfully.
- * @retval true         Endpoint busy, operation not started.
+ * @retval FALSE        Operation started successfully.
+ * @retval TRUE         Endpoint busy, operation not started.
  *
  * @iclass
  */
-bool usbStartReceiveI(USBDriver *usbp, usbep_t ep) {
+bool_t usbStartReceiveI(USBDriver *usbp, usbep_t ep) {
 
-  osalDbgCheckClassI();
-  osalDbgCheck(usbp != NULL);
+  chDbgCheckClassI();
+  chDbgCheck(usbp != NULL, "usbStartReceiveI");
 
   if (usbGetReceiveStatusI(usbp, ep))
-    return true;
+    return TRUE;
 
   usbp->receiving |= (1 << ep);
   usb_lld_start_out(usbp, ep);
-  return false;
+  return FALSE;
 }
 
 /**
@@ -492,22 +504,22 @@ bool usbStartReceiveI(USBDriver *usbp, usbep_t ep) {
  * @param[in] ep        endpoint number
  *
  * @return              The operation status.
- * @retval false        Operation started successfully.
- * @retval true         Endpoint busy, operation not started.
+ * @retval FALSE        Operation started successfully.
+ * @retval TRUE         Endpoint busy, operation not started.
  *
  * @iclass
  */
-bool usbStartTransmitI(USBDriver *usbp, usbep_t ep) {
+bool_t usbStartTransmitI(USBDriver *usbp, usbep_t ep) {
 
-  osalDbgCheckClassI();
-  osalDbgCheck(usbp != NULL);
+  chDbgCheckClassI();
+  chDbgCheck(usbp != NULL, "usbStartTransmitI");
 
   if (usbGetTransmitStatusI(usbp, ep))
-    return true;
+    return TRUE;
 
   usbp->transmitting |= (1 << ep);
   usb_lld_start_in(usbp, ep);
-  return false;
+  return FALSE;
 }
 
 /**
@@ -517,21 +529,21 @@ bool usbStartTransmitI(USBDriver *usbp, usbep_t ep) {
  * @param[in] ep        endpoint number
  *
  * @return              The operation status.
- * @retval false        Endpoint stalled.
- * @retval true         Endpoint busy, not stalled.
+ * @retval FALSE        Endpoint stalled.
+ * @retval TRUE         Endpoint busy, not stalled.
  *
  * @iclass
  */
-bool usbStallReceiveI(USBDriver *usbp, usbep_t ep) {
+bool_t usbStallReceiveI(USBDriver *usbp, usbep_t ep) {
 
-  osalDbgCheckClassI();
-  osalDbgCheck(usbp != NULL);
+  chDbgCheckClassI();
+  chDbgCheck(usbp != NULL, "usbStallReceiveI");
 
   if (usbGetReceiveStatusI(usbp, ep))
-    return true;
+    return TRUE;
 
   usb_lld_stall_out(usbp, ep);
-  return false;
+  return FALSE;
 }
 
 /**
@@ -541,21 +553,21 @@ bool usbStallReceiveI(USBDriver *usbp, usbep_t ep) {
  * @param[in] ep        endpoint number
  *
  * @return              The operation status.
- * @retval false        Endpoint stalled.
- * @retval true         Endpoint busy, not stalled.
+ * @retval FALSE        Endpoint stalled.
+ * @retval TRUE         Endpoint busy, not stalled.
  *
  * @iclass
  */
-bool usbStallTransmitI(USBDriver *usbp, usbep_t ep) {
+bool_t usbStallTransmitI(USBDriver *usbp, usbep_t ep) {
 
-  osalDbgCheckClassI();
-  osalDbgCheck(usbp != NULL);
+  chDbgCheckClassI();
+  chDbgCheck(usbp != NULL, "usbStallTransmitI");
 
   if (usbGetTransmitStatusI(usbp, ep))
-    return true;
+    return TRUE;
 
   usb_lld_stall_in(usbp, ep);
-  return false;
+  return FALSE;
 }
 
 /**
@@ -641,9 +653,9 @@ void _usb_ep0setup(USBDriver *usbp, usbep_t ep) {
       /* Starts the transmit phase.*/
       usbp->ep0state = USB_EP0_TX;
       usbPrepareTransmit(usbp, 0, usbp->ep0next, usbp->ep0n);
-      osalSysLockFromISR();
+      chSysLockFromIsr();
       usbStartTransmitI(usbp, 0);
-      osalSysUnlockFromISR();
+      chSysUnlockFromIsr();
     }
     else {
       /* No transmission phase, directly receiving the zero sized status
@@ -651,9 +663,9 @@ void _usb_ep0setup(USBDriver *usbp, usbep_t ep) {
       usbp->ep0state = USB_EP0_WAITING_STS;
 #if (USB_EP0_STATUS_STAGE == USB_EP0_STATUS_STAGE_SW)
       usbPrepareReceive(usbp, 0, NULL, 0);
-      osalSysLockFromISR();
+      chSysLockFromIsr();
       usbStartReceiveI(usbp, 0);
-      osalSysUnlockFromISR();
+      chSysUnlockFromIsr();
 #else
       usb_lld_end_setup(usbp, ep);
 #endif
@@ -665,9 +677,9 @@ void _usb_ep0setup(USBDriver *usbp, usbep_t ep) {
       /* Starts the receive phase.*/
       usbp->ep0state = USB_EP0_RX;
       usbPrepareReceive(usbp, 0, usbp->ep0next, usbp->ep0n);
-      osalSysLockFromISR();
+      chSysLockFromIsr();
       usbStartReceiveI(usbp, 0);
-      osalSysUnlockFromISR();
+      chSysUnlockFromIsr();
     }
     else {
       /* No receive phase, directly sending the zero sized status
@@ -675,9 +687,9 @@ void _usb_ep0setup(USBDriver *usbp, usbep_t ep) {
       usbp->ep0state = USB_EP0_SENDING_STS;
 #if (USB_EP0_STATUS_STAGE == USB_EP0_STATUS_STAGE_SW)
       usbPrepareTransmit(usbp, 0, NULL, 0);
-      osalSysLockFromISR();
+      chSysLockFromIsr();
       usbStartTransmitI(usbp, 0);
-      osalSysUnlockFromISR();
+      chSysUnlockFromIsr();
 #else
       usb_lld_end_setup(usbp, ep);
 #endif
@@ -707,9 +719,9 @@ void _usb_ep0in(USBDriver *usbp, usbep_t ep) {
        transmitted.*/
     if ((usbp->ep0n < max) && ((usbp->ep0n % usbp->epc[0]->in_maxsize) == 0)) {
       usbPrepareTransmit(usbp, 0, NULL, 0);
-      osalSysLockFromISR();
+      chSysLockFromIsr();
       usbStartTransmitI(usbp, 0);
-      osalSysUnlockFromISR();
+      chSysUnlockFromIsr();
       usbp->ep0state = USB_EP0_WAITING_TX0;
       return;
     }
@@ -719,9 +731,9 @@ void _usb_ep0in(USBDriver *usbp, usbep_t ep) {
     usbp->ep0state = USB_EP0_WAITING_STS;
 #if (USB_EP0_STATUS_STAGE == USB_EP0_STATUS_STAGE_SW)
     usbPrepareReceive(usbp, 0, NULL, 0);
-    osalSysLockFromISR();
+    chSysLockFromIsr();
     usbStartReceiveI(usbp, 0);
-    osalSysUnlockFromISR();
+    chSysUnlockFromIsr();
 #else
     usb_lld_end_setup(usbp, ep);
 #endif
@@ -763,9 +775,9 @@ void _usb_ep0out(USBDriver *usbp, usbep_t ep) {
     usbp->ep0state = USB_EP0_SENDING_STS;
 #if (USB_EP0_STATUS_STAGE == USB_EP0_STATUS_STAGE_SW)
     usbPrepareTransmit(usbp, 0, NULL, 0);
-    osalSysLockFromISR();
+    chSysLockFromIsr();
     usbStartTransmitI(usbp, 0);
-    osalSysUnlockFromISR();
+    chSysUnlockFromIsr();
 #else
     usb_lld_end_setup(usbp, ep);
 #endif

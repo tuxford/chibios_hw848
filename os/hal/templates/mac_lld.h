@@ -1,5 +1,5 @@
 /*
-    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio
+    ChibiOS/RT - Copyright (C) 2006-2013 Giovanni Di Sirio
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -15,8 +15,8 @@
 */
 
 /**
- * @file    mac_lld.h
- * @brief   PLATFORM MAC subsystem low level driver header.
+ * @file    templates/mac_lld.h
+ * @brief   MAC Driver subsystem low level driver header template.
  *
  * @addtogroup MAC
  * @{
@@ -34,14 +34,14 @@
 /**
  * @brief   This implementation supports the zero-copy mode API.
  */
-#define MAC_SUPPORTS_ZERO_COPY      TRUE
+#define MAC_SUPPORTS_ZERO_COPY              TRUE
 
 /*===========================================================================*/
 /* Driver pre-compile time settings.                                         */
 /*===========================================================================*/
 
 /**
- * @name    PLATFORM configuration options
+ * @name    Configuration options
  * @{
  */
 /**
@@ -87,16 +87,16 @@ struct MACDriver {
   /**
    * @brief Transmit semaphore.
    */
-  threads_queue_t       tdqueue;
+  Semaphore             tdsem;
   /**
    * @brief Receive semaphore.
    */
-  threads_queue_t       rdqueue;
+  Semaphore             rdsem;
 #if MAC_USE_EVENTS || defined(__DOXYGEN__)
   /**
    * @brief Receive event.
    */
-  event_source_t        rdevent;
+  EventSource           rdevent;
 #endif
   /* End of the mandatory fields.*/
 };
@@ -155,7 +155,7 @@ extern "C" {
   msg_t mac_lld_get_receive_descriptor(MACDriver *macp,
                                        MACReceiveDescriptor *rdp);
   void mac_lld_release_receive_descriptor(MACReceiveDescriptor *rdp);
-  bool mac_lld_poll_link_status(MACDriver *macp);
+  bool_t mac_lld_poll_link_status(MACDriver *macp);
   size_t mac_lld_write_transmit_descriptor(MACTransmitDescriptor *tdp,
                                            uint8_t *buf,
                                            size_t size);

@@ -1,5 +1,5 @@
 /*
-    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio
+    ChibiOS/RT - Copyright (C) 2006-2013 Giovanni Di Sirio
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -15,13 +15,14 @@
 */
 
 /**
- * @file    spi_lld.c
- * @brief   PLATFORM SPI subsystem low level driver source.
+ * @file    templates/spi_lld.c
+ * @brief   SPI Driver subsystem low level driver source template.
  *
  * @addtogroup SPI
  * @{
  */
 
+#include "ch.h"
 #include "hal.h"
 
 #if HAL_USE_SPI || defined(__DOXYGEN__)
@@ -101,6 +102,8 @@ void spi_lld_start(SPIDriver *spip) {
 void spi_lld_stop(SPIDriver *spip) {
 
   if (spip->state == SPI_READY) {
+    /* Resets the peripheral.*/
+
     /* Disables the peripheral.*/
 #if PLATFORM_SPI_USE_SPI1
     if (&SPID1 == spip) {

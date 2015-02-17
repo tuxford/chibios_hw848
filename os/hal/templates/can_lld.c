@@ -1,5 +1,5 @@
 /*
-    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio
+    ChibiOS/RT - Copyright (C) 2006-2013 Giovanni Di Sirio
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -15,13 +15,14 @@
 */
 
 /**
- * @file    can_lld.c
- * @brief   PLATFORM CAN subsystem low level driver source.
+ * @file    templates/can_lld.c
+ * @brief   CAN Driver subsystem low level driver source template.
  *
  * @addtogroup CAN
  * @{
  */
 
+#include "ch.h"
 #include "hal.h"
 
 #if HAL_USE_CAN || defined(__DOXYGEN__)
@@ -124,7 +125,7 @@ void can_lld_stop(CANDriver *canp) {
  *
  * @notapi
  */
-bool can_lld_is_tx_empty(CANDriver *canp, canmbx_t mailbox) {
+bool_t can_lld_is_tx_empty(CANDriver *canp, canmbx_t mailbox) {
 
   (void)canp;
 
@@ -173,7 +174,7 @@ void can_lld_transmit(CANDriver *canp,
  *
  * @notapi
  */
-bool can_lld_is_rx_nonempty(CANDriver *canp, canmbx_t mailbox) {
+bool_t can_lld_is_rx_nonempty(CANDriver *canp, canmbx_t mailbox) {
 
   (void)canp;
   (void)mailbox;
