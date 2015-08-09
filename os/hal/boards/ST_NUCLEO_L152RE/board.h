@@ -27,6 +27,7 @@
 #define BOARD_ST_NUCLEO_L152RE
 #define BOARD_NAME                  "STMicroelectronics NUCLEO-L152RE"
 
+
 /*
  * Board oscillators-related settings.
  * NOTE: HSE not fitted.
@@ -44,7 +45,7 @@
 /*
  * MCU type as defined in the ST header file stm32l1xx.h.
  */
-#define STM32L152xE
+#define STM32L1XX_MD
 
 /*
  * IO pins assignments.

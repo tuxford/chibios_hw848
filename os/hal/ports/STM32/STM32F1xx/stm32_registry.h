@@ -68,8 +68,7 @@
 #define STM32_HAS_ETH                       FALSE
 
 /* EXTI attributes.*/
-#define STM32_EXTI_NUM_LINES                18
-#define STM32_EXTI_IMR_MASK                 0x00000000U
+#define STM32_EXTI_NUM_CHANNELS             18
 
 /* GPIO attributes.*/
 #define STM32_HAS_GPIOA                     TRUE
@@ -81,8 +80,6 @@
 #define STM32_HAS_GPIOG                     FALSE
 #define STM32_HAS_GPIOH                     FALSE
 #define STM32_HAS_GPIOI                     FALSE
-#define STM32_HAS_GPIOJ                     FALSE
-#define STM32_HAS_GPIOK                     FALSE
 
 /* I2C attributes.*/
 #define STM32_HAS_I2C1                      TRUE
@@ -91,7 +88,6 @@
 
 #define STM32_HAS_I2C2                      FALSE
 #define STM32_HAS_I2C3                      FALSE
-#define STM32_HAS_I2C4                      FALSE
 
 /* RTC attributes.*/
 #define STM32_HAS_RTC                       TRUE
@@ -158,9 +154,6 @@
 #define STM32_HAS_TIM14                     FALSE
 #define STM32_HAS_TIM18                     FALSE
 #define STM32_HAS_TIM19                     FALSE
-#define STM32_HAS_TIM20                     FALSE
-#define STM32_HAS_TIM21                     FALSE
-#define STM32_HAS_TIM22                     FALSE
 
 /* USART attributes.*/
 #define STM32_HAS_USART1                    TRUE
@@ -175,8 +168,6 @@
 #define STM32_HAS_UART4                     FALSE
 #define STM32_HAS_UART5                     FALSE
 #define STM32_HAS_USART6                    FALSE
-#define STM32_HAS_UART7                     FALSE
-#define STM32_HAS_UART8                     FALSE
 
 /* USB attributes.*/
 #define STM32_HAS_USB                       FALSE
@@ -237,8 +228,7 @@
 #define STM32_HAS_ETH                       FALSE
 
 /* EXTI attributes.*/
-#define STM32_EXTI_NUM_LINES                19
-#define STM32_EXTI_IMR_MASK                 0x00000000U
+#define STM32_EXTI_NUM_CHANNELS             19
 
 /* GPIO attributes.*/
 #define STM32_HAS_GPIOA                     TRUE
@@ -250,8 +240,6 @@
 #define STM32_HAS_GPIOG                     FALSE
 #define STM32_HAS_GPIOH                     FALSE
 #define STM32_HAS_GPIOI                     FALSE
-#define STM32_HAS_GPIOJ                     FALSE
-#define STM32_HAS_GPIOK                     FALSE
 
 /* I2C attributes.*/
 #define STM32_HAS_I2C1                      TRUE
@@ -263,7 +251,6 @@
 #define STM32_I2C_I2C2_TX_DMA_STREAM        STM32_DMA_STREAM_ID(1, 4)
 
 #define STM32_HAS_I2C3                      FALSE
-#define STM32_HAS_I2C4                      FALSE
 
 /* RTC attributes.*/
 #define STM32_HAS_RTC                       TRUE
@@ -336,9 +323,6 @@
 #define STM32_HAS_TIM14                     FALSE
 #define STM32_HAS_TIM18                     FALSE
 #define STM32_HAS_TIM19                     FALSE
-#define STM32_HAS_TIM20                     FALSE
-#define STM32_HAS_TIM21                     FALSE
-#define STM32_HAS_TIM22                     FALSE
 
 /* USART attributes.*/
 #define STM32_HAS_USART1                    TRUE
@@ -356,8 +340,6 @@
 #define STM32_HAS_UART4                     FALSE
 #define STM32_HAS_UART5                     FALSE
 #define STM32_HAS_USART6                    FALSE
-#define STM32_HAS_UART7                     FALSE
-#define STM32_HAS_UART8                     FALSE
 
 /* USB attributes.*/
 #define STM32_HAS_USB                       FALSE
@@ -414,8 +396,7 @@
 #define STM32_HAS_ETH                       FALSE
 
 /* EXTI attributes.*/
-#define STM32_EXTI_NUM_LINES                19
-#define STM32_EXTI_IMR_MASK                 0x00000000U
+#define STM32_EXTI_NUM_CHANNELS             19
 
 /* GPIO attributes.*/
 #define STM32_HAS_GPIOA                     TRUE
@@ -427,8 +408,6 @@
 #define STM32_HAS_GPIOG                     FALSE
 #define STM32_HAS_GPIOH                     FALSE
 #define STM32_HAS_GPIOI                     FALSE
-#define STM32_HAS_GPIOJ                     FALSE
-#define STM32_HAS_GPIOK                     FALSE
 
 /* I2C attributes.*/
 #define STM32_HAS_I2C1                      TRUE
@@ -437,7 +416,6 @@
 
 #define STM32_HAS_I2C2                      FALSE
 #define STM32_HAS_I2C3                      FALSE
-#define STM32_HAS_I2C4                      FALSE
 
 /* RTC attributes.*/
 #define STM32_HAS_RTC                       TRUE
@@ -489,9 +467,6 @@
 #define STM32_HAS_TIM17                     FALSE
 #define STM32_HAS_TIM18                     FALSE
 #define STM32_HAS_TIM19                     FALSE
-#define STM32_HAS_TIM20                     FALSE
-#define STM32_HAS_TIM21                     FALSE
-#define STM32_HAS_TIM22                     FALSE
 
 /* USART attributes.*/
 #define STM32_HAS_USART1                    TRUE
@@ -506,8 +481,6 @@
 #define STM32_HAS_UART4                     FALSE
 #define STM32_HAS_UART5                     FALSE
 #define STM32_HAS_USART6                    FALSE
-#define STM32_HAS_UART7                     FALSE
-#define STM32_HAS_UART8                     FALSE
 
 /* USB attributes.*/
 #define STM32_HAS_USB                       FALSE
@@ -564,8 +537,7 @@
 #define STM32_HAS_ETH                       FALSE
 
 /* EXTI attributes.*/
-#define STM32_EXTI_NUM_LINES                19
-#define STM32_EXTI_IMR_MASK                 0x00000000U
+#define STM32_EXTI_NUM_CHANNELS             19
 
 /* GPIO attributes.*/
 #define STM32_HAS_GPIOA                     TRUE
@@ -577,8 +549,6 @@
 #define STM32_HAS_GPIOG                     FALSE
 #define STM32_HAS_GPIOH                     FALSE
 #define STM32_HAS_GPIOI                     FALSE
-#define STM32_HAS_GPIOJ                     FALSE
-#define STM32_HAS_GPIOK                     FALSE
 
 /* I2C attributes.*/
 #define STM32_HAS_I2C1                      TRUE
@@ -590,7 +560,6 @@
 #define STM32_I2C_I2C2_TX_DMA_STREAM        STM32_DMA_STREAM_ID(1, 4)
 
 #define STM32_HAS_I2C3                      FALSE
-#define STM32_HAS_I2C4                      FALSE
 
 /* RTC attributes.*/
 #define STM32_HAS_RTC                       TRUE
@@ -648,9 +617,6 @@
 #define STM32_HAS_TIM17                     FALSE
 #define STM32_HAS_TIM18                     FALSE
 #define STM32_HAS_TIM19                     FALSE
-#define STM32_HAS_TIM20                     FALSE
-#define STM32_HAS_TIM21                     FALSE
-#define STM32_HAS_TIM22                     FALSE
 
 /* USART attributes.*/
 #define STM32_HAS_USART1                    TRUE
@@ -668,8 +634,6 @@
 #define STM32_HAS_UART4                     FALSE
 #define STM32_HAS_UART5                     FALSE
 #define STM32_HAS_USART6                    FALSE
-#define STM32_HAS_UART7                     FALSE
-#define STM32_HAS_UART8                     FALSE
 
 /* USB attributes.*/
 #define STM32_HAS_USB                       TRUE
@@ -733,8 +697,7 @@
 #define STM32_HAS_ETH                       FALSE
 
 /* EXTI attributes.*/
-#define STM32_EXTI_NUM_LINES                19
-#define STM32_EXTI_IMR_MASK                 0x00000000U
+#define STM32_EXTI_NUM_CHANNELS             19
 
 /* GPIO attributes.*/
 #define STM32_HAS_GPIOA                     TRUE
@@ -746,8 +709,6 @@
 #define STM32_HAS_GPIOG                     TRUE
 #define STM32_HAS_GPIOH                     FALSE
 #define STM32_HAS_GPIOI                     FALSE
-#define STM32_HAS_GPIOJ                     FALSE
-#define STM32_HAS_GPIOK                     FALSE
 
 /* I2C attributes.*/
 #define STM32_HAS_I2C1                      TRUE
@@ -759,7 +720,6 @@
 #define STM32_I2C_I2C2_TX_DMA_STREAM        STM32_DMA_STREAM_ID(1, 4)
 
 #define STM32_HAS_I2C3                      FALSE
-#define STM32_HAS_I2C4                      FALSE
 
 /* RTC attributes.*/
 #define STM32_HAS_RTC                       TRUE
@@ -850,9 +810,6 @@
 #define STM32_HAS_TIM17                     FALSE
 #define STM32_HAS_TIM18                     FALSE
 #define STM32_HAS_TIM19                     FALSE
-#define STM32_HAS_TIM20                     FALSE
-#define STM32_HAS_TIM21                     FALSE
-#define STM32_HAS_TIM22                     FALSE
 
 /* USART attributes.*/
 #define STM32_HAS_USART1                    TRUE
@@ -873,8 +830,6 @@
 
 #define STM32_HAS_UART5                     FALSE
 #define STM32_HAS_USART6                    FALSE
-#define STM32_HAS_UART7                     FALSE
-#define STM32_HAS_UART8                     FALSE
 
 /* USB attributes.*/
 #define STM32_HAS_USB                       TRUE
@@ -938,8 +893,7 @@
 #define STM32_HAS_ETH                       FALSE
 
 /* EXTI attributes.*/
-#define STM32_EXTI_NUM_LINES                19
-#define STM32_EXTI_IMR_MASK                 0x00000000U
+#define STM32_EXTI_NUM_CHANNELS             19
 
 /* GPIO attributes.*/
 #define STM32_HAS_GPIOA                     TRUE
@@ -951,8 +905,6 @@
 #define STM32_HAS_GPIOG                     TRUE
 #define STM32_HAS_GPIOH                     FALSE
 #define STM32_HAS_GPIOI                     FALSE
-#define STM32_HAS_GPIOJ                     FALSE
-#define STM32_HAS_GPIOK                     FALSE
 
 /* I2C attributes.*/
 #define STM32_HAS_I2C1                      TRUE
@@ -964,7 +916,6 @@
 #define STM32_I2C_I2C2_TX_DMA_STREAM        STM32_DMA_STREAM_ID(1, 4)
 
 #define STM32_HAS_I2C3                      FALSE
-#define STM32_HAS_I2C4                      FALSE
 
 /* RTC attributes.*/
 #define STM32_HAS_RTC                       TRUE
@@ -1055,9 +1006,6 @@
 #define STM32_HAS_TIM17                     FALSE
 #define STM32_HAS_TIM18                     FALSE
 #define STM32_HAS_TIM19                     FALSE
-#define STM32_HAS_TIM20                     FALSE
-#define STM32_HAS_TIM21                     FALSE
-#define STM32_HAS_TIM22                     FALSE
 
 /* USART attributes.*/
 #define STM32_HAS_USART1                    TRUE
@@ -1078,8 +1026,6 @@
 
 #define STM32_HAS_UART5                     FALSE
 #define STM32_HAS_USART6                    FALSE
-#define STM32_HAS_UART7                     FALSE
-#define STM32_HAS_UART8                     FALSE
 
 /* USB attributes.*/
 #define STM32_HAS_USB                       TRUE
@@ -1141,12 +1087,9 @@
 
 /* ETH attributes.*/
 #define STM32_HAS_ETH                       TRUE
-#define STM32_ETH_HANDLER                   Vector134
-#define STM32_ETH_NUMBER                    61
 
 /* EXTI attributes.*/
-#define STM32_EXTI_NUM_LINES                20
-#define STM32_EXTI_IMR_MASK                 0x00000000U
+#define STM32_EXTI_NUM_CHANNELS             20
 
 /* GPIO attributes.*/
 #define STM32_HAS_GPIOA                     TRUE
@@ -1158,8 +1101,6 @@
 #define STM32_HAS_GPIOG                     FALSE
 #define STM32_HAS_GPIOH                     FALSE
 #define STM32_HAS_GPIOI                     FALSE
-#define STM32_HAS_GPIOJ                     FALSE
-#define STM32_HAS_GPIOK                     FALSE
 
 /* I2C attributes.*/
 #define STM32_HAS_I2C1                      TRUE
@@ -1171,7 +1112,6 @@
 #define STM32_I2C_I2C2_TX_DMA_STREAM        STM32_DMA_STREAM_ID(1, 4)
 
 #define STM32_HAS_I2C3                      FALSE
-#define STM32_HAS_I2C4                      FALSE
 
 /* RTC attributes.*/
 #define STM32_HAS_RTC                       TRUE
@@ -1241,9 +1181,6 @@
 #define STM32_HAS_TIM17                     FALSE
 #define STM32_HAS_TIM18                     FALSE
 #define STM32_HAS_TIM19                     FALSE
-#define STM32_HAS_TIM20                     FALSE
-#define STM32_HAS_TIM21                     FALSE
-#define STM32_HAS_TIM22                     FALSE
 
 /* USART attributes.*/
 #define STM32_HAS_USART1                    TRUE
@@ -1265,8 +1202,6 @@
 #define STM32_HAS_UART5                     TRUE
 
 #define STM32_HAS_USART6                    FALSE
-#define STM32_HAS_UART7                     FALSE
-#define STM32_HAS_UART8                     FALSE
 
 /* USB attributes.*/
 #define STM32_HAS_USB                       FALSE

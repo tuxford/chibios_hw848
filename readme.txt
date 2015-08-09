@@ -73,47 +73,19 @@
 *** Releases and Change Log                                               ***
 *****************************************************************************
 
-*** 3.1.0 ***
-- HAL: Added support for I2C3 and I2C4 to the STM32 I2Cv2 I2C driver.
-- HAL: Added support for SPI4...SPI6 to the STM32 SPIv2 SPI driver.
-- HAL: Added support for UART4...UART8 to the STM32 UARTv2 UART driver.
-- HAL: Added support for UART7 and UART8 to the STM32 UARTv2 serial driver.
-- HAL: STM32F2xx, STM32F4xx and STM32F7xx devices now share the same ADCv2
-       and DMAv2 drivers.
-- HAL: STM32F0xx and STM32L0xx devices now share the same ADCv1 driver.
-- HAL: STM32F0xx, STM32L0xx and STM32L1xx devices now share the same DMAv1
-       driver.
-- HAL: Introduced preliminary support for STM32F7xx devices.
-- HAL: Introduced preliminary support for STM32L0xx devices.
-- HAL: New STM32 shared DMAv2 driver supporting channel selection (F2, F4, F7).
-- HAL: New STM32 shared DMAv1 driver supporting channel selection and fixing
-       the behavior with shared IRQs (F0, L0).
-- HAL: New STM32 ADCv2 driver supporting large STM32 devices (F2, F4, F7).
-- HAL: New STM32 ADCv1 driver supporting small STM32 devices (F0, L0).
-- HAL: Introduced support for TIM21 and TIM22 in STM32 ST driver.
-- HAL: Updated STM32F0xx headers to STM32CubeF0 version 1.3.0. Added support
-       for STM32F030xC, STM32F070x6, STM32F070xB devices.
-- HAL: Fixed CEC clock cannot be disabled on STM32F0xx (bug #628)
-       (backported to 3.0.1).
-- VAR: Fixed lwIP arch code breaks with a 16-bit systick timer (bug #627)
-       (backported to 3.0.1).
-- HAL: Fixed broken MAC driver for STM32F107 (bug #626)(backported to 3.0.1).
-- NIL: Fixed missing configuration options from NIL PPC port (bug #625)
-       (backported to 3.0.1).
-- HAL: Fixed wrong offset in STM32 DAC driver (bug #624)(backported to 3.0.1).
-- HAL: Fixed crash on STM32F030x4/6 devices (bug #623)(backported to 3.0.1).
-- HAL: Fixed duplicated doxygen tag in STM32F4xx hal_lld.h file (bug #621)
-       (backported to 3.0.1 and 2.6.9).
-- HAL: Fixed STM32F042 registry error (bug #620)(backported to 3.0.1).
-- HAL: Fixed wrong check in canReceive() (bug #619)(backported to 3.0.1
-       and 2.6.9).
-- HAL: Fixed wrong EXTI[18] vector number on STM32F373 (bug #618)(backported
-       to 3.0.1 and 2.6.9).
+*** 3.0.1 ***
+- HAL: Fixed CEC clock cannot be disabled on STM32F0xx (bug #628).
+- VAR: Fixed lwIP arch code breaks with a 16-bit systick timer (bug #627).
+- HAL: Fixed broken MAC driver for STM32F107 (bug #626).
+- NIL: Fixed missing configuration options from NIL PPC port (bug #625).
+- HAL: Fixed wrong offset in STM32 DAC driver (bug #624).
+- HAL: Fixed crash on STM32F030x4/6 devices (bug #623).
+- HAL: Fixed duplicated doxygen tag in STM32F4xx hal_lld.h file (bug #621).
+- HAL: Fixed STM32F042 registry error (bug #620).
+- HAL: Fixed wrong check in canReceive() (bug #619).
+- HAL: Fixed wrong EXTI[18] vector number on STM32F373 (bug #618).
 - HAL: Fixed wrong check on STM32_LSE_ENABLED definition in STM32L1xx HAL port
-       (bug #617)(backported to 3.0.1 and 2.6.9).
-- HAL: Fixed rtcConvertDateTimeToFAT() incorrect conversion (bug #615)
-       (backported to 3.0.1).
-- HAL: Fixed missing UART7 and UART8 support on STM32F4xx family (bug #612).
+       (bug #617).
 
 *** 3.0.0 ***
 - NEW: Added an initialization function to the lwIP bindings, now it is
