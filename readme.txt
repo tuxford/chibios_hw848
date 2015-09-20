@@ -6,6 +6,7 @@
   +--readme.txt           - This file.
   +--documentation.html   - Shortcut to the web documentation page.
   +--license.txt          - GPL license text.
+  +--exception.txt        - GPL exception text (stable releases only).
   +--demos/               - Demo projects, one directory per platform.
   +--docs/                - Documentation.
   |  +--common/           - Documentation common build resources.
@@ -72,98 +73,36 @@
 *** Releases and Change Log                                               ***
 *****************************************************************************
 
-*** 3.1.0 ***
-- HAL: Added support for differential mode to the STM32F3xx ADC driver.
-- HAL: Experimental isochronous capability added to STM32 OTGv1 driver.
-- HAL: Modified the serial-USB driver to reject write/read attempts if the
-       underlying USB is not in active state. In case of disconnection the
-       SDU driver broadcasts a CHN_DISCONNECTED event.
-- HAL: Modified the USB driver to have a separate USB_SUSPENDED state, this
-       allows the application to detect if the USB is communicating or if
-       it is disconnected or powered down.
-- HAL: Added wake-up and suspend events to the STM32 OTGv1 driver.
-- HAL: STM32 USB/OTG buffers and queues do not more require to be aligned in
-       position and size.
-- VAR: Improved GCC rules.ld, now it is possible to assign the heap to any
-       of the available RAM regions.
-- HAL: STM32 GPT, ICU and PWM driver enhancements. Now it is possible to
-       suppress default ISRs by defining STM32_TIMx_SUPPRESS_ISR.
-       The application is now able to define custom handlers if required
-       or simply save space if the driver callbacks are not used.
-       Now the functions xxx_lld_serve_interrupts() have global scope, this
-       way custom ISRs can call them from outside the driver module.
-- HAL: Added TIM units use cross-check in STM32 GPT, ICU, PWM and ST drivers,
-       now use collisions are explicitly reported.
+*** 3.0.2 ***
+- HAL: Fixed RT dependency in STM32 SDCv1 driver (bug #643).
+- VAR: Fixed incorrect working area size in LwIP creation in demos (bug #642).
+- HAL: Fixed error in hal_lld_f100.h checks (bug #641).
+- HAL: Fixed volatile variable issue in I/O queues, both RT and HAL (bug #640).
+- HAL: Fixed wrong DMA assignment for I2C1 in STM32F302xC registry (bug #637).
+- HAL: Fixed missing timers 5, 6, 7, 10 & 11 from STM32L1 HAL port (bug #636).
+- VAR: Fixed CRT0_CALL_DESTRUCTORS not utilized in crt0_v7m.s (bug #635).
+- DEM: Fixed wrong ld file in STM32F072xB USB CDC demo (bug #634).
+- NIL: Fixed wrong assertion in NIL chSemResetI() and NIL OSAL
+       osalThreadDequeueAllI() (bug #633).
+- RT:  Fixed problem with RT mutexes involving priority inheritance (bug #632).
+- HAL: Fixed HAL to RT dependency in STM32 DAC driver (bug #631).
+- HAL: Fixed problem with STM32 I2S driver restart (bug #630).
 - NIL: Added polled delays required to fix bug #629.
-- HAL: Added support for I2C3 and I2C4 to the STM32 I2Cv2 I2C driver.
-- HAL: Added support for SPI4...SPI6 to the STM32 SPIv2 SPI driver.
-- HAL: Added support for UART4...UART8 to the STM32 UARTv2 UART driver.
-- HAL: Added support for UART7 and UART8 to the STM32 UARTv2 serial driver.
-- HAL: STM32F2xx, STM32F4xx and STM32F7xx devices now share the same ADCv2
-       and DMAv2 drivers.
-- HAL: STM32F0xx and STM32L0xx devices now share the same ADCv1 driver.
-- HAL: STM32F0xx, STM32L0xx and STM32L1xx devices now share the same DMAv1
-       driver.
-- HAL: Introduced preliminary support for STM32F7xx devices.
-- HAL: Introduced preliminary support for STM32L0xx devices.
-- HAL: New STM32 shared DMAv2 driver supporting channel selection and
-       data cache invalidation (F2, F4, F7).
-- HAL: New STM32 shared DMAv1 driver supporting channel selection and fixing
-       the behavior with shared IRQs (F0, L0).
-- HAL: New STM32 ADCv2 driver supporting large STM32 devices (F2, F4, F7).
-- HAL: New STM32 ADCv1 driver supporting small STM32 devices (F0, L0).
-- HAL: Introduced support for TIM21 and TIM22 in STM32 ST driver.
-- HAL: Updated STM32F0xx headers to STM32CubeF0 version 1.3.0. Added support
-       for STM32F030xC, STM32F070x6, STM32F070xB devices.
-- HAL: Fixed RT dependency in STM32 SDCv1 driver (bug #643)(backported
-       to 3.0.2).
-- VAR: Fixed incorrect working area size in LwIP creation in demos (bug #642)
-       (backported to 3.0.2 and 2.6.10).
-- HAL: Fixed error in hal_lld_f100.h checks (bug #641)(backported to 3.0.2
-       and 2.6.10).
-- HAL: Fixed volatile variable issue in I/O queues, both RT and HAL (bug #640)
-       (backported to 3.0.2).
-- HAL: Fixed wrong DMA assignment for I2C1 in STM32F302xC registry (bug #637)
-       (backported to 3.0.2).
-- HAL: Fixed missing timers 5, 6, 7, 10 & 11 from STM32L1 HAL port (bug #636)
-       (backported to 3.0.2).
-- VAR: Fixed CRT0_CALL_DESTRUCTORS not utilized in crt0_v7m.s (bug #635)
-       (backported to 3.0.2).
-- HAL: Fixed wrong ld file in STM32F072xB USB CDC demo (bug #634)(backported
-       to 3.0.2).
-- NIL: Fixed Wrong assertion in NIL chSemResetI() and NIL OSAL
-       osalThreadDequeueAllI() (bug #633)(backported to 3.0.2).
-- RT:  Fixed problem with RT mutexes involving priority inheritance (bug #632)
-       (backported to 3.0.2 and 2.6.10).
-- HAL: Fixed HAL to RT dependency in STM32 DAC driver (bug #631)(backported
-       to 3.0.2).
-- HAL: Fixed problem with STM32 I2S driver restart (bug #630)(backported
-       to 3.0.2).
-- HAL: Fixed STM32F3xx ADC driver uses US2RTC directly (bug #629)(backported
-       to 3.0.2).
-- HAL: Fixed CEC clock cannot be disabled on STM32F0xx (bug #628)
-       (backported to 3.0.1).
-- VAR: Fixed lwIP arch code breaks with a 16-bit systick timer (bug #627)
-       (backported to 3.0.1).
-- HAL: Fixed broken MAC driver for STM32F107 (bug #626)(backported to 3.0.1).
-- NIL: Fixed missing configuration options from NIL PPC port (bug #625)
-       (backported to 3.0.1).
-- HAL: Fixed wrong offset in STM32 DAC driver (bug #624)(backported to 3.0.1).
-- HAL: Fixed crash on STM32F030x4/6 devices (bug #623)(backported to 3.0.1).
-- HAL: Fixed duplicated doxygen tag in STM32F4xx hal_lld.h file (bug #621)
-       (backported to 3.0.1 and 2.6.9).
-- HAL: Fixed STM32F042 registry error (bug #620)(backported to 3.0.1).
-- HAL: Fixed wrong check in canReceive() (bug #619)(backported to 3.0.1
-       and 2.6.9).
-- HAL: Fixed wrong EXTI[18] vector number on STM32F373 (bug #618)(backported
-       to 3.0.1 and 2.6.9).
+- HAL: Fixed STM32F3xx ADC driver uses US2RTC directly (bug #629).
+
+*** 3.0.1 ***
+- HAL: Fixed CEC clock cannot be disabled on STM32F0xx (bug #628).
+- VAR: Fixed lwIP arch code breaks with a 16-bit systick timer (bug #627).
+- HAL: Fixed broken MAC driver for STM32F107 (bug #626).
+- NIL: Fixed missing configuration options from NIL PPC port (bug #625).
+- HAL: Fixed wrong offset in STM32 DAC driver (bug #624).
+- HAL: Fixed crash on STM32F030x4/6 devices (bug #623).
+- HAL: Fixed duplicated doxygen tag in STM32F4xx hal_lld.h file (bug #621).
+- HAL: Fixed STM32F042 registry error (bug #620).
+- HAL: Fixed wrong check in canReceive() (bug #619).
+- HAL: Fixed wrong EXTI[18] vector number on STM32F373 (bug #618).
 - HAL: Fixed wrong check on STM32_LSE_ENABLED definition in STM32L1xx HAL port
-       (bug #617)(backported to 3.0.1 and 2.6.9).
-- HAL: Fixed rtcConvertDateTimeToFAT() incorrect conversion (bug #615)
-       (backported to 3.0.1).
-- HAL: Fixed missing UART7 and UART8 support on STM32F4xx family (bug #612).
-- HAL: Fixed USB HS ULPI Support (except board files because patch originally
-       targeted version 2.6.x)(bug #377).
+       (bug #617).
 
 *** 3.0.0 ***
 - NEW: Added an initialization function to the lwIP bindings, now it is

@@ -82,11 +82,7 @@ void nvicSetSystemHandlerPriority(uint32_t handler, uint32_t prio) {
 
   osalDbgCheck(handler <= 12);
 
-#if defined(__CORE_CM7_H_GENERIC)
-  SCB->SHPR[handler] = NVIC_PRIORITY_MASK(prio);
-#else
   SCB->SHP[handler] = NVIC_PRIORITY_MASK(prio);
-#endif
 }
 
 /**

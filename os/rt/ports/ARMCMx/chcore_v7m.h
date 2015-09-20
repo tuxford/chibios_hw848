@@ -157,20 +157,11 @@
 
 #elif (CORTEX_MODEL == 4)
 #define PORT_ARCHITECTURE_ARM_v7ME
-#define PORT_ARCHITECTURE_NAME          "ARMv7E-M"
+#define PORT_ARCHITECTURE_NAME          "ARMv7-ME"
 #if CORTEX_USE_FPU
 #define PORT_CORE_VARIANT_NAME          "Cortex-M4F"
 #else
 #define PORT_CORE_VARIANT_NAME          "Cortex-M4"
-#endif
-
-#elif (CORTEX_MODEL == 7)
-#define PORT_ARCHITECTURE_ARM_v7ME
-#define PORT_ARCHITECTURE_NAME          "ARMv7E-M"
-#if CORTEX_USE_FPU
-#define PORT_CORE_VARIANT_NAME          "Cortex-M7F"
-#else
-#define PORT_CORE_VARIANT_NAME          "Cortex-M7"
 #endif
 #endif
 
@@ -388,11 +379,8 @@ static inline void port_init(void) {
   /* Initializing priority grouping.*/
   NVIC_SetPriorityGrouping(CORTEX_PRIGROUP_INIT);
 
-  /* DWT cycle counter enable, note, the M7 requires DWT unlocking.*/
+  /* DWT cycle counter enable.*/
   CoreDebug->DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;
-#if CORTEX_MODEL == 7
-  DWT->LAR = 0xC5ACCE55;
-#endif
   DWT->CTRL |= DWT_CTRL_CYCCNTENA_Msk;
 
   /* Initialization of the system vectors used by the port.*/
