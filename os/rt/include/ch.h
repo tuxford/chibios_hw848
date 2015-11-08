@@ -39,7 +39,7 @@
 /**
  * @brief   Stable release flag.
  */
-#define CH_KERNEL_STABLE        0
+#define CH_KERNEL_STABLE        1
 
 /**
  * @name    ChibiOS/RT version identification
@@ -48,7 +48,7 @@
 /**
  * @brief   Kernel version string.
  */
-#define CH_KERNEL_VERSION       "3.1.0"
+#define CH_KERNEL_VERSION       "3.0.3"
 
 /**
  * @brief   Kernel version major number.
@@ -58,12 +58,12 @@
 /**
  * @brief   Kernel version minor number.
  */
-#define CH_KERNEL_MINOR         1
+#define CH_KERNEL_MINOR         0
 
 /**
  * @brief   Kernel version patch number.
  */
-#define CH_KERNEL_PATCH         0
+#define CH_KERNEL_PATCH         3
 /** @} */
 
 /* Core headers.*/

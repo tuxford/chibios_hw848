@@ -94,24 +94,6 @@
 #endif
 
 /**
- * @brief   UART7 driver enable switch.
- * @details If set to @p TRUE the support for UART7 is included.
- * @note    The default is @p TRUE.
- */
-#if !defined(STM32_SERIAL_USE_UART7) || defined(__DOXYGEN__)
-#define STM32_SERIAL_USE_UART7              FALSE
-#endif
-
-/**
- * @brief   UART8 driver enable switch.
- * @details If set to @p TRUE the support for UART8 is included.
- * @note    The default is @p TRUE.
- */
-#if !defined(STM32_SERIAL_USE_UART8) || defined(__DOXYGEN__)
-#define STM32_SERIAL_USE_UART8              FALSE
-#endif
-
-/**
  * @brief   USART1 interrupt priority level setting.
  */
 #if !defined(STM32_SERIAL_USART1_PRIORITY) || defined(__DOXYGEN__)
@@ -133,14 +115,6 @@
 #endif
 
 /**
- * @brief   USART3..8 interrupt priority level setting.
- * @note    Only valid on those devices with a shared IRQ.
- */
-#if !defined(STM32_SERIAL_USART3_8_PRIORITY) || defined(__DOXYGEN__)
-#define STM32_SERIAL_USART3_8_PRIORITY      12
-#endif
-
-/**
  * @brief   UART4 interrupt priority level setting.
  */
 #if !defined(STM32_SERIAL_UART4_PRIORITY) || defined(__DOXYGEN__)
@@ -159,20 +133,6 @@
  */
 #if !defined(STM32_SERIAL_USART6_PRIORITY) || defined(__DOXYGEN__)
 #define STM32_SERIAL_USART6_PRIORITY        12
-#endif
-
-/**
- * @brief   UART7 interrupt priority level setting.
- */
-#if !defined(STM32_SERIAL_UART7_PRIORITY) || defined(__DOXYGEN__)
-#define STM32_SERIAL_UART7_PRIORITY         12
-#endif
-
-/**
- * @brief   UART8 interrupt priority level setting.
- */
-#if !defined(STM32_SERIAL_UART8_PRIORITY) || defined(__DOXYGEN__)
-#define STM32_SERIAL_UART8_PRIORITY         12
 #endif
 /** @} */
 
@@ -204,18 +164,9 @@
 #error "USART6 not present in the selected device"
 #endif
 
-#if STM32_SERIAL_USE_UART7 && !STM32_HAS_UART7
-#error "UART7 not present in the selected device"
-#endif
-
-#if STM32_SERIAL_USE_UART8 && !STM32_HAS_UART8
-#error "UART8 not present in the selected device"
-#endif
-
 #if !STM32_SERIAL_USE_USART1 && !STM32_SERIAL_USE_USART2 &&                 \
     !STM32_SERIAL_USE_USART3 && !STM32_SERIAL_USE_UART4  &&                 \
-    !STM32_SERIAL_USE_UART5  && !STM32_SERIAL_USE_USART6 &&                 \
-    !STM32_SERIAL_USE_UART7  && !STM32_SERIAL_USE_UART8
+    !STM32_SERIAL_USE_UART5  && !STM32_SERIAL_USE_USART6
 #error "SERIAL driver activated but no USART/UART peripheral assigned"
 #endif
 
@@ -247,16 +198,6 @@
 #if STM32_SERIAL_USE_USART6 &&                                              \
     !OSAL_IRQ_IS_VALID_PRIORITY(STM32_SERIAL_USART6_PRIORITY)
 #error "Invalid IRQ priority assigned to USART6"
-#endif
-
-#if STM32_SERIAL_USE_UART7 &&                                               \
-    !OSAL_IRQ_IS_VALID_PRIORITY(STM32_SERIAL_UART7_PRIORITY)
-#error "Invalid IRQ priority assigned to UART7"
-#endif
-
-#if STM32_SERIAL_USE_UART8 &&                                               \
-    !OSAL_IRQ_IS_VALID_PRIORITY(STM32_SERIAL_UART8_PRIORITY)
-#error "Invalid IRQ priority assigned to UART8"
 #endif
 
 /*===========================================================================*/
@@ -345,12 +286,6 @@ extern SerialDriver SD5;
 #endif
 #if STM32_SERIAL_USE_USART6 && !defined(__DOXYGEN__)
 extern SerialDriver SD6;
-#endif
-#if STM32_SERIAL_USE_UART7 && !defined(__DOXYGEN__)
-extern SerialDriver SD7;
-#endif
-#if STM32_SERIAL_USE_UART8 && !defined(__DOXYGEN__)
-extern SerialDriver SD8;
 #endif
 
 #ifdef __cplusplus

@@ -101,15 +101,6 @@
 #endif
 
 /**
- * @brief   Enables HS mode on OTG2 else FS mode.
- * @note    The default is @p TRUE.
- * @note    Has effect only if @p BOARD_OTG2_USES_ULPI is defined.
- */
-#if !defined(STM32_USE_USB_OTG2_HS) || defined(__DOXYGEN__)
-#define STM32_USE_USB_OTG2_HS               TRUE
-#endif
-
-/**
  * @brief   Dedicated data pump threads priority.
  */
 #if !defined(STM32_USB_OTG_THREAD_PRIO) || defined(__DOXYGEN__)
@@ -185,7 +176,7 @@
 #error "OTG2 RX FIFO size must be a multiple of 4"
 #endif
 
-#if defined(STM32F2XX) || defined(STM32F4XX) || defined(STM32F7XX)
+#if defined(STM32F4XX) || defined(STM32F2XX)
 #define STM32_USBCLK                        STM32_PLL48CLK
 #elif defined(STM32F10X_CL)
 #define STM32_USBCLK                        STM32_OTGFSCLK
@@ -510,22 +501,14 @@ struct USBDriver {
  *
  * @api
  */
-#if defined(STM32F7XX) || defined(__DOXYGEN__)
-#define usb_lld_connect_bus(usbp) ((usbp)->otg->DCTL &= ~DCTL_SDIS)
-#else
 #define usb_lld_connect_bus(usbp) ((usbp)->otg->GCCFG |= GCCFG_VBUSBSEN)
-#endif
 
 /**
  * @brief   Disconnect the USB device.
  *
  * @api
  */
-#if defined(STM32F7XX) || defined(__DOXYGEN__)
-#define usb_lld_disconnect_bus(usbp) ((usbp)->otg->DCTL |= DCTL_SDIS)
-#else
 #define usb_lld_disconnect_bus(usbp) ((usbp)->otg->GCCFG &= ~GCCFG_VBUSBSEN)
-#endif
 
 /*===========================================================================*/
 /* External declarations.                                                    */

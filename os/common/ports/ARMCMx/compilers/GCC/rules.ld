@@ -101,7 +101,7 @@ SECTIONS
     {
         *(.eh_frame)
     } > flash
-
+    
     .textalign : ONLY_IF_RO
     {
         . = ALIGN(8);
@@ -224,13 +224,9 @@ SECTIONS
         . = ALIGN(4);
         __ram7_free__ = .;
     } > ram7
-
-    /* The default heap uses the (statically) unused part of a RAM section.*/
-    .heap (NOLOAD) :
-    {
-        . = ALIGN(8);
-        __heap_base__ = .;
-        . = ORIGIN(HEAP_RAM) + LENGTH(HEAP_RAM);
-        __heap_end__ = .;
-    } > HEAP_RAM
 }
+
+/* Heap default boundaries, it is defaulted to be the non-used part
+   of ram0 region.*/
+__heap_base__   = __ram0_free__;
+__heap_end__    = __ram0_end__;
