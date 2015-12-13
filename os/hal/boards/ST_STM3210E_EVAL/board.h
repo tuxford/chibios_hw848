@@ -39,7 +39,7 @@
  *       verify the STM32 model mounted on your board. The change also
  *       affects your linker script.
  */
-#define STM32F103xG
+#define STM32F10X_XL
 
 /*
  * IO pins assignments.

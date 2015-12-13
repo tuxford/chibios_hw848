@@ -132,7 +132,7 @@
  * @brief   Enables the SERIAL subsystem.
  */
 #if !defined(HAL_USE_SERIAL) || defined(__DOXYGEN__)
-#define HAL_USE_SERIAL              FALSE
+#define HAL_USE_SERIAL              TRUE
 #endif
 
 /**
@@ -161,13 +161,6 @@
  */
 #if !defined(HAL_USE_USB) || defined(__DOXYGEN__)
 #define HAL_USE_USB                 FALSE
-#endif
-
-/**
- * @brief   Enables the WDG subsystem.
- */
-#if !defined(HAL_USE_WDG) || defined(__DOXYGEN__)
-#define HAL_USE_WDG                 FALSE
 #endif
 
 /*===========================================================================*/
@@ -334,26 +327,6 @@
  */
 #if !defined(SPI_USE_MUTUAL_EXCLUSION) || defined(__DOXYGEN__)
 #define SPI_USE_MUTUAL_EXCLUSION    TRUE
-#endif
-
-/*===========================================================================*/
-/* UART driver related settings.                                             */
-/*===========================================================================*/
-
-/**
- * @brief   Enables synchronous APIs.
- * @note    Disabling this option saves both code and data space.
- */
-#if !defined(UART_USE_WAIT) || defined(__DOXYGEN__)
-#define UART_USE_WAIT                       FALSE
-#endif
-
-/**
- * @brief   Enables the @p uartAcquireBus() and @p uartReleaseBus() APIs.
- * @note    Disabling this option saves both code and data space.
- */
-#if !defined(UART_USE_MUTUAL_EXCLUSION) || defined(__DOXYGEN__)
-#define UART_USE_MUTUAL_EXCLUSION           FALSE
 #endif
 
 #endif /* _HALCONF_H_ */
