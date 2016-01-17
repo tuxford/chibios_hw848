@@ -43,14 +43,14 @@
 /**
  * @brief   Trace buffer entries.
  */
-#if !defined(CH_DBG_TRACE_BUFFER_SIZE) || defined(__DOXYGEN__)
+#ifndef CH_DBG_TRACE_BUFFER_SIZE
 #define CH_DBG_TRACE_BUFFER_SIZE            64
 #endif
 
 /**
  * @brief   Fill value for thread stack area in debug mode.
  */
-#if !defined(CH_DBG_STACK_FILL_VALUE) || defined(__DOXYGEN__)
+#ifndef CH_DBG_STACK_FILL_VALUE
 #define CH_DBG_STACK_FILL_VALUE             0x55
 #endif
 
@@ -61,7 +61,7 @@
  *          a debugger. A uninitialized field is not an error in itself but it
  *          better to know it.
  */
-#if !defined(CH_DBG_THREAD_FILL_VALUE) || defined(__DOXYGEN__)
+#ifndef CH_DBG_THREAD_FILL_VALUE
 #define CH_DBG_THREAD_FILL_VALUE            0xFF
 #endif
 /** @} */
