@@ -95,9 +95,7 @@ static inline bool chMsgIsPendingI(thread_t *tp) {
  */
 static inline msg_t chMsgGet(thread_t *tp) {
 
-  chDbgAssert(tp->p_state == CH_STATE_SNDMSG, "invalid state");
-
-  return tp->p_u.sentmsg;
+  return tp->p_msg;
 }
 
 /**
