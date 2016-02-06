@@ -72,39 +72,32 @@
 *** Releases and Change Log                                               ***
 *****************************************************************************
 
-*** Next ***
-- RT:  Removed the p_msg field from the thread_t structure saving a
-       msg_t-sized field from the structure. Messages now use a new field
-       into the p_u union. Now synchronous messages are even faster.
-- HAL: Fixed unused variable in STM32 SPIv2 driver (bug #705)(backported
-       to 16.1.3).
-- HAL: Fixed chDbgAssert() still called from STM32 SPIv1 driver (bug #704)
-       (backported to 3.0.6 and 16.1.3).
-- HAL: Fixed broken demo for STM32F429 (bug #703)(backported to 16.1.3).
-- HAL: Fixed wrong macro definition for palWriteLine (bug #702)(backported
-       to 16.1.3).
-- HAL: Fixed error is buffer queues (bug #701)(backported to 16.1.3).
-- HAL: Fixed F105_F107 CANv1 build failure (bug #699).
-- HAL: Fixed typos in STM32F0 RCC enable/disable macros (bug #698)(backported
-       to 16.1.3).
+*** 16.1.3 ***
+- HAL: Fixed unused variable in STM32 SPIv2 driver (bug #705).
+- HAL: Fixed chDbgAssert() still called from STM32 SPIv1 driver (bug #704).
+- HAL: Fixed broken demo for STM32F429 (bug #703).
+- HAL: Fixed wrong macro definition for palWriteLine (bug #702).
+- HAL: Fixed error is buffer queues (bug #701).
+- HAL: Fixed typos in STM32F0 RCC enable/disable macros (bug #698).
 - RT:  Fixed useless call to chTMStartMeasurementX() in _thread_init()
-       (bug #697)(backported to 3.0.6 and 16.1.3).
-- VAR: Fixed missing time conversion in lwIP arch module (bug #696)
-       (backported to 2.6.10, 3.0.5 and 16.1.2).
+       (bug #697).
+- VAR: Fixed missing time conversion in lwIP arch module (bug #696, again).
+
+*** 16.1.2 ***
+- VAR: Fixed missing time conversion in lwIP arch module (bug #696).
 - HAL: Fixed incorrect handling of TIME_IMMEDIATE in the HAL buffer queues
-       (bug #695)(backported to 16.1.2).
-- NIL: Fixed NIL_CFG_USE_EVENTS not properly checked in NIL (bug #694)
-       (backported to 3.0.5 and 16.1.1).
+       (bug #695).
+
+*** 16.1.1 ***
+- NIL: NIL_CFG_USE_EVENTS not properly checked in NIL (bug #694).
 - RT:  Fixed ISR statistics are not updated from a critical zone in RT
-       (bug #693)(backported to 3.0.5 and 16.1.1).
+       (bug #693).
 - NIL: Fixed NIL test suite calls I and S functions outside critical zone
-       (bug #692)(backported to 3.0.5 and 16.1.1).
-- NIL: Fixed protocol violation in NIL OSAL (bug #691)(backported to
-       3.0.5 and 16.1.1).
-- HAL: Fixed error in HAL buffer queues (bug #689)(backported to 16.1.1).
-- RT:  Fixed tm_stop - best case bug (bug #688)(backported to 16.1.1
-       and 3.0.5).
-- ALL: Several minor documentation/formatting-related fixes.
+       (bug #692).
+- NIL: Fixed protocol violation in NIL OSAL (bug #691).
+- HAL: Fixed error in HAL buffer queues (bug #689).
+- RT:  Fixed tm_stop - best case bug (bug #688).
+- RT:  Several minor documentation/formatting-related fixes.
 
 *** 16.1.0 ***
 - RT:  Added CodeWarrior compiler support to the e200 port.

@@ -90,7 +90,8 @@ msg_t chMsgSend(thread_t *tp, msg_t msg) {
   chDbgCheck(tp != NULL);
 
   chSysLock();
-  ctp->p_u.sentmsg = msg;
+  ctp->p_msg = msg;
+  ctp->p_u.wtobjp = &tp->p_msgqueue;
   msg_insert(ctp, &tp->p_msgqueue);
   if (tp->p_state == CH_STATE_WTMSG) {
     (void) chSchReadyI(tp);
