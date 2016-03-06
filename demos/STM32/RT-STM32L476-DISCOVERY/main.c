@@ -19,7 +19,7 @@
 #include "test.h"
 
 /*
- * LEDs blinker thread, times are in milliseconds.
+ * Red LED blinker thread, times are in milliseconds.
  */
 static THD_WORKING_AREA(waThread1, 128);
 static THD_FUNCTION(Thread1, arg) {

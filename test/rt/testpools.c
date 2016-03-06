@@ -57,10 +57,9 @@ static MEMORYPOOL_DECL(mp1, THD_WORKING_AREA_SIZE(THREADS_STACK_SIZE), NULL);
  * operation.
  */
 
-static void *null_provider(size_t size, unsigned align) {
+static void *null_provider(size_t size) {
 
   (void)size;
-  (void)align;
   return NULL;
 }
 

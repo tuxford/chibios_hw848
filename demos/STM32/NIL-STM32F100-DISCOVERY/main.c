@@ -15,7 +15,7 @@
 */
 
 #include "hal.h"
-#include "ch.h"
+#include "nil.h"
 
 /*
  * Thread 1.

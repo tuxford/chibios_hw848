@@ -25,7 +25,7 @@
 #ifndef _TEST_ROOT_H_
 #define _TEST_ROOT_H_
 
-#include "ch.h"
+#include "nil.h"
 
 #include "test_sequence_001.h"
 #include "test_sequence_002.h"

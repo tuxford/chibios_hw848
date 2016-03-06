@@ -15,7 +15,7 @@
 */
 
 #include "hal.h"
-#include "ch.h"
+#include "nil.h"
 #include "ch_test.h"
 
 /*

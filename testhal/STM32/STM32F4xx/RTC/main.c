@@ -278,8 +278,7 @@ int main(void){
   /* Shell initialization.*/
   sdStart(&SD6, &ser_cfg);
   shellInit();
-  chThdCreateStatic(waShell, sizeof(waShell), NORMALPRIO,
-                    shellThread, (void *)&shell_cfg1);
+  shellCreateStatic(&shell_cfg1, waShell, sizeof(waShell), NORMALPRIO);
 
   /* wait until user do not want to test wakeup */
   while (true){
