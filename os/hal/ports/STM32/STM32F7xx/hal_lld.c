@@ -1,5 +1,5 @@
 /*
-    ChibiOS - Copyright (C) 2006..2016 Giovanni Di Sirio
+    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -120,6 +120,9 @@ void hal_lld_init(void) {
   rccResetAPB1(~RCC_APB1RSTR_PWRRST);
   rccResetAPB2(~0);
 
+  /* PWR clock enabled.*/
+  rccEnablePWRInterface(FALSE);
+
   /* Initializes the backup domain.*/
   hal_lld_backup_domain_init();
 
@@ -159,15 +162,8 @@ void hal_lld_init(void) {
 void stm32_clock_init(void) {
 
 #if !STM32_NO_INIT
-  /* PWR clock enabled.*/
-#if defined(HAL_USE_RTC) &&                                                 \
-    (defined(STM32F765xx) || defined(STM32F767xx) ||                        \
-     defined(STM32F769xx) || defined(STM32F777xx) ||                        \
-     defined (STM32F779xx))
-  RCC->APB1ENR = RCC_APB1ENR_PWREN | RCC_APB1ENR_RTCEN;
-#else
+  /* PWR clock enable.*/
   RCC->APB1ENR = RCC_APB1ENR_PWREN;
-#endif
 
   /* PWR initialization.*/
   PWR->CR1 = STM32_VOS;

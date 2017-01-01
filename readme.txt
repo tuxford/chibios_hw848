@@ -2,7 +2,7 @@
 *** Files Organization                                                    ***
 *****************************************************************************
 
---{root}                  - ChibiOS directory.
+--{root}                  - ChibiOS/RT directory.
   +--readme.txt           - This file.
   +--documentation.html   - Shortcut to the web documentation page.
   +--license.txt          - GPL license text.
@@ -34,26 +34,11 @@
   |  |  +--index.html     - Local documentation access (after rebuild).
   +--ext/                 - External libraries, not part of ChibiOS/RT.
   +--os/                  - ChibiOS components.
-  |  +--common/           - Shared OS modules.
-  |  |  +--abstractions/  - API emulator wrappers.
-  |  |  |  +--cmsis_os/   - CMSIS OS emulation layer for RT (ARMCMx port only).
-  |  |  |  +--nasa_osal/  - NASA Operating System Abstraction Layer for RT.
-  |  |  +--ext/           - Vendor files used by the OS.
-  |  |  +--oslib/         - RTOS modules usable by both RT and NIL.
-  |  |  +--ports/         - RTOS ports usable by both RT and NIL.
-  |  |  +--startup/       - Startup support for all compilers and platforms.
-  |  +--ex/               - EX component.
-  |  |  +--Micron/        - EX complex drivers for Micron devices.
-  |  |  +--ST/            - EX complex drivers for STMicroelectronics devices.
-  |  |  +--subsystems/    - EX subsystems.
-  |  |  |  +--mfs/        - EX Managed Flash Storage module.
   |  +--hal/              - HAL component.
   |  |  +--boards/        - HAL board support files.
   |  |  +--dox/           - HAL documentation resources.
   |  |  +--include/       - HAL high level headers.
   |  |  +--lib/           - HAL libraries.
-  |  |  |  +--peripherals/- HAL peripherals interfaces.
-  |  |  |  +--streams/    - HAL streams.
   |  |  +--osal/          - HAL OSAL implementations.
   |  |  +--src/           - HAL high level source.
   |  |  +--ports/         - HAL ports.
@@ -63,12 +48,14 @@
   |  |  +--dox/           - NIL documentation resources.
   |  |  +--include/       - NIL high level headers.
   |  |  +--src/           - NIL high level source.
-  |  |  +--templates/     - NIL configuration template files.
+  |  |  +--ports/         - NIL ports.
+  |  |  +--templates/     - NIL port template files.
   |  +--rt/               - RT RTOS component.
   |  |  +--dox/           - RT documentation resources.
   |  |  +--include/       - RT high level headers.
   |  |  +--src/           - RT high level source.
-  |  |  +--templates/     - RT configuration template files.
+  |  |  +--ports/         - RT ports.
+  |  |  +--templates/     - RT port template files.
   |  +--various/          - Various portable support files.
   +--test/                - Kernel test suite source code.
   |  +--lib/              - Portable test engine.
@@ -85,274 +72,157 @@
 *** Releases and Change Log                                               ***
 *****************************************************************************
 
-*** Next ***
-- HAL: Implemented separated virtual timers module under /os/hal/osal/lib,
-       it can be used by OSAL implementations where the underlying RTOS is
-       lacking a timeout feature or missing.
-- HAL: Added CAN3 support to the STM32 CANv1 driver.
-- HAL: Added support for all existing STM32 Nucleo and Discovery boards.
-- HAL: Extended STM32F4xx port by adding STM32F412 support.
-- HAL: Extended STM32L4xx port by adding STM32L432 support.
-- HAL: Implemented better handling for number of endpoints on STM32 OTGv1
-       driver, now it is a registry key.
-- VAR: Updated CMSIS file for STM32F1xx to 4.1.0.
-- EX:  Added thermometer implementation for ST HTS221 device.
-- EX:  Added hygrometer implementation for ST HTS221 device.
-- EX:  Added barometer implementation for ST LPS25H device.
-- HAL: Added base barometer, base hygrometer, base thermometer classes.
-- EX:  Added compass implementation for ST LIS3MDL device.
-- EX:  Added gyroscope implementation for ST LSM6DS0 device.
-- EX:  Added accelerometer implementation for ST LSM6DS0 device.
-- EX:  Added accelerometer implementation for ST LIS3DSH device.
-- EX:  Added accelerometer implementation for ST LIS302DL device.
-- HAL: Added an advanced buffering mode to the serial driver, now, if the
-       LLD supports it, it is possible to set the size of each queue
-       independently.
-- EX:  Added compass implementation for ST LSM303DLHC device.
-- EX:  Added accelerometer implementation for ST LSM303DLHC device.
-- EX:  Added gyroscope implementation for ST L3GD20 device.
-- HAL: Added events handling to the PAL driver. The EXT driver is now
-       deprecated but still supported.
-- EX:  Added flash implementation for Micron M25Qxxx devices.
-- HAL: Added base flash class and JESD216 serial flash class handling both SPI
-       and QSPI modes.
-- HAL: Extended PLLI2S for STM32F4xx subfamily.
-- HAL: Added QSPI driver implementation for STM32.
-- HAL: Added QSPI driver model.
-- HAL: Added base sensor, base gyroscope, base accelerometer and base compass
-       classes.
-- HAL: Updated all STM32 Nucleo board files.
-- VAR: Cortex-M VTOR initialization is now performed in startup files and
-       no more in port initialization.
-- VAR: Changed GCC asm files extension from .s to .S because conventions.
-- VAR: Updated CMSIS to version 4.50, it still contains the same errors
-       found in 4.30, fixes applied.
-- HAL: All high level file names have been renamed and prefixed with "hal_"
-       in order to minimize the risk of name conflicts when integrating
-       external libraries. 
-- LIB: Added Guarded Memory Pools to RT and NIL.
-- RT:  Updated the RT test suite by generating the code using the new system.
-- NIL: Updated the NIL test suite by generating the code using the new system.
-- RT:  Removed I/O Queues and Streams interface, now those exists (much
-       improved) inside the HAL.
-- HAL: Improvements to the I/O queues now timeouts are absolute for
-       iqReadTimeout() and oqWriteTimeout() functions.
-- RT:  Added a NASA-OSAL API emulator over the RT kernel.
-- HAL: Updated all STM32L476 mcuconf.h files.
-- ALL: Startup files relicensed under Apache 2.0.
-- ALL: Enhanced GCC .ld files with multiple flash regions and capability to
-       insert additional sections within the standard loading rules.
-- VAR: The shell now accepts quoted arguments.
-- VAR: Centralized all usual shell commands into a single shell_cmd.c
-       file. This will allow to update all demos with a single change.
-       Each single command can be disabled using preprocessor switches.
-       Shell files are now located under ./os/various/shell and have a
-       dedicated shell.mk file.
-- ALL: Reorganized source tree, now ports are shared between RT and NIL.
-- EX:  New EX subsystem.
-- RT:  Merged RT4.
-- NIL: Merged NIL2.
-- NIL: Added STM32F7 demo.
-- HAL: Fixed wrong initialization in ADC lld v3 (bug #807)
-       (backported to 16.1.6).
-- HAL: Fixed wrong clock init in STM32F0 port ad added more error checks 
-       (bug #806)(backported to 16.1.6).
-- HAL: Fixed misplaced else in STM32F0 port (bug #805)
-       (backported to 16.1.6).
-- HAL: Fixed flash waiting state misconfiguration in STM32L4 port (bug #804)
-       (backported to 16.1.6).
-- HAL: Added CR field to DAC configuration in STM32 port (bug #803)
-       (backported to 16.1.6).
-- HAL: Fixed wrong initialization for DACD4 in STM32 port (bug #802)
-       (backported to 16.1.6).
-- HAL: Fixed tab instead of space in dac driver (bug #801)
-       (backported to 16.1.6).
-- HAL: Fixed missing GPT and DAC in STM32F07/​9x mcuconf (bug #800)
-       (backported to 16.1.6).
-- HAL: Fixed STM32 RTCv2 driver does not handle the DST bit (bug #799)
-       (backported to 16.1.6).
-- HAL: Fixed MAC driver broken on STM32F107 (bug #798)(backported to 16.1.6).
-- VAR: Fixed missing const qualifier in local shell commands array (bug #797)
-       (backported to 16.1.6, 3.0.6, 2.6.10).
-- VAR: Fixed compilation error in cmsis_os.h (bug #796)(backported to 16.1.6,
-       3.0.6).
-- HAL: Fixed double empty lines in HAL (bug #794)(backported to 16.1.6, 
-       3.0.6, 2.6.10).
-- RT:  Fixed double empty lines in RT (bug #793)(backported to 16.1.6, 3.0.6).
-- HAL: Fixed wrong entries in STM32L4 registry (bug #792)(backported to 
-       16.1.6).
+*** 16.1.6 ***
+- HAL: Fixed wrong initialization in ADC lld v3 (bug #807).
+- HAL: Fixed wrong clock init in STM32F0 port ad added more error checks
+       (bug #806).
+- HAL: Fixed misplaced else in STM32F0 port (bug #805).
+- HAL: Fixed flash waiting state misconfiguration in STM32L4 port (bug #804).
+- HAL: Added CR field to DAC configuration in STM32 port (bug #803).
+- HAL: Fixed wrong initialization for DACD4 in STM32 port (bug #802).
+- HAL: Fixed tab instead of space in DAC driver (bug #801).
+- HAL: Fixed missing GPT and DAC in STM32F07/?9x mcuconf (bug #800).
+- HAL: Fixed STM32 RTCv2 driver does not handle the DST bit (bug #799).
+- HAL: Fixed MAC driver broken on STM32F107 (bug #798).
+- VAR: Fixed missing const qualifier in local shell commands array (bug #797).
+- VAR: Fixed compilation error in cmsis_os.h (bug #796).
+- HAL: Fixed double empty lines in HAL (bug #794).
+- RT:  Fixed double empty lines in RT (bug #793).
+- HAL: Fixed wrong entries in STM32L4 registry (bug #792).
 - HAL: Fixed missing ARPE bit in CR1 initialization on STM32 GPT driver
-       (bug #791)(backported to 16.1.6, 3.0.6).
-- HAL: Fixed wrong DMA definition for STM32F303x8 ADC (bug #790)(backported
-       to 16.1.6).
-- VAR: Fixed GCC garbage collector discards code in syscalls.c (bug #789)
-       (backported to 16.1.6, 3.0.6).
-- HAL: Fixed Makefile dependencies not generated for .S files (bug #787)
-       (backported to 16.1.6, 3.0.6).
-- HAL: Fixed OTGv1 driver not functional on STM32L4 (bug #786)(backported
-       to 16.1.6).
+       (bug #791).
+- HAL: Fixed wrong DMA definition for STM32F303x8 ADC (bug #790).
+- VAR: Fixed GCC garbage collector discards code in syscalls.c (bug #789).
+- HAL: Fixed Makefile dependencies not generated for .S files (bug #787).
+- HAL: Fixed OTGv1 driver not functional on STM32L4 (bug #786).
 - HAL: Fixed wrong bit offset in STM32F37x ADC_CR2_EXTSEL_SRC() macro
-       (bug #785)(backported to 16.1.6, 3.0.6).
-- RT:  Fixed tick-less mode can fail in RT for very large delays (bug #784)
-       (backported to 16.1.6, 3.0.6).
-- HAL: Fixed STM32L0xx CCIPR initialization (bug #783) 
-       (backported to 16.1.6).
-- HAL: Fixed STM32F105 port not compiling (bug #782)
-       (backported to 16.1.6, 3.0.6, 2.6.10).
+       (bug #785).
+- RT:  Fixed tick-less mode can fail in RT for very large delays (bug #784).
+- HAL: Fixed STM32L0xx CCIPR initialization (bug #783).
+- HAL: Fixed STM32F105 port not compiling (bug #782).
 - HAL: Fixed wrong registry for STM32F205xx and STM32F215xx port 
-       (bug #780)(backported to 16.1.6, 3.0.6).
+       (bug #780).
 - HAL: Fixed wrong HSE checks and PLL2 enable switch in STM32F105 and
-       STM32F107 port (bug #779)(backported to 16.1.6, 3.0.6, 2.6.10).
+       STM32F107 port (bug #779).
 - HAL: Fixed wrong SRAM2_BASE in STM32F7xx port (bug #778)
        (backported to 16.1.6).
-- HAL: Added DAC configs in RT-STM32F051-DISCOVERY\mcuconf.h (bug #777)
-       (backported to 16.1.6, 3.0.6).
+- HAL: Added DAC configs in RT-STM32F051-DISCOVERY\mcuconf.h (bug #777).
 - HAL: Fixed DAC driver not compiling on STM32F051 and some bitmasks related 
-        to DAC disabling (bug #776)(backported to 16.1.6, 3.0.6).
-- HAL: Fixed addition semicolon in cpp wrapper (bug #774)
-       (backported to 16.1.6, 3.0.6).
-- HAL: Fixed function gpt_lld_polled_delay() is broken on STM32 (bug #775)
-       (backported to 16.1.6, 3.0.6).
+        to DAC disabling (bug #776).
+- HAL: Fixed addition semicolon in cpp wrapper (bug #774).
+- HAL: Fixed function gpt_lld_polled_delay() is broken on STM32 (bug #775).
 - HAL: Fixed invalid output initialization for STM32 DACx channels 2
-       (bug #773)(backported to 16.1.6, 3.0.6).
-- HAL: Fixed CAN inclusion path missing for STM32F107 (bug #772)(backported
-       to 16.1.6).
-- HAL: Fixed extra brackets in STM32F0 registry (bug #771)(backported
-       to 16.1.6).
-- HAL: Fixed STM32 CAN filters initialization problem (bug #770)(backported
-       to 16.1.6, 3.0.6, 2.6.10).
-- HAL: Fixed wrong bit mask in STM32L0xx port (bug #769)(backported to 16.1.6).
+       (bug #773).
+- HAL: Fixed CAN inclusion path missing for STM32F107 (bug #772).
+- HAL: Fixed extra brackets in STM32F0 registry (bug #771).
+- HAL: Fixed STM32 CAN filters initialization problem (bug #770).
+- HAL: Fixed wrong bit mask in STM32L0xx port (bug #769).
 - HAL: Fixed potential wait states problem in STM32L4 initialization code
-       (bug #768)(backported to 16.1.6).
-- HAL: Fixed SDIO driver not compiling on STM32F446 devices (bug #767)
-       (backported to 16.1.6).
-- HAL: Fixed error in STM32L4xx ST headers (bug #766)(backported to 16.1.6).
-- HAL: Fixed wrong check in win32 simulator serial driver (bug #765)
-       (backported to 16.1.6, 3.0.6, 2.6.10).
-- HAL: Fixed dependency on RT in hal_usb.c (bug #764)(backported to 16.1.6).
-- HAL: Fixed wrong backup domain reset in STM32L4xx\hal_lld (bug #763)
-       (backported to 16.1.6).
-- HAL: Fixed wrong PWR configurations in STM32L4xx\hal_lld (bug #761)
-       (backported to 16.1.5).
-- HAL: Fixed wrong comment in STM32L4xx\hal_lld (bug #760)
-       (backported to 16.1.5).
+       (bug #768).
+- HAL: Fixed SDIO driver not compiling on STM32F446 devices (bug #767).
+- HAL: Fixed error in STM32L4xx ST headers (bug #766).
+- HAL: Fixed wrong check in win32 simulator serial driver (bug #765).
+- HAL: Fixed dependency on RT in hal_usb.c (bug #764).
+- HAL: Fixed wrong backup domain reset in STM32L4xx\hal_lld (bug #763).
+
+*** 16.1.5 ***
+- NEW: Added support for more Nucleo and Discovery boards.
+- HAL: Board files regenerated using the latest version of the generator
+       plugin.
+- HAL: Fixed wrong PWR configurations in STM32L4xx\hal_lld (bug #761).
+- HAL: Fixed wrong comment in STM32L4xx\hal_lld (bug #760).
 - HAL: Fixed wrong MSIRANGE management for STM32L4xx in function 
-       stm32_clock_init() (bug #759)(backported to 16.1.5).
+       stm32_clock_init() (bug #759).
 - HAL: Fixed problem in USB driver when changing configuration (bug #757).
-- HAL: Fixed bug in function usbDisableEndpointsI() (bug #756)(backported
-       to 16.1.5).
-- HAL: Fixed wrong info in readme of LWIP related demos (bug #755)(backported
-       to 16.1.5).
+- HAL: Fixed bug in function usbDisableEndpointsI() (bug #756).
+- HAL: Fixed wrong info in readme of LWIP related demos (bug #755).
 - HAL: Fixed misconfiguration in STM32L4 Discovery board files 
-       (bug #754)(backported to 16.1.5).
+       (bug #754).
 - HAL: Fixed errors in documentation related to OTG peripheral switches 
-       (bug #753)(backported to 2.6.10, 3.0.6 and 16.1.5).
+       (bug #753).
 - HAL: Fixed CMSIS function osThreadGetPriority() does not return correct
-       priority (bug #752)(backported 3.0.6 and 16.1.5).
-- HAL: Fixed wrong conditional branches in _adc_isr_error_code (bug #751)
-       (backported to 2.6.10, 3.0.6 and 16.1.5).
+       priority (bug #752).
+- HAL: Fixed wrong conditional branches in _adc_isr_error_code (bug #751).
 - HAL: Fixed bug in STM32/ADCv3 (bug #750).
 - HAL: Fixed OPT settings and added board folder in STM32F4xx-USB_CDC demo
-       (bug #749)(backported to 3.0.6 and 16.1.5).
-- HAL: Fixed wrong comments in STM32F4xx GPT demo (bug #748)
-       (backported to 2.6.10, 3.0.6 and 16.1.5).
+       (bug #749).
+- HAL: Fixed wrong comments in STM32F4xx GPT demo (bug #748).
 - HAL: Fixed wrong comments and indents in STM32F7xx-GPT-ADC and 
-       STM32L4-GPT-ADC demos (bug #747) (backported to 16.1.5).
+       STM32L4-GPT-ADC demos (bug #747).
 - HAL: Fixed wrong comments and indent in STM32F4xx and STM32F7xx 
-       hal_lld.h (bug #746)(backported to 2.6.10, 3.0.6 and 16.1.5).
-- HAL: Removed wrong SAI masks in STM32F4xx hal_lld.h (bug #745)
-       (backported to 3.0.6 and 16.1.5).
+       hal_lld.h (bug #746).
+- HAL: Removed wrong SAI masks in STM32F4xx hal_lld.h (bug #745).
 - HAL: Fixed wrong mask placement in STM32F4xx hal_lld.h (bug #744).
-- HAL: Fixed wrong indent in STM32F4xx hal_lld.h (bug #743)
-       (backported to 2.6.10, 3.0.6 and 16.1.5).
-- HAL: Removed unused macros in STM32F7xx and STM32F4xx hal_lld.h (bug #742)
-       (backported to 2.6.10, 3.0.6 and 16.1.5).
+- HAL: Fixed wrong indent in STM32F4xx hal_lld.h (bug #743).
+- HAL: Removed unused macros in STM32F7xx and STM32F4xx hal_lld.h (bug #742).
 - HAL: Fixed Doxygen related macros in STM32F7xx, STM32L0xx and STM32L4xx
        lld files (bug #741).
 - HAL: Fixed bug in VREF enable/disable functions in ADCv3 driver 
-       (bug #740)(backported to 16.1.5).
+       (bug #740).
 - HAL: Fixed DAC driver not enabled for STM32F4x7 and STM32F4x9 devices
-       (bug #739)(backported to 3.0.6 and 16.1.5).
-- HAL: Fixed bug in interrupt handlers in STM32F4xx EXT driver (bug #738)
-       (backported to 16.1.5).
+       (bug #739).
+- HAL: Fixed bug in interrupt handlers in STM32F4xx EXT driver (bug #738).
 - HAL: Fixed clock enabling in STM32 ADCv3 (bug #737).
 - HAL: Fixed missing SDC initialization in RT-STM32F103-OLIMEX_STM32_P103 demo
-       (bug #735)(backported to 16.1.5).
-- HAL: Fixed STM32 dac bug when using only channel 2 in direct mode (bug #734)
-       (backported to 3.0.6 and 16.1.5).
-- HAL: Fixed PAL lines support not working for STM32 GPIOv1 (bug #730)
-       (backported to 16.1.5).
-- RT:  Fixed bug in chSchPreemption() function (bug #728)(backported to 2.6.10,
-       3.0.6 and 16.1.5).
-- HAL: Fixed prescaler not initialized in STM32 ADCv1 (bug #725)
-       (backported to 16.1.5).
-- HAL: Fixed missing DAC section in STM32F072 mcuconf.h files (bug #724)
-       (backported to 16.1.5).
-- VAR: Fixed palSetMode glitching outputs (bug #723)(backported to 3.0.6
-       and 16.1.4).
-- VAR: Fixed error in STM32 PWM driver regarding channels 4 and 5 (bug #722)
-       (backported to 3.0.6 and 16.1.4).
-- VAR: Fixed wrong flash and ram size in linker script for maple mini
-       (bug #719).
-- VAR: Fixed GCC 5.2 crashes while compiling ChibiOS (bug #718)(backported
-       to 3.0.6 and 16.1.4).
-- HAL: Fixed wrong definition in STM32L4 ext_lld_isr.h (bug #717)
-       (backported to 16.1.4).
+       (bug #735).
+- HAL: Fixed STM32 dac bug when using only channel 2 in direct mode (bug #734).
+- HAL: Fixed PAL lines support not working for STM32 GPIOv1 (bug #730).
+- RT:  Fixed bug in chSchPreemption() function (bug #728).
+- HAL: Fixed prescaler not initialized in STM32 ADCv1 (bug #725).
+- HAL: Fixed missing DAC section in STM32F072 mcuconf.h files (bug #724).
+
+*** 16.1.4 ***
+- ALL: Startup files relicensed under Apache 2.0.
+- RT:  Added RT-STM32L476-DISCOVERY demo.
+- HAL: Added more STM32L4xx testhal demos.
+- HAL: Updated all STM32F476 mcuconf.h files.
+- VAR: Fixed palSetMode glitching outputs (bug #723).
+- VAR: Fixed error in STM32 PWM driver regarding channels 4 and 5 (bug #722).
+- VAR: Fixed GCC 5.2 crashes while compiling ChibiOS (bug #718).
+- HAL: Fixed wrong definition in STM32L4 ext_lld_isr.h (bug #717).
 - HAL: Fixed wrong definitions in STM32F746 mcuconf.h files (bug #716)
-       (backported to 16.1.4).
-- RT:  Fixed wrong SysTick initialization in generic demos (bug #715)
-       (backported to 16.1.4).
-- NIL: Fixed wrong SysTick initialization in generic demos (bug #715)
-       (backported to 16.1.4).
+- RT:  Fixed wrong SysTick initialization in generic demos (bug #715).
+- NIL: Fixed wrong SysTick initialization in generic demos (bug #715).
 - HAL: Fixed usbStop does not resume threads suspended in synchronous calls
-       to usbTransmit (bug #714)(backported to 16.1.4).
+       to usbTransmit (bug #714).
 - VAR: Fixed state check in lwIP when SYS_LIGHTWEIGHT_PROT is disabled
-       (bug #713)(backported to 2.6.10, 3.0.6 and 16.1.4). 
-- RT:  Removed the p_msg field from the thread_t structure saving a
-       msg_t-sized field from the structure. Messages now use a new field
-       into the p_u union. Now synchronous messages are even faster.
-- HAL: Fixed IAR warnings in ext_lld_isr.c (bug #711)(backported to 16.1.4).
-- HAL: Fixed build error caused by STM32 SPIv1 driver (bug #710)(backported
-       to 3.0.6 and 16.1.4).
+       (bug #713).
+- RT:  Fixed race condition in RT registry (bug #712). 
+- HAL: Fixed IAR warnings in ext_lld_isr.c (bug #711).
+- HAL: Fixed build error caused by STM32 SPIv1 driver (bug #710).
 - HAL: Fixed shift of signed constant causes warnings with IAR compiler
-       (bug #709)(backported to 2.6.10, 3.0.6 and 16.1.4).
-- HAL: Fixed wrong RTCv2 settings for STM32L4 (bug #708)(backported
-       to 16.1.4).
-- HAL: Fixed missing OTGv1 support for STM32L4 (bug #707)(backported
-       to 16.1.4).
-- NIL: Fixed ARM errata 752419 (bug #706)(backported to 2.6.10,
-       3.0.6 and 16.1.4).
-- RT:  Fixed ARM errata 752419 (bug #706)(backported to 2.6.10,
-       3.0.6 and 16.1.4).
-- HAL: Fixed unused variable in STM32 SPIv2 driver (bug #705)(backported
-       to 16.1.3).
-- HAL: Fixed chDbgAssert() still called from STM32 SPIv1 driver (bug #704)
-       (backported to 3.0.6 and 16.1.3).
-- HAL: Fixed broken demo for STM32F429 (bug #703)(backported to 16.1.3).
-- HAL: Fixed wrong macro definition for palWriteLine (bug #702)(backported
-       to 16.1.3).
-- HAL: Fixed error is buffer queues (bug #701)(backported to 16.1.3).
-- HAL: Fixed F105_F107 CANv1 build failure (bug #699).
-- HAL: Fixed typos in STM32F0 RCC enable/disable macros (bug #698)(backported
-       to 16.1.3).
+       (bug #709).
+- HAL: Fixed wrong RTCv2 settings for STM32L4 (bug #708).
+- HAL: Fixed missing OTGv1 support for STM32L4 (bug #707).
+- NIL: Fixed ARM errata 752419 (bug #706).
+- RT:  Fixed ARM errata 752419 (bug #706).
+
+*** 16.1.3 ***
+- HAL: Fixed unused variable in STM32 SPIv2 driver (bug #705).
+- HAL: Fixed chDbgAssert() still called from STM32 SPIv1 driver (bug #704).
+- HAL: Fixed broken demo for STM32F429 (bug #703).
+- HAL: Fixed wrong macro definition for palWriteLine (bug #702).
+- HAL: Fixed error is buffer queues (bug #701).
+- HAL: Fixed typos in STM32F0 RCC enable/disable macros (bug #698).
 - RT:  Fixed useless call to chTMStartMeasurementX() in _thread_init()
-       (bug #697)(backported to 3.0.6 and 16.1.3).
-- VAR: Fixed missing time conversion in lwIP arch module (bug #696)
-       (backported to 2.6.10, 3.0.5 and 16.1.2).
+       (bug #697).
+- VAR: Fixed missing time conversion in lwIP arch module (bug #696, again).
+
+*** 16.1.2 ***
+- VAR: Fixed missing time conversion in lwIP arch module (bug #696).
 - HAL: Fixed incorrect handling of TIME_IMMEDIATE in the HAL buffer queues
-       (bug #695)(backported to 16.1.2).
-- NIL: Fixed NIL_CFG_USE_EVENTS not properly checked in NIL (bug #694)
-       (backported to 3.0.5 and 16.1.1).
+       (bug #695).
+
+*** 16.1.1 ***
+- NIL: NIL_CFG_USE_EVENTS not properly checked in NIL (bug #694).
 - RT:  Fixed ISR statistics are not updated from a critical zone in RT
-       (bug #693)(backported to 3.0.5 and 16.1.1).
+       (bug #693).
 - NIL: Fixed NIL test suite calls I and S functions outside critical zone
-       (bug #692)(backported to 3.0.5 and 16.1.1).
-- NIL: Fixed protocol violation in NIL OSAL (bug #691)(backported to
-       3.0.5 and 16.1.1).
-- HAL: Fixed error in HAL buffer queues (bug #689)(backported to 16.1.1).
-- RT:  Fixed tm_stop - best case bug (bug #688)(backported to 16.1.1
-       and 3.0.5).
-- ALL: Several minor documentation/formatting-related fixes.
+       (bug #692).
+- NIL: Fixed protocol violation in NIL OSAL (bug #691).
+- HAL: Fixed error in HAL buffer queues (bug #689).
+- RT:  Fixed tm_stop - best case bug (bug #688).
+- RT:  Several minor documentation/formatting-related fixes.
 
 *** 16.1.0 ***
 - RT:  Added CodeWarrior compiler support to the e200 port.

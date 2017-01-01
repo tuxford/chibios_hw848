@@ -1,5 +1,5 @@
 /*
-    ChibiOS - Copyright (C) 2006..2016 Giovanni Di Sirio
+    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@
 
 #if AVR_SPI_USE_SPI1
 
-#if defined(__AVR_ATmega644__) || defined(__AVR_ATmega644P__) || defined(__AVR_ATmega162__)
+#if defined(__AVR_ATmega644__) || defined(__AVR_ATmega644P__)
   #define PIN_SPI1            PINB
   #define PORT_SPI1           PORTB
   #define DDR_SPI1            DDRB
