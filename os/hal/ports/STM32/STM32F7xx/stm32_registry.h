@@ -1,5 +1,5 @@
 /*
-    ChibiOS - Copyright (C) 2006..2016 Giovanni Di Sirio
+    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -22,8 +22,8 @@
  * @{
  */
 
-#ifndef STM32_REGISTRY_H
-#define STM32_REGISTRY_H
+#ifndef _STM32_REGISTRY_H_
+#define _STM32_REGISTRY_H_
 
 /*===========================================================================*/
 /* Platform capabilities.                                                    */
@@ -34,10 +34,10 @@
  * @{
  */
 /*===========================================================================*/
-/* STM32F745xx, STM32F746xx, STM32F756xx, STM32F767xx, STM32F769xx.          */
+/* STM32F745xx, STM32F746xx, STM32F756xx.                                    */
 /*===========================================================================*/
 #if defined(STM32F745xx) || defined(STM32F746xx) || defined(STM32F756xx) || \
-    defined(STM32F767xx) || defined(STM32F769xx) || defined(__DOXYGEN__)
+    defined(__DOXYGEN__)
 /* ADC attributes.*/
 #define STM32_ADC_HANDLER                   Vector88
 #define STM32_ADC_NUMBER                    18
@@ -85,18 +85,6 @@
 #define STM32_CAN2_RX0_NUMBER               64
 #define STM32_CAN2_RX1_NUMBER               65
 #define STM32_CAN2_SCE_NUMBER               66
-
-#define STM32_CAN3_MAX_FILTERS              14
-
-#define STM32_HAS_CAN3                      TRUE
-#define STM32_CAN3_TX_HANDLER               Vector1E0
-#define STM32_CAN3_RX0_HANDLER              Vector1E4
-#define STM32_CAN3_RX1_HANDLER              Vector1E8
-#define STM32_CAN3_SCE_HANDLER              Vector1EC
-#define STM32_CAN3_TX_NUMBER                104
-#define STM32_CAN3_RX0_NUMBER               105
-#define STM32_CAN3_RX1_NUMBER               106
-#define STM32_CAN3_SCE_NUMBER               107
 
 /* DAC attributes.*/
 #define STM32_HAS_DAC1_CH1                  TRUE
@@ -227,13 +215,6 @@
 #define STM32_I2C4_TX_DMA_MSK               STM32_DMA_STREAM_ID_MSK(1, 5)
 #define STM32_I2C4_TX_DMA_CHN               0x00200000
 
-/* QUADSPI attributes.*/
-#define STM32_HAS_QUADSPI1                  TRUE
-#define STM32_QUADSPI1_HANDLER              Vector1B0
-#define STM32_QUADSPI1_NUMBER               92
-#define STM32_QUADSPI1_DMA_MSK              STM32_DMA_STREAM_ID_MSK(2, 7)
-#define STM32_QUADSPI1_DMA_CHN              0x30000000
-
 /* RTC attributes.*/
 #define STM32_HAS_RTC                       TRUE
 #define STM32_RTC_HAS_SUBSECONDS            TRUE
@@ -301,11 +282,11 @@
 #define STM32_SPI6_TX_DMA_CHN               0x00100000
 
 /* TIM attributes.*/
-#define STM32_TIM_MAX_CHANNELS              6
+#define STM32_TIM_MAX_CHANNELS              4
 
 #define STM32_HAS_TIM1                      TRUE
 #define STM32_TIM1_IS_32BITS                FALSE
-#define STM32_TIM1_CHANNELS                 6
+#define STM32_TIM1_CHANNELS                 4
 #define STM32_TIM1_UP_HANDLER               VectorA4
 #define STM32_TIM1_CC_HANDLER               VectorAC
 #define STM32_TIM1_UP_NUMBER                25
@@ -363,13 +344,13 @@
 
 #define STM32_HAS_TIM10                     TRUE
 #define STM32_TIM10_IS_32BITS               FALSE
-#define STM32_TIM10_CHANNELS                1
+#define STM32_TIM10_CHANNELS                2
 #define STM32_TIM10_HANDLER                 VectorA4 /* Note: same as STM32_TIM1_UP */
 #define STM32_TIM10_NUMBER                  25 /* Note: same as STM32_TIM1_UP */
 
 #define STM32_HAS_TIM11                     TRUE
 #define STM32_TIM11_IS_32BITS               FALSE
-#define STM32_TIM11_CHANNELS                1
+#define STM32_TIM11_CHANNELS                2
 #define STM32_TIM11_HANDLER                 VectorA8
 #define STM32_TIM11_NUMBER                  26
 
@@ -381,13 +362,13 @@
 
 #define STM32_HAS_TIM13                     TRUE
 #define STM32_TIM13_IS_32BITS               FALSE
-#define STM32_TIM13_CHANNELS                1
+#define STM32_TIM13_CHANNELS                2
 #define STM32_TIM13_HANDLER                 VectorF0 /* Note: same as STM32_TIM8_UP */
 #define STM32_TIM13_NUMBER                  44 /* Note: same as STM32_TIM8_UP */
 
 #define STM32_HAS_TIM14                     TRUE
 #define STM32_TIM14_IS_32BITS               FALSE
-#define STM32_TIM14_CHANNELS                1
+#define STM32_TIM14_CHANNELS                2
 #define STM32_TIM14_HANDLER                 VectorF4
 #define STM32_TIM14_NUMBER                  45
 
@@ -523,6 +504,6 @@
 
 /** @} */
 
-#endif /* STM32_REGISTRY_H */
+#endif /* _STM32_REGISTRY_H_ */
 
 /** @} */
