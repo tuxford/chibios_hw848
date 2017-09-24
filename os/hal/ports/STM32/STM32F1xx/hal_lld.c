@@ -1,5 +1,5 @@
 /*
-    ChibiOS - Copyright (C) 2006..2016 Giovanni Di Sirio
+    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -66,13 +66,7 @@ static void hal_lld_backup_domain_init(void) {
 
   /* If enabled then the LSE is started.*/
 #if STM32_LSE_ENABLED
-#if defined(STM32_LSE_BYPASS)
-  /* LSE Bypass.*/
-  RCC->BDCR |= RCC_BDCR_LSEON | RCC_BDCR_LSEBYP;
-#else
-  /* No LSE Bypass.*/
   RCC->BDCR |= RCC_BDCR_LSEON;
-#endif
   while ((RCC->BDCR & RCC_BDCR_LSERDY) == 0)
     ;                                     /* Waits until LSE is stable.   */
 #endif /* STM32_LSE_ENABLED */
@@ -142,13 +136,9 @@ void hal_lld_init(void) {
   /* Initializes the backup domain.*/
   hal_lld_backup_domain_init();
 
-  /* DMA subsystems initialization.*/
 #if defined(STM32_DMA_REQUIRED)
   dmaInit();
 #endif
-
-  /* IRQ subsystem initialization.*/
-  irqInit();
 
   /* Programmable voltage detector enable.*/
 #if STM32_PVD_ENABLE

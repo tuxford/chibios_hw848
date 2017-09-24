@@ -1,5 +1,5 @@
 /*
-    ChibiOS - Copyright (C) 2006..2016 Giovanni Di Sirio
+    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -22,8 +22,8 @@
  * @{
  */
 
-#ifndef OSAL_H
-#define OSAL_H
+#ifndef _OSAL_H_
+#define _OSAL_H_
 
 #include <stddef.h>
 #include <stdint.h>
@@ -936,6 +936,6 @@ static inline void osalMutexUnlock(mutex_t *mp) {
 #endif
 }
 
-#endif /* OSAL_H */
+#endif /* _OSAL_H_ */
 
 /** @} */
