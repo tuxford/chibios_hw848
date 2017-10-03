@@ -180,13 +180,13 @@ eventmask_t chEvtGetAndClearEvents(eventmask_t events) {
  * @api
  */
 eventmask_t chEvtAddEvents(eventmask_t events) {
-  eventmask_t newevt;
 
   chSysLock();
-  newevt = chEvtAddEventsI(events);
+  currp->epending |= events;
+  events = currp->epending;
   chSysUnlock();
 
-  return newevt;
+  return events;
 }
 
 /**

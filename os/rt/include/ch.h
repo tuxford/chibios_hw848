@@ -39,7 +39,7 @@
 /**
  * @brief   Stable release flag.
  */
-#define CH_KERNEL_STABLE        0
+#define CH_KERNEL_STABLE        1
 
 /**
  * @name    ChibiOS/RT version identification
@@ -48,12 +48,12 @@
 /**
  * @brief   Kernel version string.
  */
-#define CH_KERNEL_VERSION       "5.0.0"
+#define CH_KERNEL_VERSION       "4.0.2"
 
 /**
  * @brief   Kernel version major number.
  */
-#define CH_KERNEL_MAJOR         5
+#define CH_KERNEL_MAJOR         4
 
 /**
  * @brief   Kernel version minor number.
@@ -63,7 +63,7 @@
 /**
  * @brief   Kernel version patch number.
  */
-#define CH_KERNEL_PATCH         0
+#define CH_KERNEL_PATCH         2
 /** @} */
 
 /* Core headers.*/
@@ -100,8 +100,6 @@
 #include "chmemcore.h"
 #include "chheap.h"
 #include "chmempools.h"
-#include "chfifo.h"
-#include "chfactory.h"
 #include "chdynamic.h"
 
 #if !defined(_CHIBIOS_RT_CONF_)
