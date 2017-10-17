@@ -16,7 +16,7 @@
 
 #include "ch.h"
 #include "hal.h"
-#include "rt_test_root.h"
+#include "ch_test.h"
 
 /*
  * Blinker thread.
@@ -68,7 +68,7 @@ int main(void) {
    */
   while (true) {
     if (palReadPad(GPIOA, GPIOA_BUTTON))
-      test_execute((BaseSequentialStream *)&SD2, &rt_test_suite);
+      test_execute((BaseSequentialStream *)&SD2);
     chThdSleepMilliseconds(500);
   }
 }

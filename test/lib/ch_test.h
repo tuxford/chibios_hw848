@@ -65,27 +65,6 @@ typedef struct {
   void (*execute)(void);        /**< @brief Test case execution function.   */
 } testcase_t;
 
-/**
- * @brief   Structure representing a test sequence.
- */
-typedef struct {
-  const char        *name;          /**< @brief Name of the test sequence.  */
-  const testcase_t * const * cases; /**< @brief Test cases array.           */
-} testsequence_t;
-
-/**
- * @brief   Type of a test suite.
- */
-typedef struct {
-  const char        *name;          /**< @brief Name of the test suite.     */
-  const testsequence_t * const * sequences; /**< @brief Test sequences array.           */
-} testsuite_t;
-
-/**
- * @brief   Type of a test suite.
- */
-//typedef const testcase_t * const *testsuite_t[];
-
 /*===========================================================================*/
 /* Module macros.                                                            */
 /*===========================================================================*/
@@ -194,7 +173,7 @@ extern "C" {
   void test_println(const char *msgp);
   void test_emit_token(char token);
   void test_emit_token_i(char token);
-  msg_t test_execute(BaseSequentialStream *stream, const testsuite_t *tsp);
+  msg_t test_execute(BaseSequentialStream *stream);
 #ifdef __cplusplus
 }
 #endif
@@ -202,6 +181,12 @@ extern "C" {
 /*===========================================================================*/
 /* Module inline functions.                                                  */
 /*===========================================================================*/
+
+/*===========================================================================*/
+/* Late inclusions.                                                          */
+/*===========================================================================*/
+
+#include "test_root.h"
 
 #endif /* CH_TEST_H */
 

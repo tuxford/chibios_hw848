@@ -15,7 +15,7 @@
 */
 
 #include "hal.h"
-#include "nasa_osal_test_root.h"
+#include "ch_test.h"
 #include "osapi.h"
 
 /*
@@ -66,7 +66,7 @@ int main(void) {
      waiting for a button event, then the test suite is executed.*/
   while (true) {
     if (palReadLine(LINE_BUTTON))
-      test_execute((BaseSequentialStream *)&SD2, &nasa_osal_test_suite);
+      test_execute((BaseSequentialStream *)&SD2);
     OS_TaskDelay(500);
   }
 }

@@ -164,9 +164,9 @@ extern "C" {
                                       unsigned align);
   void chGuardedPoolLoadArray(guarded_memory_pool_t *gmp, void *p, size_t n);
   void *chGuardedPoolAllocTimeoutS(guarded_memory_pool_t *gmp,
-                                   sysinterval_t timeout);
+                                   systime_t timeout);
   void *chGuardedPoolAllocTimeout(guarded_memory_pool_t *gmp,
-                                  sysinterval_t timeout);
+                                  systime_t timeout);
   void chGuardedPoolFreeI(guarded_memory_pool_t *gmp, void *objp);
   void chGuardedPoolFree(guarded_memory_pool_t *gmp, void *objp);
 #endif

@@ -31,7 +31,7 @@
 #include "chprintf.h"
 
 #if (SHELL_CMD_TEST_ENABLED == TRUE) || defined(__DOXYGEN__)
-#include "rt_test_root.h"
+#include "ch_test.h"
 #endif
 
 /*===========================================================================*/

@@ -482,7 +482,7 @@ eventmask_t chEvtWaitAll(eventmask_t events) {
  *
  * @param[in] events    events that the function should wait
  *                      for, @p ALL_EVENTS enables all the events
- * @param[in] timeout   the number of ticks before the operation timeouts,
+ * @param[in] time      the number of ticks before the operation timeouts,
  *                      the following special values are allowed:
  *                      - @a TIME_IMMEDIATE immediate timeout.
  *                      - @a TIME_INFINITE no timeout.
@@ -492,19 +492,19 @@ eventmask_t chEvtWaitAll(eventmask_t events) {
  *
  * @api
  */
-eventmask_t chEvtWaitOneTimeout(eventmask_t events, sysinterval_t timeout) {
+eventmask_t chEvtWaitOneTimeout(eventmask_t events, systime_t time) {
   thread_t *ctp = currp;
   eventmask_t m;
 
   chSysLock();
   m = ctp->epending & events;
   if (m == (eventmask_t)0) {
-    if (TIME_IMMEDIATE == timeout) {
+    if (TIME_IMMEDIATE == time) {
       chSysUnlock();
       return (eventmask_t)0;
     }
     ctp->u.ewmask = events;
-    if (chSchGoSleepTimeoutS(CH_STATE_WTOREVT, timeout) < MSG_OK) {
+    if (chSchGoSleepTimeoutS(CH_STATE_WTOREVT, time) < MSG_OK) {
       chSysUnlock();
       return (eventmask_t)0;
     }
@@ -525,7 +525,7 @@ eventmask_t chEvtWaitOneTimeout(eventmask_t events, sysinterval_t timeout) {
  *
  * @param[in] events    events that the function should wait
  *                      for, @p ALL_EVENTS enables all the events
- * @param[in] timeout   the number of ticks before the operation timeouts,
+ * @param[in] time      the number of ticks before the operation timeouts,
  *                      the following special values are allowed:
  *                      - @a TIME_IMMEDIATE immediate timeout.
  *                      - @a TIME_INFINITE no timeout.
@@ -535,19 +535,19 @@ eventmask_t chEvtWaitOneTimeout(eventmask_t events, sysinterval_t timeout) {
  *
  * @api
  */
-eventmask_t chEvtWaitAnyTimeout(eventmask_t events, sysinterval_t timeout) {
+eventmask_t chEvtWaitAnyTimeout(eventmask_t events, systime_t time) {
   thread_t *ctp = currp;
   eventmask_t m;
 
   chSysLock();
   m = ctp->epending & events;
   if (m == (eventmask_t)0) {
-    if (TIME_IMMEDIATE == timeout) {
+    if (TIME_IMMEDIATE == time) {
       chSysUnlock();
       return (eventmask_t)0;
     }
     ctp->u.ewmask = events;
-    if (chSchGoSleepTimeoutS(CH_STATE_WTOREVT, timeout) < MSG_OK) {
+    if (chSchGoSleepTimeoutS(CH_STATE_WTOREVT, time) < MSG_OK) {
       chSysUnlock();
       return (eventmask_t)0;
     }
@@ -566,7 +566,7 @@ eventmask_t chEvtWaitAnyTimeout(eventmask_t events, sysinterval_t timeout) {
  *
  * @param[in] events    events that the function should wait
  *                      for, @p ALL_EVENTS requires all the events
- * @param[in] timeout   the number of ticks before the operation timeouts,
+ * @param[in] time      the number of ticks before the operation timeouts,
  *                      the following special values are allowed:
  *                      - @a TIME_IMMEDIATE immediate timeout.
  *                      - @a TIME_INFINITE no timeout.
@@ -576,17 +576,17 @@ eventmask_t chEvtWaitAnyTimeout(eventmask_t events, sysinterval_t timeout) {
  *
  * @api
  */
-eventmask_t chEvtWaitAllTimeout(eventmask_t events, sysinterval_t timeout) {
+eventmask_t chEvtWaitAllTimeout(eventmask_t events, systime_t time) {
   thread_t *ctp = currp;
 
   chSysLock();
   if ((ctp->epending & events) != events) {
-    if (TIME_IMMEDIATE == timeout) {
+    if (TIME_IMMEDIATE == time) {
       chSysUnlock();
       return (eventmask_t)0;
     }
     ctp->u.ewmask = events;
-    if (chSchGoSleepTimeoutS(CH_STATE_WTANDEVT, timeout) < MSG_OK) {
+    if (chSchGoSleepTimeoutS(CH_STATE_WTANDEVT, time) < MSG_OK) {
       chSysUnlock();
       return (eventmask_t)0;
     }

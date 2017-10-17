@@ -16,7 +16,7 @@
 
 #include "ch.h"
 #include "hal.h"
-#include "rt_test_root.h"
+#include "ch_test.h"
 
 /*
  * LED blinker thread, times are in milliseconds.

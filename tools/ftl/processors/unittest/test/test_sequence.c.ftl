@@ -7,22 +7,21 @@
     [#break]
   [/#if]
 [/#list]
-[#assign prefix_lower = instance.global_data_and_code.code_prefix.value[0]?trim?lower_case /]
-[#assign prefix_upper = instance.global_data_and_code.code_prefix.value[0]?trim?upper_case /]
 [#list instance.sequences.sequence as sequence]
-  [@pp.changeOutputFile name=prefix_lower+"test_sequence_" + (sequence_index + 1)?string("000") + ".c" /]
+  [@pp.changeOutputFile name="test_sequence_" + (sequence_index + 1)?string("000") + ".c" /]
 [@utils.EmitIndentedCCode "" 2 instance.description.copyright.value[0] /]
 
 #include "hal.h"
-#include "${prefix_lower}test_root.h"
+#include "ch_test.h"
+#include "test_root.h"
 
 /**
- * @file    ${prefix_lower}test_sequence_${(sequence_index + 1)?string("000")}.c
+ * @file    test_sequence_${(sequence_index + 1)?string("000")}.c
  * @brief   Test Sequence ${(sequence_index + 1)?string("000")} code.
  *
- * @page ${prefix_lower}test_sequence_${(sequence_index + 1)?string("000")} [${(sequence_index + 1)?string}] ${utils.WithoutDot(sequence.brief.value[0]?string)}
+ * @page test_sequence_${(sequence_index + 1)?string("000")} [${(sequence_index + 1)?string}] ${utils.WithoutDot(sequence.brief.value[0]?string)}
  *
- * File: @ref ${prefix_lower}test_sequence_${(sequence_index + 1)?string("000")}.c
+ * File: @ref test_sequence_${(sequence_index + 1)?string("000")}.c
  *
  * <h2>Description</h2>
 [@utils.FormatStringAsText " * "
@@ -41,7 +40,7 @@
  * <h2>Test Cases</h2>
   [#if sequence.cases.case?size > 0]
     [#list sequence.cases.case as case]
- * - @subpage ${prefix_lower}test_${(sequence_index + 1)?string("000")}_${(case_index + 1)?string("000")}
+ * - @subpage test_${(sequence_index + 1)?string("000")}_${(case_index + 1)?string("000")}
     [/#list]
  * .
   [#else]
@@ -79,7 +78,7 @@
     [/#if]
     [#-- Header generation.--]
 /**
- * @page ${prefix_lower}test_${(sequence_index + 1)?string("000")}_${(case_index + 1)?string("000")} [${(sequence_index + 1)?string}.${(case_index + 1)?string}] ${utils.WithoutDot(case.brief.value[0])}
+ * @page test_${(sequence_index + 1)?string("000")}_${(case_index + 1)?string("000")} [${(sequence_index + 1)?string}.${(case_index + 1)?string}] ${utils.WithoutDot(case.brief.value[0])}
  *
  * <h2>Description</h2>
 [@utils.FormatStringAsText " * "
@@ -122,18 +121,18 @@
  */
 
     [#if case.various_code.setup_code.value[0]?trim?length > 0]
-static void ${prefix_lower}test_${(sequence_index + 1)?string("000")}_${(case_index + 1)?string("000")}_setup(void) {
+static void test_${(sequence_index + 1)?string("000")}_${(case_index + 1)?string("000")}_setup(void) {
 [@utils.EmitIndentedCCode "  " 2 case.various_code.setup_code.value[0] /]
 }
 
     [/#if]
     [#if case.various_code.teardown_code.value[0]?trim?length > 0]
-static void ${prefix_lower}test_${(sequence_index + 1)?string("000")}_${(case_index + 1)?string("000")}_teardown(void) {
+static void test_${(sequence_index + 1)?string("000")}_${(case_index + 1)?string("000")}_teardown(void) {
 [@utils.EmitIndentedCCode "  " 2 case.various_code.teardown_code.value[0] /]
 }
 
     [/#if]
-static void ${prefix_lower}test_${(sequence_index + 1)?string("000")}_${(case_index + 1)?string("000")}_execute(void) {
+static void test_${(sequence_index + 1)?string("000")}_${(case_index + 1)?string("000")}_execute(void) {
     [#if case.various_code.local_variables.value[0]?trim?length > 0]
 [@utils.EmitIndentedCCode "  " 2 case.various_code.local_variables.value[0] /]
     [/#if]
@@ -166,19 +165,19 @@ static void ${prefix_lower}test_${(sequence_index + 1)?string("000")}_${(case_in
     [/#list]
 }
 
-static const testcase_t ${prefix_lower}test_${(sequence_index + 1)?string("000")}_${(case_index + 1)?string("000")} = {
+static const testcase_t test_${(sequence_index + 1)?string("000")}_${(case_index + 1)?string("000")} = {
   "${utils.WithoutDot(case.brief.value[0]?string)}",
     [#if case.various_code.setup_code.value[0]?trim?length > 0]
-  ${prefix_lower}test_${(sequence_index + 1)?string("000")}_${(case_index + 1)?string("000")}_setup,
+  test_${(sequence_index + 1)?string("000")}_${(case_index + 1)?string("000")}_setup,
     [#else]
   NULL,
     [/#if]
     [#if case.various_code.teardown_code.value[0]?trim?length > 0]
-  ${prefix_lower}test_${(sequence_index + 1)?string("000")}_${(case_index + 1)?string("000")}_teardown,
+  test_${(sequence_index + 1)?string("000")}_${(case_index + 1)?string("000")}_teardown,
     [#else]
   NULL,
     [/#if]
-  ${prefix_lower}test_${(sequence_index + 1)?string("000")}_${(case_index + 1)?string("000")}_execute
+  test_${(sequence_index + 1)?string("000")}_${(case_index + 1)?string("000")}_execute
 };
     [#if case.condition.value[0]?trim?length > 0]
 #endif /* ${case.condition.value[0]?trim} */
@@ -190,27 +189,19 @@ static const testcase_t ${prefix_lower}test_${(sequence_index + 1)?string("000")
  ****************************************************************************/
 
 /**
- * @brief   Array of test cases.
+ * @brief   ${utils.WithDot(sequence.brief.value[0]?string)}
  */
-const testcase_t * const ${prefix_lower}test_sequence_${(sequence_index + 1)?string("000")}_array[] = {
+const testcase_t * const test_sequence_${(sequence_index + 1)?string("000")}[] = {
   [#list sequence.cases.case as case]
    [#if case.condition.value[0]?trim?length > 0]
 #if (${case.condition.value[0]?trim}) || defined(__DOXYGEN__)
     [/#if]
-  &${prefix_lower}test_${(sequence_index + 1)?string("000")}_${(case_index + 1)?string("000")},
+  &test_${(sequence_index + 1)?string("000")}_${(case_index + 1)?string("000")},
     [#if case.condition.value[0]?trim?length > 0]
 #endif
     [/#if]
   [/#list]
   NULL
-};
-
-/**
- * @brief   ${utils.WithDot(sequence.brief.value[0]?string)}
- */
-const testsequence_t ${prefix_lower}test_sequence_${(sequence_index + 1)?string("000")} = {
-  NULL,
-  ${prefix_lower}test_sequence_${(sequence_index + 1)?string("000")}_array
 };
   [#if sequence.condition.value[0]?trim?length > 0]
 

@@ -16,7 +16,7 @@
 
 #include "ch.hpp"
 #include "hal.h"
-#include "rt_test_root.h"
+#include "ch_test.h"
 
 using namespace chibios_rt;
 
@@ -129,7 +129,7 @@ protected:
 
     setName("tester");
 
-    test_execute((BaseSequentialStream *)&SD2, &rt_test_suite);
+    test_execute((BaseSequentialStream *)&SD2);
     exit(test_global_fail);
   }
 

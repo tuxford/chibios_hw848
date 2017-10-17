@@ -16,8 +16,7 @@
 
 #include "ch.h"
 #include "hal.h"
-#include "rt_test_root.h"
-#include "oslib_test_root.h"
+#include "ch_test.h"
 
 /*
  * This is a periodic thread that does absolutely nothing except flashing
@@ -30,9 +29,9 @@ static THD_FUNCTION(Thread1, arg) {
   chRegSetThreadName("blinker");
   while (true) {
     palSetLine(LINE_ARD_D13);
-    chThdSleepMilliseconds(1000);
+    chThdSleepMilliseconds(500);
     palClearLine(LINE_ARD_D13);
-    chThdSleepMilliseconds(1000);
+    chThdSleepMilliseconds(500);
   }
 }
 
@@ -65,17 +64,15 @@ int main(void) {
   /*
    * Creates the example thread.
    */
-  chThdCreateStatic(waThread1, sizeof(waThread1), NORMALPRIO+1, Thread1, NULL);
+  chThdCreateStatic(waThread1, sizeof(waThread1), NORMALPRIO, Thread1, NULL);
 
   /*
    * Normal main() thread activity, in this demo it does nothing except
    * sleeping in a loop and check the button state.
    */
   while (true) {
-    if (palReadLine(LINE_BUTTON_USER)) {
-      test_execute((BaseSequentialStream *)&SD1, &rt_test_suite);
-      test_execute((BaseSequentialStream *)&SD1, &oslib_test_suite);
-    }
-    chThdSleepMilliseconds(2000);
+    if (palReadLine(LINE_BUTTON_USER))
+      test_execute((BaseSequentialStream *)&SD1);
+    chThdSleepMilliseconds(500);
   }
 }

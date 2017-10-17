@@ -16,7 +16,7 @@
 
 #include "hal.h"
 #include "ch.h"
-#include "nil_test_root.h"
+#include "ch_test.h"
 
 /*
  * Thread 1.
@@ -72,7 +72,7 @@ THD_FUNCTION(Thread3, arg) {
   /* Waiting for button push and activation of the test suite.*/
   while (true) {
     if (palReadLine(LINE_BUTTON))
-      test_execute((BaseSequentialStream *)&SD1, &rt_test_suite);
+      test_execute((BaseSequentialStream *)&SD1);
     chThdSleepMilliseconds(500);
   }
 }
