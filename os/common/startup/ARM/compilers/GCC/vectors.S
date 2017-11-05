@@ -56,7 +56,7 @@ _start:
                 ldr     pc, _fiq
 
 _reset:
-                .word   Boot_Handler
+                .word   Reset_Handler
 _undefined:
                 .word   Und_Handler
 _swi:
@@ -92,13 +92,7 @@ Irq_Handler:
                 .weak   _unhandled_exception
 _unhandled_exception:
                 b       _unhandled_exception
-/*
- * Default boot handler. Jump to Reset_Handler.
- */
-                .section .boot, "ax"
-                .weak	Boot_Handler
-Boot_Handler:
-                b       Reset_Handler
+
 #endif
 
 /** @} */

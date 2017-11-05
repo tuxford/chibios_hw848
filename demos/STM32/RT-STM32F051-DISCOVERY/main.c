@@ -16,8 +16,7 @@
 
 #include "ch.h"
 #include "hal.h"
-#include "rt_test_root.h"
-#include "oslib_test_root.h"
+#include "ch_test.h"
 
 /*
  * Blue LED blinker thread, times are in milliseconds.
@@ -87,10 +86,8 @@ int main(void) {
    * driver 1.
    */
   while (true) {
-    if (palReadPad(GPIOA, GPIOA_BUTTON)) {
-      test_execute((BaseSequentialStream *)&SD1, &rt_test_suite);
-      test_execute((BaseSequentialStream *)&SD1, &oslib_test_suite);
-    }
+    if (palReadPad(GPIOA, GPIOA_BUTTON))
+      test_execute((BaseSequentialStream *)&SD1);
     chThdSleepMilliseconds(500);
   }
 }

@@ -20,8 +20,7 @@
 
 #include "ch.h"
 #include "hal.h"
-#include "rt_test_root.h"
-#include "oslib_test_root.h"
+#include "ch_test.h"
 #include "console.h"
 
 /*
@@ -43,8 +42,7 @@ int main(int argc, char *argv[]) {
   conInit();
   chSysInit();
 
-  test_execute((BaseSequentialStream *)&CD1, &rt_test_suite);
-  test_execute((BaseSequentialStream *)&CD1, &oslib_test_suite);
+  test_execute((BaseSequentialStream *)&CD1);
   if (test_global_fail)
     exit(1);
   else

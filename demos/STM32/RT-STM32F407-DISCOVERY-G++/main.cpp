@@ -16,8 +16,7 @@
 
 #include "ch.hpp"
 #include "hal.h"
-#include "rt_test_root.h"
-#include "oslib_test_root.h"
+#include "ch_test.h"
 
 using namespace chibios_rt;
 
@@ -95,7 +94,7 @@ protected:
     while (true) {
       switch(curr->action) {
       case SLEEP:
-        sleep(TIME_MS2I(curr->value));
+        sleep(MS2ST(curr->value));
         break;
       case GOTO:
         curr = &base[curr->value];
@@ -130,8 +129,7 @@ protected:
 
     setName("tester");
 
-    test_execute((BaseSequentialStream *)&SD2, &rt_test_suite);
-    test_execute((BaseSequentialStream *)&SD2, &oslib_test_suite);
+    test_execute((BaseSequentialStream *)&SD2);
     exit(test_global_fail);
   }
 
@@ -187,7 +185,7 @@ int main(void) {
       tester.start(NORMALPRIO);
       tester.wait();
     };
-    BaseThread::sleep(TIME_MS2I(500));
+    BaseThread::sleep(MS2ST(500));
   }
 
   return 0;

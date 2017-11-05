@@ -110,7 +110,7 @@ static const I2CConfig i2cfg2 = {
  */
 int main(void) {
   msg_t status = MSG_OK;
-  sysinterval_t tmo = TIME_MS2I(4);
+  systime_t tmo = MS2ST(4);
 
   /*
    * System initializations.

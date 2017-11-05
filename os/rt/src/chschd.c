@@ -336,7 +336,6 @@ static void wakeup(void *p) {
 #endif
 #if (CH_CFG_USE_CONDVARS == TRUE) && (CH_CFG_USE_CONDVARS_TIMEOUT == TRUE)
   case CH_STATE_WTCOND:
-    /* Falls into, intentional. */
 #endif
   case CH_STATE_QUEUED:
     /* States requiring dequeuing.*/
@@ -360,7 +359,7 @@ static void wakeup(void *p) {
  *          @ref thread_states are defined into @p threads.h.
  *
  * @param[in] newstate  the new thread state
- * @param[in] timeout   the number of ticks before the operation timeouts, the
+ * @param[in] time      the number of ticks before the operation timeouts, the
  *                      special values are handled as follow:
  *                      - @a TIME_INFINITE the thread enters an infinite sleep
  *                        state, this is equivalent to invoking
@@ -372,14 +371,14 @@ static void wakeup(void *p) {
  *
  * @sclass
  */
-msg_t chSchGoSleepTimeoutS(tstate_t newstate, sysinterval_t timeout) {
+msg_t chSchGoSleepTimeoutS(tstate_t newstate, systime_t time) {
 
   chDbgCheckClassS();
 
-  if (TIME_INFINITE != timeout) {
+  if (TIME_INFINITE != time) {
     virtual_timer_t vt;
 
-    chVTDoSetI(&vt, timeout, wakeup, currp);
+    chVTDoSetI(&vt, time, wakeup, currp);
     chSchGoSleepS(newstate);
     if (chVTIsArmedI(&vt)) {
       chVTDoResetI(&vt);
