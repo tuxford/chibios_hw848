@@ -18,10 +18,12 @@
 */
 
 /**
- * @file    chcore.h
- * @brief   AVR port macros and structures.
+ * @file    templates/chcore.h
+ * @brief   Port related template macros and structures.
+ * @details This file is a template of the system driver macros provided by
+ *          a port.
  *
- * @addtogroup AVR_CORE
+ * @addtogroup core
  * @{
  */
 
