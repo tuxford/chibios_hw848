@@ -1,5 +1,5 @@
 /*
-    ChibiOS - Copyright (C) 2006..2018 Giovanni Di Sirio
+    ChibiOS - Copyright (C) 2006..2016 Giovanni Di Sirio
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -162,7 +162,6 @@ typedef struct {
  * @brief   @p BaseFlash specific methods with inherited ones.
  */
 #define _base_flash_methods                                                 \
-  _base_object_methods                                                      \
   _base_flash_methods_alone
 
 /**
@@ -176,13 +175,11 @@ struct BaseFlashVMT {
  * @brief   @p BaseFlash specific data.
  */
 #define _base_flash_data                                                    \
-  _base_object_data                                                         \
   /* Driver state.*/                                                        \
   flash_state_t         state;
 
+
 /**
- * @extends BaseObject
- *
  * @brief   Base flash class.
  */
 typedef struct {
@@ -199,13 +196,6 @@ typedef struct {
  * @name    Macro Functions (BaseFlash)
  * @{
  */
-/**
- * @brief   Instance getter.
- * @details This special method is used to get the instance of this class
- *          object from a derived class.
- */
-#define getBaseFlash(ip) ((BaseFlash *)&(ip)->vmt)
-
 /**
  * @brief   Sensors get axes number.
  *
@@ -228,7 +218,6 @@ typedef struct {
  * @retval FLASH_NO_ERROR if there is no erase operation in progress.
  * @retval FLASH_BUSY_ERASING if there is an erase operation in progress.
  * @retval FLASH_ERROR_READ if the read operation failed.
- * @retval FLASH_ERROR_HW_FAILURE if access to the memory failed.
  *
  * @api
  */
@@ -246,7 +235,6 @@ typedef struct {
  * @retval FLASH_NO_ERROR if there is no erase operation in progress.
  * @retval FLASH_BUSY_ERASING if there is an erase operation in progress.
  * @retval FLASH_ERROR_PROGRAM if the program operation failed.
- * @retval FLASH_ERROR_HW_FAILURE if access to the memory failed.
  *
  * @api
  */
@@ -260,7 +248,6 @@ typedef struct {
  * @return              An error code.
  * @retval FLASH_NO_ERROR if there is no erase operation in progress.
  * @retval FLASH_BUSY_ERASING if there is an erase operation in progress.
- * @retval FLASH_ERROR_HW_FAILURE if access to the memory failed.
  *
  * @api
  */
@@ -275,7 +262,6 @@ typedef struct {
  * @return              An error code.
  * @retval FLASH_NO_ERROR if there is no erase operation in progress.
  * @retval FLASH_BUSY_ERASING if there is an erase operation in progress.
- * @retval FLASH_ERROR_HW_FAILURE if access to the memory failed.
  *
  * @api
  */
@@ -292,7 +278,6 @@ typedef struct {
  * @retval FLASH_NO_ERROR if there is no erase operation in progress.
  * @retval FLASH_BUSY_ERASING if there is an erase operation in progress.
  * @retval FLASH_ERROR_ERASE if the erase operation failed.
- * @retval FLASH_ERROR_HW_FAILURE if access to the memory failed.
  *
  * @api
  */
@@ -305,10 +290,9 @@ typedef struct {
  * @param[in] ip        pointer to a @p BaseFlash or derived class
  * @param[in] sector    sector to be verified
  * @return              An error code.
- * @retval FLASH_NO_ERROR if the sector is erased.
+ * @retval FLASH_NO_ERROR if there is no erase operation in progress.
  * @retval FLASH_BUSY_ERASING if there is an erase operation in progress.
  * @retval FLASH_ERROR_VERIFY if the verify operation failed.
- * @retval FLASH_ERROR_HW_FAILURE if access to the memory failed.
  *
  * @api
  */

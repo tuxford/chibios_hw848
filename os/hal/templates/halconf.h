@@ -1,5 +1,5 @@
 /*
-    ChibiOS - Copyright (C) 2006..2018 Giovanni Di Sirio
+    ChibiOS - Copyright (C) 2006..2016 Giovanni Di Sirio
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -55,17 +55,10 @@
 #endif
 
 /**
- * @brief   Enables the cryptographic subsystem.
- */
-#if !defined(HAL_USE_CRY) || defined(__DOXYGEN__)
-#define HAL_USE_CRY                 TRUE
-#endif
-
-/**
  * @brief   Enables the DAC subsystem.
  */
 #if !defined(HAL_USE_DAC) || defined(__DOXYGEN__)
-#define HAL_USE_DAC                 TRUE
+#define HAL_USE_DAC                 FALSE
 #endif
 
 /**

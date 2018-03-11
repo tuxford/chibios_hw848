@@ -80,14 +80,12 @@ struct BaseGyroscopeVMT {
   _base_sensor_data
 
 /**
- * @extends BaseSensor
- *
  * @brief   Base gyroscope class.
  * @details This class represents a generic gyroscope.
  */
 typedef struct {
   /** @brief Virtual Methods Table.*/
-  const struct BaseGyroscopeVMT *vmt;
+  const struct BaseGyroscopeVMT *vmt_gyroscope;
   _base_gyroscope_data
 } BaseGyroscope;
 
@@ -100,6 +98,13 @@ typedef struct {
  * @{
  */
 /**
+ * @brief   Instance getter.
+ * @details This special method is used to get the instance of this class
+ *          object from a derived class.
+ */
+#define getBaseGyroscope(ip) ((BaseGyroscope *)&(ip)->vmt_gyroscope)
+
+/**
  * @brief   Gyroscope get axes number.
  *
  * @param[in] ip        pointer to a @p BaseGyroscope class.
@@ -108,7 +113,7 @@ typedef struct {
  * @api
  */
 #define gyroscopeGetAxesNumber(ip)                                          \
-        (ip)->vmt->get_channels_number(ip)
+        (ip)->vmt_gyroscope->get_channels_number(ip)
 
 /**
  * @brief   Gyroscope read raw data.
@@ -123,7 +128,7 @@ typedef struct {
  * @api
  */
 #define gyroscopeReadRaw(ip, dp)                                            \
-        (ip)->vmt->read_raw(ip, dp)
+        (ip)->vmt_gyroscope->read_raw(ip, dp)
 
 /**
  * @brief   Gyroscope read cooked data.
@@ -138,7 +143,7 @@ typedef struct {
  * @api
  */
 #define gyroscopeReadCooked(ip, dp)                                         \
-        (ip)->vmt->read_cooked(ip, dp)
+        (ip)->vmt_gyroscope->read_cooked(ip, dp)
 
 /**
  * @brief   Gyroscope bias sampling procedure.
@@ -155,7 +160,7 @@ typedef struct {
  * @api
  */
 #define gyroscopeSampleBias(ip)                                             \
-        (ip)->vmt->sample_bias(ip)
+        (ip)->vmt_gyroscope->sample_bias(ip)
 
 /**
  * @brief   Updates gyroscope bias data from received buffer.
@@ -172,7 +177,7 @@ typedef struct {
  * @api
  */
 #define gyroscopeSetBias(ip, bp)                                            \
-        (ip)->vmt->set_bias(ip, bp)
+        (ip)->vmt_gyroscope->set_bias(ip, bp)
 		
 /**
  * @brief   Reset gyroscope bias data restoring it to zero.
@@ -186,7 +191,7 @@ typedef struct {
  * @api
  */
 #define gyroscopeResetBias(ip)                                               \
-        (ip)->vmt->reset_bias(ip)
+        (ip)->vmt_gyroscope->reset_bias(ip)
 		
 /**
  * @brief   Updates gyroscope sensitivity data from received buffer.
@@ -203,7 +208,7 @@ typedef struct {
  * @api
  */
 #define gyroscopeSetSensitivity(ip, sp)                                     \
-        (ip)->vmt->set_sensitivity(ip, sp)
+        (ip)->vmt_gyroscope->set_sensitivity(ip, sp)
 		
 /**
  * @brief   Reset gyroscope sensitivity data restoring it to its typical 
@@ -218,7 +223,7 @@ typedef struct {
  * @api
  */
 #define gyroscopeResetSensitivity(ip)                                       \
-        (ip)->vmt->reset_sensitivity(ip)
+        (ip)->vmt_gyroscope->reset_sensitivity(ip)
 /** @} */
 
 /*===========================================================================*/

@@ -337,6 +337,7 @@ typedef struct {
   _base_accelerometer_methods                                               \
   _lis302dl_accelerometer_methods_alone
 
+
 /**
  * @extends BaseAccelerometerVMT
  *

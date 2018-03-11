@@ -1,5 +1,5 @@
 /*
-    ChibiOS - Copyright (C) 2006..2018 Giovanni Di Sirio
+    ChibiOS - Copyright (C) 2006..2016 Giovanni Di Sirio
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -61,7 +61,6 @@ typedef struct {
  * @brief   @p BaseBlockDevice specific methods.
  */
 #define _base_block_device_methods                                          \
-  _base_object_methods                                                      \
   /* Removable media detection.*/                                           \
   bool (*is_inserted)(void *instance);                                      \
   /* Removable write protection detection.*/                                \
@@ -85,7 +84,6 @@ typedef struct {
  * @brief   @p BaseBlockDevice specific data.
  */
 #define _base_block_device_data                                             \
-  _base_object_data                                                         \
   /* Driver state.*/                                                        \
   blkstate_t            state;
 
@@ -97,8 +95,6 @@ struct BaseBlockDeviceVMT {
 };
 
 /**
- * @extends BaseObject
- *
  * @brief   Base block device class.
  * @details This class represents a generic, block-accessible, device.
  */
@@ -131,8 +127,8 @@ typedef struct {
  * @param[in] ip        pointer to a @p BaseBlockDevice or derived class
  *
  * @return              The driver state.
- * @retval false        the device is not transferring data.
- * @retval true         the device not transferring data.
+ * @retval FALSE        the device is not transferring data.
+ * @retval TRUE         the device not transferring data.
  *
  * @special
  */
@@ -151,8 +147,8 @@ typedef struct {
  * @param[in] ip        pointer to a @p BaseBlockDevice or derived class
  *
  * @return              The media state.
- * @retval false        media not inserted.
- * @retval true         media inserted.
+ * @retval FALSE        media not inserted.
+ * @retval TRUE         media inserted.
  *
  * @api
  */
@@ -164,8 +160,8 @@ typedef struct {
  * @param[in] ip        pointer to a @p BaseBlockDevice or derived class
  *
  * @return              The media state.
- * @retval false        writable media.
- * @retval true         non writable media.
+ * @retval FALSE        writable media.
+ * @retval TRUE         non writable media.
  *
  * @api
  */

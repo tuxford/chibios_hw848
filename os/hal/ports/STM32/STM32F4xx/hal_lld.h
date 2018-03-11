@@ -1,5 +1,5 @@
 /*
-    ChibiOS - Copyright (C) 2006..2018 Giovanni Di Sirio
+    ChibiOS - Copyright (C) 2006..2016 Giovanni Di Sirio
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -1961,10 +1961,8 @@
 #define STM32_FLASHBITS             0x00000006
 #elif STM32_HCLK <= STM32_7WS_THRESHOLD
 #define STM32_FLASHBITS             0x00000007
-#elif STM32_HCLK <= STM32_8WS_THRESHOLD
-#define STM32_FLASHBITS             0x00000008
 #else
-#error "invalid frequency at specified VDD level"
+#define STM32_FLASHBITS             0x00000008
 #endif
 
 /* There are differences in vector names in the various sub-families,
@@ -1992,8 +1990,6 @@
 
 /* Various helpers.*/
 #include "nvic.h"
-#include "cache.h"
-#include "mpu_v7m.h"
 #include "stm32_isr.h"
 #include "stm32_dma.h"
 #include "stm32_rcc.h"
