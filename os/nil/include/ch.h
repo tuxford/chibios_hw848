@@ -46,7 +46,7 @@
 /**
  * @brief   Stable release flag.
  */
-#define CH_KERNEL_STABLE        0
+#define CH_KERNEL_STABLE        1
 
 /**
  * @name    ChibiOS/NIL version identification
@@ -417,11 +417,6 @@
 /*===========================================================================*/
 /* Derived constants and error checks.                                       */
 /*===========================================================================*/
-
-/* License checks.*/
-#if !defined(CH_CUSTOMER_LIC_NIL) || !defined(CH_LICENSE_FEATURES)
-#error "malformed chlicense.h"
-#endif
 
 #if CH_CUSTOMER_LIC_NIL == FALSE
 #error "ChibiOS/NIL not licensed"
@@ -1561,8 +1556,13 @@ extern "C" {
 }
 #endif
 
-/* OSLIB.*/
-#include "chlib.h"
+/* Optional subsystems.*/
+#include "chmboxes.h"
+#include "chmemcore.h"
+#include "chheap.h"
+#include "chmempools.h"
+#include "chfifo.h"
+#include "chfactory.h"
 
 #endif /* CH_H */
 

@@ -18,7 +18,7 @@ ifeq ($(USE_CPPOPT),)
   USE_CPPOPT = -fno-rtti
 endif
 
-# Enable this if you want the linker to remove unused code and data.
+# Enable this if you want the linker to remove unused code and data
 ifeq ($(USE_LINK_GC),)
   USE_LINK_GC = yes
 endif
@@ -28,7 +28,7 @@ ifeq ($(USE_LDOPT),)
   USE_LDOPT = 
 endif
 
-# Enable this if you want link time optimizations (LTO).
+# Enable this if you want link time optimizations (LTO)
 ifeq ($(USE_LTO),)
   USE_LTO = yes
 endif
@@ -74,11 +74,6 @@ ifeq ($(USE_FPU),)
   USE_FPU = no
 endif
 
-# FPU-related options.
-ifeq ($(USE_FPU_OPT),)
-  USE_FPU_OPT = -mfloat-abi=$(USE_FPU) -mfpu=fpv4-sp-d16 -fsingle-precision-constant
-endif
-
 #
 # Architecture or project specific options
 ##############################################################################
@@ -92,9 +87,6 @@ PROJECT = ch
 
 # Imported source files and paths
 CHIBIOS = ../../..
-CONFDIR  := ./cfg
-BUILDDIR := ./build
-DEPDIR   := ./.dep
 
 # Licensing files.
 include $(CHIBIOS)/os/license/license.mk
@@ -108,8 +100,6 @@ include $(CHIBIOS)/os/hal/osal/rt/osal.mk
 # RTOS files (optional).
 include $(CHIBIOS)/os/rt/rt.mk
 include $(CHIBIOS)/os/common/ports/ARMCMx/compilers/GCC/mk/port_v7m.mk
-# Auto-build files in ./source recursively.
-include $(CHIBIOS)/tools/mk/autobuild.mk
 # Other files (optional).
 include $(CHIBIOS)/test/lib/test.mk
 include $(CHIBIOS)/test/rt/rt_test.mk
@@ -148,37 +138,14 @@ TCSRC =
 #       option that results in lower performance and larger code size.
 TCPPSRC =
 
-# List ASM source files here.
+# List ASM source files here
 ASMSRC = $(ALLASMSRC)
 ASMXSRC = $(ALLXASMSRC)
 
-INCDIR = $(CONFDIR) $(ALLINC) $(TESTINC)
+INCDIR = $(ALLINC) $(TESTINC)
 
 #
 # Project, sources and paths
-##############################################################################
-
-##############################################################################
-# Start of user section
-#
-
-# List all user C define here, like -D_DEBUG=1
-UDEFS =
-
-# Define ASM defines here
-UADEFS =
-
-# List all user directories here
-UINCDIR =
-
-# List the user directory to look for the libraries here
-ULIBDIR =
-
-# List all user libraries here
-ULIBS =
-
-#
-# End of user section
 ##############################################################################
 
 ##############################################################################
@@ -218,6 +185,29 @@ CPPWARN = -Wall -Wextra -Wundef
 
 #
 # Compiler settings
+##############################################################################
+
+##############################################################################
+# Start of user section
+#
+
+# List all user C define here, like -D_DEBUG=1
+UDEFS =
+
+# Define ASM defines here
+UADEFS =
+
+# List all user directories here
+UINCDIR =
+
+# List the user directory to look for the libraries here
+ULIBDIR =
+
+# List all user libraries here
+ULIBS =
+
+#
+# End of user defines
 ##############################################################################
 
 RULESPATH = $(CHIBIOS)/os/common/startup/ARMCMx/compilers/GCC

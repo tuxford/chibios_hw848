@@ -36,6 +36,7 @@
   |  |  |  +--cmsis_os/   - CMSIS OS emulation layer for RT (ARMCMx port only).
   |  |  |  +--nasa_osal/  - NASA Operating System Abstraction Layer for RT.
   |  |  +--ext/           - Vendor files used by the OS.
+  |  |  +--oslib/         - RTOS modules usable by both RT and NIL.
   |  |  +--ports/         - RTOS ports usable by both RT and NIL.
   |  |  +--startup/       - Startup support for all compilers and platforms.
   |  +--ex/               - EX component.
@@ -49,8 +50,6 @@
   |  |  +--dox/           - HAL documentation resources.
   |  |  +--include/       - HAL high level headers.
   |  |  +--lib/           - HAL libraries.
-  |  |  |  +--complex/    - HAL collection of complex drivers.
-  |  |  |  |  +--mfs/     - HAL managed flash storage driver.
   |  |  |  +--fallback/   - HAL fall back software drivers.
   |  |  |  +--peripherals/- HAL peripherals interfaces.
   |  |  |  +--streams/    - HAL streams.
@@ -60,10 +59,6 @@
   |  |  +--ports/         - HAL ports.
   |  |  +--templates/     - HAL driver template files.
   |  |     +--osal/       - HAL OSAL templates.
-  |  +--lib/              - RTOS modules usable by both RT and NIL (OSLIB).
-  |  |  +--include/       - OSLIB high level headers.
-  |  |  +--src/           - OSLIB high level source.
-  |  |  +--templates/     - OSLIB configuration template files.
   |  +--nil/              - NIL RTOS component.
   |  |  +--dox/           - NIL documentation resources.
   |  |  +--include/       - NIL high level headers.
@@ -90,67 +85,50 @@
 *** Releases and Change Log                                               ***
 *****************************************************************************
 
-*** Next ***
-- NEW: Change, chMtxGetNextMutexS() renamed to chMtxGetNextMutexX().
-- NEW: RT C++ wrapper reworked, now it is mostly inline code, added some new
-       wrappers and methods. Added wrappers for more API functions. BaseThreads
-       are no more descendants of ThreadReference.
-- NEW: Updated STM32L4xx headers to version 1.11.0.
+*** 18.2.1 ***
 - NEW: Added HAL support for STM32L443.
-- NEW: Added support for LDM303AGR 6 axis Accelerometer\Magnetometer MEMS.
-- NEW: Added support for LSM6DSL 6 axis Accelerometer\Gyroscope MEMS.
-- NEW: Added support for LPS22HB 2 axis Barometer\Thermometer MEMS.
-- NEW: Separated OSLIB from RT and NIL, now it is a separate "product" with
-       its own version, configuration file and licensing. The library will
-       grow to include more functionalities.
-       RT and NIL will contain only the core functionalities, everything else
-       is shared library code.
-- EX:  Updated HTS221 to 1.1.0 (backported to 18.2.1).
-- EX:  Updated L3GD20 to 1.1.0 (backported to 18.2.1).
-- EX:  Updated LIS3DSH to 1.1.0 (backported to 18.2.1).
-- EX:  Updated LIS3MDL to 1.1.0 (backported to 18.2.1).
-- EX:  Updated LIS302DL to 1.1.0 (backported to 18.2.1).
-- EX:  Updated LPS25H to 1.1.0 (backported to 18.2.1).
-- EX:  Updated LSM303DLHC to 1.1.0 (backported to 18.2.1).
-- HAL: Fixed invalid settings in STM32F769I-Discovery board files (bug #942)
-       (backported to 18.2.1 and 17.6.5).
-- OTH: Fixed short branch to _unhandled_exception in vectors.S (bug #941)
-       (backported to 18.2.1).
-- HAL: Fixed IOBus PAL functions missing the const qualifier (bug #940)
-       (backported to 18.2.1 and 17.6.5).
+- NEW: Improved some EX drivers and related test applications.
+- NEW: Improved VMT mechanisms to allow multiple interfaces.
+- NEW: Updated make mechanisms in demos/STM32, testhal/STM32 and testex/STM32:
+       now makefile are more shorter and inclusion are easier to do.
+- EX:  Updated HTS221 to 1.1.0.
+- EX:  Updated L3GD20 to 1.1.0.
+- EX:  Updated LIS3DSH to 1.1.0.
+- EX:  Updated LIS3MDL to 1.1.0.
+- EX:  Updated LIS302DL to 1.1.0.
+- EX:  Updated LPS25H to 1.1.0.
+- EX:  Updated LSM303DLHC to 1.1.0.
+- HAL: Fixed invalid settings in STM32F769I-Discovery board files (bug #942).
+- OTH: Fixed short branch to _unhandled_exception in vectors.S (bug #941).
+- HAL: Fixed IOBus PAL functions missing the const qualifier (bug #940).
 - HAL: Fixed STM32 USBv1 driver does not reset data toggling bits on endpoint
-       initialization (bug #939)(backported to 18.2.1 and 17.6.5).
-- HAL: Fixed incorrect behavior of USB driver on SET CONFIGURATION (bug #938)
-       (backported to 18.2.1 and 17.6.5).
+       initialization (bug #939).
+- HAL: Fixed incorrect behavior of USB driver on SET CONFIGURATION (bug #938).
 - HAL: Fixed macro expansion problem in SPI high level driver (bug #937)
-       (backported to 18.2.1).
-- HAL: Fixed missing CAN2 macros from STM32L4xx stm32_rcc.h file (bug #936)
-       (backported to 18.2.1).
-- OTH: Fixed inclusion order problem in STM32L4 cmparams.h file (bug #935)
-       (backported to 18.2.1 and 17.6.5).
-- HAL: Fixed problem clearing UIF timer flag in STM32 PWM driver (bug #934)
-       (backported to 18.2.1 and 17.6.5).
+- HAL: Fixed missing CAN2 macros from STM32L4xx stm32_rcc.h file (bug #936).
+- OTH: Fixed inclusion order problem in STM32L4 cmparams.h file (bug #935).
+- HAL: Fixed problem clearing UIF timer flag in STM32 PWM driver (bug #934).
 - HAL: Fixed USB Serial driver problem with zero-size OUT transactions
-       (bug #933)(backported to 18.2.1 and 17.6.5).
-- HAL: Fixed race condition in STM32 QSPI driver (bug #932)(backported to
-       18.2.1 and 17.6.5).
+       (bug #933).
+- HAL: Fixed race condition in STM32 QSPI driver (bug #932).
 - HAL: Fixed function mfsReadRecord() causes memory corruption because a
-       buffer overflow (bug #931)(backported to 18.2.1).
-- HAL: Fixed silence GCC 7.3.0 warning (bug #930)(backported to 18.2.1
-       and 17.6.5).
-- HAL: Fixed invalid SAI1 clock selection on STM32F7xx (bug #929)(backported
-       to 18.2.1 and 17.6.4).
+       buffer overflow (bug #931).
+- HAL: Fixed silence GCC 7.3.0 warning (bug #930).
+- HAL: Fixed invalid SAI1 clock selection on STM32F7xx (bug #929).
 - HAL: Fixed invalid clock checks for SDMMC1 and SDMMC2 on STM32F7xx
-       (bug #928)(backported to 18.2.1).
+       (bug #928).
 - HAL: Fixed useless writes in read-only CFGR_SWS field on all STM32Fxx
-       (bug #927)(backported to 18.2.1 and 17.6.4).
-- HAL: Fixed typo in hal_pal.h (bug #926)(backported to 18.2.1).
-- HAL: Fixed I2C address not accepted (bug #923)(backported to 18.2.1
-       and 17.6.4).
-- HAL: Fixed problem with HSI48 on STM32L4xx (bug #922)(backported to 18.2.1).
+       (bug #927).
+- HAL: Fixed typo in hal_pal.h (bug #926).
+- HAL: Fixed UART driver stop functions confusing returned value (bug #925).
+- HAL: Fixed USB driver not stopped (bug #924).
+- HAL: Fixed I2C address not accepted (bug #923).
+- HAL: Fixed problem with HSI48 on STM32L4xx (bug #922).
 - HAL: Fixed invalid implementation of palWaitPadTimeoutS() and
-       palWaitLineTimeoutS() APIs (bug #921)(backported to 18.2.1).
-- HAL: Fixed wrong DMA settings for STM32F76x I2C3 and I2C4 (bug #920)
-       (backported to 18.2.1 and 17.6.4).
-- HAL: Fixed wrong flash waiting state for STM32F7xx (bug #918)
-       (backported to 18.2.1 and 17.6.4).
+       palWaitLineTimeoutS() APIs (bug #921).
+- HAL: Fixed wrong DMA settings for STM32F76x I2C3 and I2C4 (bug #920).
+- HAL: Fixed wrong flash waiting state for STM32F7xx (bug #918).
+
+*** 18.2.0 ***
+- First 18.2.x release, see release note 18.2.0.
+

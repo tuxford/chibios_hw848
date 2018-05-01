@@ -39,7 +39,7 @@
 /**
  * @brief   Stable release flag.
  */
-#define CH_KERNEL_STABLE        0
+#define CH_KERNEL_STABLE        1
 
 /**
  * @name    ChibiOS/RT version identification
@@ -119,15 +119,19 @@ extern "C" {
 /* Optional subsystems headers.*/
 #include "chregistry.h"
 #include "chsem.h"
+#include "chbsem.h"
 #include "chmtx.h"
 #include "chcond.h"
 #include "chevents.h"
 #include "chmsg.h"
 
-/* OSLIB.*/
-#include "chlib.h"
-
-/* Headers dependent on the OSLIB.*/
+/* OSLIB headers.*/
+#include "chmboxes.h"
+#include "chmemcore.h"
+#include "chheap.h"
+#include "chmempools.h"
+#include "chfifo.h"
+#include "chfactory.h"
 #include "chdynamic.h"
 
 #endif /* CH_H */

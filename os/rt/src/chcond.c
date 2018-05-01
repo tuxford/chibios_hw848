@@ -204,14 +204,15 @@ msg_t chCondWait(condition_variable_t *cp) {
  */
 msg_t chCondWaitS(condition_variable_t *cp) {
   thread_t *ctp = currp;
-  mutex_t *mp = chMtxGetNextMutexX();
+  mutex_t *mp;
   msg_t msg;
 
   chDbgCheckClassS();
   chDbgCheck(cp != NULL);
-  chDbgAssert(mp != NULL, "not owning a mutex");
+  chDbgAssert(ctp->mtxlist != NULL, "not owning a mutex");
 
-  /* Releasing "current" mutex.*/
+  /* Getting "current" mutex and releasing it.*/
+  mp = chMtxGetNextMutexS();
   chMtxUnlockS(mp);
 
   /* Start waiting on the condition variable, on exit the mutex is taken
@@ -293,14 +294,15 @@ msg_t chCondWaitTimeout(condition_variable_t *cp, sysinterval_t timeout) {
  * @sclass
  */
 msg_t chCondWaitTimeoutS(condition_variable_t *cp, sysinterval_t timeout) {
-  mutex_t *mp = chMtxGetNextMutexX();
+  mutex_t *mp;
   msg_t msg;
 
   chDbgCheckClassS();
   chDbgCheck((cp != NULL) && (timeout != TIME_IMMEDIATE));
-  chDbgAssert(mp != NULL, "not owning a mutex");
+  chDbgAssert(currp->mtxlist != NULL, "not owning a mutex");
 
-  /* Releasing "current" mutex.*/
+  /* Getting "current" mutex and releasing it.*/
+  mp = chMtxGetNextMutexS();
   chMtxUnlockS(mp);
 
   /* Start waiting on the condition variable, on exit the mutex is taken
