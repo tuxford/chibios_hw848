@@ -28,7 +28,7 @@ ifeq ($(USE_LDOPT),)
   USE_LDOPT = 
 endif
 
-# Enable this if you want link time optimizations (LTO).
+# Enable this if you want link time optimizations (LTO)
 ifeq ($(USE_LTO),)
   USE_LTO = no
 endif
@@ -65,12 +65,6 @@ PROJECT = ch
 
 # Imported source files and paths
 CHIBIOS = ../../..
-CONFDIR  := ./cfg
-BUILDDIR := ./build
-DEPDIR   := ./.dep
-
-# Licensing files.
-include $(CHIBIOS)/os/license/license.mk
 # Startup files.
 # HAL-OSAL files (optional).
 include $(CHIBIOS)/os/hal/hal.mk
@@ -88,18 +82,29 @@ include $(CHIBIOS)/test/oslib/oslib_test.mk
 #include $(CHIBIOS)/os/various/shell/shell.mk
 
 # C sources here.
-CSRC = $(ALLCSRC) \
+CSRC = $(STARTUPSRC) \
+       $(KERNSRC) \
+       $(PORTSRC) \
+       $(OSALSRC) \
+       $(HALSRC) \
+       $(PLATFORMSRC) \
+       $(BOARDSRC) \
        $(TESTSRC) \
+       $(STREAMSSRC) \
+       $(SHELLSRC) \
        main.c
 
 # C++ sources here.
-CPPSRC = $(ALLCPPSRC)
+CPPSRC =
 
-# List ASM source files here.
-ASMSRC = $(ALLASMSRC)
-ASMXSRC = $(ALLXASMSRC)
+# List ASM source files here
+ASMSRC =
+ASMXSRC = $(STARTUPASM) $(PORTASM) $(OSALASM)
 
-INCDIR = $(CONFDIR) $(ALLINC) $(TESTINC)
+INCDIR = $(CHIBIOS)/os/license \
+         $(STARTUPINC) $(KERNINC) $(PORTINC) $(OSALINC) \
+         $(HALINC) $(PLATFORMINC) $(BOARDINC) $(TESTINC) \
+         $(STREAMSINC) $(SHELLINC)
 
 # GCOV files.
 GCOVSRC = $(KERNSRC)
@@ -109,32 +114,10 @@ GCOVSRC = $(KERNSRC)
 ##############################################################################
 
 ##############################################################################
-# Start of user section
-#
-
-# List all user C define here, like -D_DEBUG=1
-UDEFS = -DSIMULATOR
-
-# Define ASM defines here
-UADEFS =
-
-# List all user directories here
-UINCDIR =
-
-# List the user directory to look for the libraries here
-ULIBDIR =
-
-# List all user libraries here
-ULIBS =
-
-#
-# End of user defines
-##############################################################################
-
-##############################################################################
 # Compiler settings
 #
 
+#TRGT = powerpc-eabi-
 TRGT = 
 CC   = $(TRGT)gcc
 CPPC = $(TRGT)g++
@@ -148,7 +131,6 @@ AS   = $(TRGT)gcc -x assembler-with-cpp
 AR   = $(TRGT)ar
 OD   = $(TRGT)objdump
 SZ   = $(TRGT)size
-HEX  = $(CP) -O ihex
 BIN  = $(CP) -O binary
 COV  = gcov
 
@@ -160,6 +142,29 @@ CPPWARN = -Wall -Wextra -Wundef
 
 #
 # Compiler settings
+##############################################################################
+
+##############################################################################
+# Start of user section
+#
+
+# List all user C define here, like -D_DEBUG=1
+UDEFS = -DSIMULATOR $(XDEFS)
+
+# Define ASM defines here
+UADEFS =
+
+# List all user directories here
+UINCDIR =
+
+# List the user directory to look for the libraries here
+ULIBDIR =
+
+# List all user libraries here
+ULIBS = -lgcov
+
+#
+# End of user defines
 ##############################################################################
 
 RULESPATH = $(CHIBIOS)/os/common/startup/SIMIA32/compilers/GCC

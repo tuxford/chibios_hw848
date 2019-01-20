@@ -11,15 +11,11 @@ PLATFORMINC := $(CHIBIOS)/os/hal/ports/common/ARMCMx \
 ifeq ($(USE_SMART_BUILD),yes)
 
 # Configuration files directory
-ifeq ($(HALCONFDIR),)
-  ifeq ($(CONFDIR),)
-    HALCONFDIR = .
-  else
-    HALCONFDIR := $(CONFDIR)
-  endif
+ifeq ($(CONFDIR),)
+  CONFDIR = .
 endif
 
-HALCONF := $(strip $(shell cat $(HALCONFDIR)/halconf.h | egrep -e "\#define"))
+HALCONF := $(strip $(shell cat $(CONFDIR)/halconf.h | egrep -e "\#define"))
 
 else
 endif

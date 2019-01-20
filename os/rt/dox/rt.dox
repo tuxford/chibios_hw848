@@ -150,3 +150,9 @@
  * @defgroup statistics Statistics
  * @ingroup debug
  */
+
+/**
+ * @defgroup core Port Layer
+ * @ingroup kernel
+ */
+ 

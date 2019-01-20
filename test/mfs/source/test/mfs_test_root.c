@@ -61,7 +61,7 @@ const testsuite_t mfs_test_suite = {
 /* Shared code.                                                              */
 /*===========================================================================*/
 
-#include "hal_mfs.h"
+#include "mfs.h"
 
 MFSDriver mfs1;
 uint8_t mfs_buffer[512];

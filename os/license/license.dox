@@ -22,16 +22,16 @@
  */
 
 /**
- * @defgroup chibios_version Release Information
+ * @defgroup version Release Information
  * @ingroup licensing
  */
 
 /**
- * @defgroup chibios_customer Customer Information
+ * @defgroup customer Customer Information
  * @ingroup licensing
  */
 
 /**
- * @defgroup chibios_license License Settings
+ * @defgroup license License Settings
  * @ingroup licensing
  */

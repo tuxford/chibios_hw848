@@ -84,34 +84,37 @@ PROJECT = ch
 
 # Imported source files and paths
 CHIBIOS = ../../..
-
-# Licensing files.
-include $(CHIBIOS)/os/license/license.mk
-
 # HAL-OSAL files (optional).
 include $(CHIBIOS)/os/hal/hal.mk
 include $(CHIBIOS)/os/hal/boards/PJRC_TEENSY_2PLUSPLUS/board.mk
 include $(CHIBIOS)/os/hal/ports/AVR/MEGA/ATMEGAxx/platform.mk
 include $(CHIBIOS)/os/hal/osal/rt/osal.mk
-
 # RTOS files (optional).
 include $(CHIBIOS)/os/rt/rt.mk
 include $(CHIBIOS)/os/common/ports/AVR/compilers/GCC/mk/port.mk
-
 # Other files (optional).
 include $(CHIBIOS)/os/hal/lib/streams/streams.mk
 include $(CHIBIOS)/os/various/shell/shell.mk
 
 # List C source files here. (C dependencies are automatically generated.)
-CSRC =  $(ALLCSRC)  \
-        usbcfg.c    \
+CSRC =  $(KERNSRC)                      \
+        $(PORTSRC)                      \
+        $(OSALSRC)                      \
+        $(HALSRC)                       \
+        $(PLATFORMSRC)                  \
+        $(BOARDSRC)                     \
+        $(CHIBIOS)/os/various/evtimer.c \
+        $(STREAMSSRC)   \
+        $(SHELLSRC)                     \
+        usbcfg.c                        \
         main.c
 
 # List C++ sources file here.
-CPPSRC = $(ALLCPPSRC)
+CPPSRC =
 
-# Header files here.
-INCDIR =  $(ALLINC)
+INCDIR =  $(CHIBIOS)/os/license $(PORTINC) $(KERNINC)                   \
+          $(HALINC) $(OSALINC) $(PLATFORMINC) $(STREAMSINC)             \
+          $(BOARDINC) $(CHIBIOS)/os/various $(CHIBIOS)/os/various/shell \
 
 #
 # Project, sources and paths.

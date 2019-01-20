@@ -11,15 +11,11 @@ PLATFORMINC := $(CHIBIOS)/os/hal/ports/common/ARMCMx \
 ifeq ($(USE_SMART_BUILD),yes)
 
 # Configuration files directory
-ifeq ($(HALCONFDIR),)
-  ifeq ($(CONFDIR),)
-    HALCONFDIR = .
-  else
-    HALCONFDIR := $(CONFDIR)
-  endif
+ifeq ($(CONFDIR),)
+  CONFDIR = .
 endif
 
-HALCONF := $(strip $(shell cat $(HALCONFDIR)/halconf.h | egrep -e "\#define"))
+HALCONF := $(strip $(shell cat $(CONFDIR)/halconf.h | egrep -e "\#define"))
 
 else
 endif
@@ -27,7 +23,6 @@ endif
 # Drivers compatible with the platform.
 include $(CHIBIOS)/os/hal/ports/STM32/LLD/ADCv2/driver.mk
 include $(CHIBIOS)/os/hal/ports/STM32/LLD/CANv1/driver.mk
-include $(CHIBIOS)/os/hal/ports/STM32/LLD/CRYPv1/driver.mk
 include $(CHIBIOS)/os/hal/ports/STM32/LLD/DACv1/driver.mk
 include $(CHIBIOS)/os/hal/ports/STM32/LLD/DMAv2/driver.mk
 include $(CHIBIOS)/os/hal/ports/STM32/LLD/EXTIv1/driver.mk

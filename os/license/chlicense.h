@@ -21,9 +21,7 @@
  * @file    chlicense.h
  * @brief   License Module macros and structures.
  *
- * @addtogroup chibios_license
- * @details This module contains all the definitions required for defining
- *          a licensing scheme for customers or public releases.
+ * @addtogroup license
  * @{
  */
 

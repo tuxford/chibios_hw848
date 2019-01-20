@@ -346,9 +346,8 @@ void sdc_lld_init(void) {
 
   sdcObjectInit(&SDCD1);
   SDCD1.thread = NULL;
-  SDCD1.dma    = NULL;
+  SDCD1.dma    = STM32_DMA_STREAM(STM32_SDC_SDIO_DMA_STREAM);
   SDCD1.sdio   = SDIO;
-  nvicEnableVector(STM32_SDIO_NUMBER, STM32_SDC_SDIO_IRQ_PRIORITY);
 }
 
 /**
@@ -378,16 +377,15 @@ void sdc_lld_start(SDCDriver *sdcp) {
 #endif
 
   if (sdcp->state == BLK_STOP) {
-    sdcp->dma = dmaStreamAllocI(STM32_SDC_SDIO_DMA_STREAM,
-                                STM32_SDC_SDIO_IRQ_PRIORITY,
-                                NULL,
-                                NULL);
-    osalDbgAssert(sdcp->dma != NULL, "unable to allocate stream");
-
+    /* Note, the DMA must be enabled before the IRQs.*/
+    bool b;
+    b = dmaStreamAllocate(sdcp->dma, STM32_SDC_SDIO_IRQ_PRIORITY, NULL, NULL);
+    osalDbgAssert(!b, "stream already allocated");
     dmaStreamSetPeripheral(sdcp->dma, &sdcp->sdio->FIFO);
 #if (defined(STM32F4XX) || defined(STM32F2XX))
     dmaStreamSetFIFO(sdcp->dma, STM32_DMA_FCR_DMDIS | STM32_DMA_FCR_FTH_FULL);
 #endif
+    nvicEnableVector(STM32_SDIO_NUMBER, STM32_SDC_SDIO_IRQ_PRIORITY);
     rccEnableSDIO(true);
   }
 
@@ -415,11 +413,9 @@ void sdc_lld_stop(SDCDriver *sdcp) {
     sdcp->sdio->DCTRL  = 0;
     sdcp->sdio->DTIMER = 0;
 
-    /* DMA stream released.*/
-    dmaStreamFreeI(sdcp->dma);
-    sdcp->dma = NULL;
-
     /* Clock deactivation.*/
+    nvicDisableVector(STM32_SDIO_NUMBER);
+    dmaStreamRelease(sdcp->dma);
     rccDisableSDIO();
   }
 }
@@ -451,8 +447,7 @@ void sdc_lld_start_clk(SDCDriver *sdcp) {
  * @notapi
  */
 void sdc_lld_set_data_clk(SDCDriver *sdcp, sdcbusclk_t clk) {
-
-#if STM32_SDC_SDIO_50MHZ
+#if 0
   if (SDC_CLK_50MHz == clk) {
     sdcp->sdio->CLKCR = (sdcp->sdio->CLKCR & 0xFFFFFF00U) | STM32_SDIO_DIV_HS
                                                           | SDIO_CLKCR_BYPASS;

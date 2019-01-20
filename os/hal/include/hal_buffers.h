@@ -33,23 +33,9 @@
 /* Driver pre-compile time settings.                                         */
 /*===========================================================================*/
 
-/**
- * @brief   Maximum size of blocks copied in critical sections.
- * @note    Increasing this value increases performance at expense of
- *          IRQ servicing efficiency.
- * @note    It must be a power of two.
- */
-#if !defined(BUFFERS_CHUNKS_SIZE) || defined(__DOXYGEN__)
-#define BUFFERS_CHUNKS_SIZE                 64
-#endif
-
 /*===========================================================================*/
 /* Derived constants and error checks.                                       */
 /*===========================================================================*/
-
-#if (BUFFERS_CHUNKS_SIZE & (BUFFERS_CHUNKS_SIZE - 1)) != 0
-#error "BUFFERS_CHUNKS_SIZE must be a power of two"
-#endif
 
 /*===========================================================================*/
 /* Driver data structures and types.                                         */
@@ -187,16 +173,6 @@ typedef io_buffers_queue_t output_buffers_queue_t;
  * @special
  */
 #define bqGetLinkX(bqp) ((bqp)->link)
-
-/**
- * @brief   Sets the queue application-defined link.
- *
- * @param[in] bqp       pointer to an @p io_buffers_queue_t structure
- * @param[in] lk        The application-defined link.
- *
- * @special
- */
-#define bqSetLinkX(bqp, lk) ((bqp)->link = lk)
 
 /**
  * @brief   Return the suspended state of the queue.

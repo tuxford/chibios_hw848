@@ -13,11 +13,10 @@
     See the License for the specific language governing permissions and
     limitations under the License.
 */
-
 SECTIONS
 {
     /* Special section for exceptions stack.*/
-    .mstack (NOLOAD) :
+    .mstack :
     {
         . = ALIGN(8);
         __main_stack_base__ = .;
@@ -27,9 +26,8 @@ SECTIONS
     } > MAIN_STACK_RAM
 
     /* Special section for process stack.*/
-    .pstack (NOLOAD) :
+    .pstack :
     {
-        . = ALIGN(8);
         __process_stack_base__ = .;
         __main_thread_stack_base__ = .;
         . += __process_stack_size__;

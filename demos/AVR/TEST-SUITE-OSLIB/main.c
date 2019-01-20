@@ -62,7 +62,7 @@ int main(void) {
    */
   test_execute((BaseSequentialStream *)&SD1, &oslib_test_suite);
 
-  while (true) {
+  while (TRUE) {
     chThdSleepMilliseconds(1000);
   }
 }

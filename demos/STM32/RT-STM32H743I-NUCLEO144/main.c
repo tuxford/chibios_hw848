@@ -29,9 +29,9 @@ static THD_FUNCTION(Thread1, arg) {
   (void)arg;
   chRegSetThreadName("blinker");
   while (true) {
-    palSetLine(LINE_LED1);
+    palSetLine(LINE_ZIO_D33);
     chThdSleepMilliseconds(500);
-    palClearLine(LINE_LED1);
+    palClearLine(LINE_ZIO_D33);
     chThdSleepMilliseconds(500);
   }
 }

@@ -58,7 +58,7 @@ int main(void) {
 
   chnWrite(&SD1, (const uint8_t *)"Hello World!\r\n", 14);
 
-  while (true) {
+  while (TRUE) {
     chThdSleepMilliseconds(1000);
   }
 }

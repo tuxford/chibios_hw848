@@ -101,6 +101,9 @@ void halInit(void) {
 #if (HAL_USE_PWM == TRUE) || defined(__DOXYGEN__)
   pwmInit();
 #endif
+#if (HAL_USE_QSPI == TRUE) || defined(__DOXYGEN__)
+  qspiInit();
+#endif
 #if (HAL_USE_SERIAL == TRUE) || defined(__DOXYGEN__)
   sdInit();
 #endif
@@ -109,9 +112,6 @@ void halInit(void) {
 #endif
 #if (HAL_USE_SPI == TRUE) || defined(__DOXYGEN__)
   spiInit();
-#endif
-#if (HAL_USE_TRNG == TRUE) || defined(__DOXYGEN__)
-  trngInit();
 #endif
 #if (HAL_USE_UART == TRUE) || defined(__DOXYGEN__)
   uartInit();
@@ -130,9 +130,6 @@ void halInit(void) {
 #endif
 #if (HAL_USE_WDG == TRUE) || defined(__DOXYGEN__)
   wdgInit();
-#endif
-#if (HAL_USE_WSPI == TRUE) || defined(__DOXYGEN__)
-  wspiInit();
 #endif
 
   /* Community driver overlay initialization.*/

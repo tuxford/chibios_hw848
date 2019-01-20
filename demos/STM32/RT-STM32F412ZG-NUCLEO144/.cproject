@@ -37,7 +37,7 @@
 		</cconfiguration>
 	</storageModule>
 	<storageModule moduleId="cdtBuildSystem" version="4.0.0">
-		<project id="RT-STM32F413ZH-NUCLEO144Y.null.1703860681" name="ARMCM4-STM32F407-DISCOVERY-ALT"/>
+		<project id="RT-STM32F429-DISCOVERY.null.1703860681" name="ARMCM4-STM32F407-DISCOVERY-ALT"/>
 	</storageModule>
 	<storageModule moduleId="scannerConfiguration">
 		<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
@@ -48,7 +48,7 @@
 	<storageModule moduleId="org.eclipse.cdt.core.LanguageSettingsProviders"/>
 	<storageModule moduleId="refreshScope" versionNumber="2">
 		<configuration configurationName="Default">
-			<resource resourceType="PROJECT" workspacePath="/RT-STM32F413ZH-NUCLEO144Y"/>
+			<resource resourceType="PROJECT" workspacePath="/RT-STM32F429-DISCOVERY"/>
 		</configuration>
 	</storageModule>
 	<storageModule moduleId="org.eclipse.cdt.internal.ui.text.commentOwnerProjectMappings"/>

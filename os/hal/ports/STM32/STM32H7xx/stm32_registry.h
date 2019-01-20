@@ -63,8 +63,8 @@
 #define STM32_HAS_CAN3                      FALSE
 
 /* DAC attributes.*/
-#define STM32_HAS_DAC1_CH1                  TRUE
-#define STM32_HAS_DAC1_CH2                  TRUE
+#define STM32_HAS_DAC1_CH1                  FALSE
+#define STM32_HAS_DAC1_CH2                  FALSE
 #define STM32_HAS_DAC2_CH1                  FALSE
 #define STM32_HAS_DAC2_CH2                  FALSE
 
@@ -89,7 +89,6 @@
 
 /* DMA attributes.*/
 #define STM32_ADVANCED_DMA                  TRUE
-#define STM32_DMA_SUPPORTS_DMAMUX           TRUE
 
 #define STM32_HAS_DMA1                      TRUE
 #define STM32_DMA1_CH0_HANDLER              Vector6C
@@ -133,9 +132,7 @@
 #define STM32_ETH_NUMBER                    61
 
 /* EXTI attributes.*/
-#define STM32_EXTI_NUM_LINES                34
-#define STM32_EXTI_IMR1_MASK                0x1F800000U
-#define STM32_EXTI_IMR2_MASK                0xFFFFFFFCU
+#define STM32_EXTI_ENHANCED
 
 /* GPIO attributes.*/
 #define STM32_HAS_GPIOA                     TRUE

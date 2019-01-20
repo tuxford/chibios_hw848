@@ -18,7 +18,7 @@
 */
 
 /**
- * @file    nil/include/ch.h
+ * @file    ch.h
  * @brief   Nil RTOS main header file.
  * @details This header includes all the required kernel headers so it is the
  *          only header you usually need to include in your application.
@@ -46,7 +46,7 @@
 /**
  * @brief   Stable release flag.
  */
-#define CH_KERNEL_STABLE        0
+#define CH_KERNEL_STABLE        1
 
 /**
  * @name    ChibiOS/NIL version identification
@@ -71,26 +71,6 @@
  * @brief   Kernel version patch number.
  */
 #define CH_KERNEL_PATCH         0
-/** @} */
-
-/**
- * @name    Constants for configuration options
- */
-/**
- * @brief   Generic 'false' preprocessor boolean constant.
- * @note    It is meant to be used in configuration files as switch.
- */
-#if !defined(FALSE) || defined(__DOXYGEN__)
-#define FALSE                   0
-#endif
-
-/**
- * @brief   Generic 'true' preprocessor boolean constant.
- * @note    It is meant to be used in configuration files as switch.
- */
-#if !defined(TRUE) || defined(__DOXYGEN__)
-#define TRUE                    1
-#endif
 /** @} */
 
 /**
@@ -143,11 +123,11 @@
 #define NIL_STATE_SUSP          (tstate_t)2 /**< @brief Thread suspended.   */
 #define NIL_STATE_WTQUEUE       (tstate_t)3 /**< @brief On queue or semaph. */
 #define NIL_STATE_WTOREVT       (tstate_t)4 /**< @brief Waiting for events. */
-#define NIL_THD_IS_READY(tp)    ((tp)->state == NIL_STATE_READY)
-#define NIL_THD_IS_SLEEPING(tp) ((tp)->state == NIL_STATE_SLEEPING)
-#define NIL_THD_IS_SUSP(tp)     ((tp)->state == NIL_STATE_SUSP)
-#define NIL_THD_IS_WTQUEUE(tp)  ((tp)->state == NIL_STATE_WTQUEUE)
-#define NIL_THD_IS_WTOREVT(tp)  ((tp)->state == NIL_STATE_WTOREVT)
+#define NIL_THD_IS_READY(tr)    ((tr)->state == NIL_STATE_READY)
+#define NIL_THD_IS_SLEEPING(tr) ((tr)->state == NIL_STATE_SLEEPING)
+#define NIL_THD_IS_SUSP(tr)     ((tr)->state == NIL_STATE_SUSP)
+#define NIL_THD_IS_WTQUEUE(tr)  ((tr)->state == NIL_STATE_WTQUEUE)
+#define NIL_THD_IS_WTOREVT(tr)  ((tr)->state == NIL_STATE_WTOREVT)
 /** @} */
 
 /**
@@ -404,7 +384,7 @@
  * @brief   Threads initialization hook.
  */
 #if !defined(CH_CFG_THREAD_EXT_INIT_HOOK) || defined(__DOXYGEN__)
-#define CH_CFG_THREAD_EXT_INIT_HOOK(tp) {}
+#define CH_CFG_THREAD_EXT_INIT_HOOK(tr) {}
 #endif
 
 /*-*
@@ -438,11 +418,6 @@
 /* Derived constants and error checks.                                       */
 /*===========================================================================*/
 
-/* License checks.*/
-#if !defined(CH_CUSTOMER_LIC_NIL) || !defined(CH_LICENSE_FEATURES)
-#error "malformed chlicense.h"
-#endif
-
 #if CH_CUSTOMER_LIC_NIL == FALSE
 #error "ChibiOS/NIL not licensed"
 #endif
@@ -463,6 +438,11 @@
 #define CH_CFG_ST_FREQUENCY                 1000
 #endif
 
+/* Restricted subsystems.*/
+#undef CH_CFG_USE_MAILBOXES
+
+#define CH_CFG_USE_MAILBOXES                FALSE
+
 #endif /* (CH_LICENSE_FEATURES == CH_FEATURES_INTERMEDIATE) ||
           (CH_LICENSE_FEATURES == CH_FEATURES_BASIC) */
 
@@ -472,6 +452,15 @@
 /* Tick-Less mode restricted.*/
 #undef CH_CFG_ST_TIMEDELTA
 #define CH_CFG_ST_TIMEDELTA                 0
+
+/* Restricted subsystems.*/
+#undef CH_CFG_USE_MEMCORE
+#undef CH_CFG_USE_MEMPOOLS
+#undef CH_CFG_USE_HEAP
+
+#define CH_CFG_USE_MEMCORE                  FALSE
+#define CH_CFG_USE_MEMPOOLS                 FALSE
+#define CH_CFG_USE_HEAP                     FALSE
 
 #endif /* CH_LICENSE_FEATURES == CH_FEATURES_BASIC */
 
@@ -1568,8 +1557,13 @@ extern "C" {
 }
 #endif
 
-/* OSLIB.*/
-#include "chlib.h"
+/* Optional subsystems.*/
+#include "chmboxes.h"
+#include "chmemcore.h"
+#include "chheap.h"
+#include "chmempools.h"
+#include "chfifo.h"
+#include "chfactory.h"
 
 #endif /* CH_H */
 

@@ -22,7 +22,6 @@
  * @brief   Memory alignment macros and structures.
  *
  * @addtogroup mem
- * @details Memory Alignment services.
  * @{
  */
 

@@ -1,5 +1,5 @@
 /*
-    ChibiOS - Copyright (C) 2006..2018 Giovanni Di Sirio
+    ChibiOS - Copyright (C) 2006..2017 Giovanni Di Sirio
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
@@ -159,15 +159,6 @@
 #define CH_CFG_USE_OBJ_FIFOS                TRUE
 
 /**
- * @brief   Pipes APIs.
- * @details If enabled then the pipes APIs are included
- *          in the kernel.
- *
- * @note    The default is @p TRUE.
- */
-#define CH_CFG_USE_PIPES                    TRUE
-
-/**
  * @brief   Managed RAM size.
  * @details Size of the RAM area to be managed by the OS. If set to zero
  *          then the whole available RAM is used. The core memory is made
@@ -229,11 +220,6 @@
  * @brief   Enables factory for objects FIFOs.
  */
 #define CH_CFG_FACTORY_OBJ_FIFOS            TRUE
-
-/**
- * @brief   Enables factory for Pipes.
- */
-#define CH_CFG_FACTORY_PIPES                TRUE
 
 /** @} */
 

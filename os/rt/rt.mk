@@ -3,15 +3,11 @@
 ifeq ($(USE_SMART_BUILD),yes)
 
 # Configuration files directory
-ifeq ($(CHCONFDIR),)
-  ifeq ($(CONFDIR),)
-    CHCONFDIR = .
-  else
-    CHCONFDIR := $(CONFDIR)
-  endif
+ifeq ($(CONFDIR),)
+  CONFDIR = .
 endif
 
-CHCONF := $(strip $(shell cat $(CHCONFDIR)/chconf.h | egrep -e "\#define"))
+CHCONF := $(strip $(shell cat $(CONFDIR)/chconf.h | egrep -e "\#define"))
 
 KERNSRC := $(CHIBIOS)/os/rt/src/chsys.c \
            $(CHIBIOS)/os/rt/src/chdebug.c \
@@ -46,6 +42,21 @@ endif
 ifneq ($(findstring CH_CFG_USE_DYNAMIC TRUE,$(CHCONF)),)
 KERNSRC += $(CHIBIOS)/os/rt/src/chdynamic.c
 endif
+ifneq ($(findstring CH_CFG_USE_MAILBOXES TRUE,$(CHCONF)),)
+KERNSRC += $(CHIBIOS)/os/common/oslib/src/chmboxes.c
+endif
+ifneq ($(findstring CH_CFG_USE_MEMCORE TRUE,$(CHCONF)),)
+KERNSRC += $(CHIBIOS)/os/common/oslib/src/chmemcore.c
+endif
+ifneq ($(findstring CH_CFG_USE_HEAP TRUE,$(CHCONF)),)
+KERNSRC += $(CHIBIOS)/os/common/oslib/src/chheap.c
+endif
+ifneq ($(findstring CH_CFG_USE_MEMPOOLS TRUE,$(CHCONF)),)
+KERNSRC += $(CHIBIOS)/os/common/oslib/src/chmempools.c
+endif
+ifneq ($(findstring CH_CFG_USE_FACTORY TRUE,$(CHCONF)),)
+KERNSRC += $(CHIBIOS)/os/common/oslib/src/chfactory.c
+endif
 else
 KERNSRC := $(CHIBIOS)/os/rt/src/chsys.c \
            $(CHIBIOS)/os/rt/src/chdebug.c \
@@ -61,15 +72,18 @@ KERNSRC := $(CHIBIOS)/os/rt/src/chsys.c \
            $(CHIBIOS)/os/rt/src/chcond.c \
            $(CHIBIOS)/os/rt/src/chevents.c \
            $(CHIBIOS)/os/rt/src/chmsg.c \
-           $(CHIBIOS)/os/rt/src/chdynamic.c
+           $(CHIBIOS)/os/rt/src/chdynamic.c \
+           $(CHIBIOS)/os/common/oslib/src/chmboxes.c \
+           $(CHIBIOS)/os/common/oslib/src/chmemcore.c \
+           $(CHIBIOS)/os/common/oslib/src/chheap.c \
+           $(CHIBIOS)/os/common/oslib/src/chmempools.c \
+           $(CHIBIOS)/os/common/oslib/src/chfactory.c
 endif
 
 # Required include directories
-KERNINC := $(CHIBIOS)/os/rt/include
+KERNINC := $(CHIBIOS)/os/rt/include \
+           $(CHIBIOS)/os/common/oslib/include
 
 # Shared variables
 ALLCSRC += $(KERNSRC)
 ALLINC  += $(KERNINC)
-
-# OS Library
-include $(CHIBIOS)/os/lib/lib.mk

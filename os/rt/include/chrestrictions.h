@@ -20,11 +20,6 @@
 /**
  * @file    chrestrictions.h
  * @brief   Licensing restrictions header.
- *
- * @addtogroup rt_restrictions
- * @details This module is responsible for applying license-related
- *          restrictions to the configuration options.
- * @{
  */
 
 #ifndef CHRESTRICTIONS_H
@@ -41,11 +36,6 @@
 /*===========================================================================*/
 /* Derived constants and error checks.                                       */
 /*===========================================================================*/
-
-/* License checks.*/
-#if !defined(CH_CUSTOMER_LIC_RT) || !defined(CH_LICENSE_FEATURES)
-#error "malformed chlicense.h"
-#endif
 
 #if CH_CUSTOMER_LIC_RT == FALSE
 #error "ChibiOS/RT not licensed"
@@ -114,5 +104,3 @@
 /*===========================================================================*/
 
 #endif /* CHRESTRICTIONS_H */
-
-/** @} */

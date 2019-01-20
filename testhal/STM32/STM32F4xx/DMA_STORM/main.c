@@ -38,9 +38,11 @@ static virtual_timer_t adcvt;
 
 static adcsample_t samples2[ADC_GRP2_NUM_CHANNELS * ADC_GRP2_BUF_DEPTH];
 
-static void adccallback(ADCDriver *adcp) {
+static void adccallback(ADCDriver *adcp, adcsample_t *buffer, size_t n) {
 
   (void)adcp;
+  (void)buffer;
+  (void)n;
 
   chSysLockFromISR();
   chVTSetI(&adcvt, TIME_MS2I(10), tmo, (void *)"ADC timeout");
@@ -60,7 +62,7 @@ static void adcerrorcallback(ADCDriver *adcp, adcerror_t err) {
  * Channels:    IN11, IN12, IN11, IN12, IN11, IN12, Sensor, VRef.
  */
 static const ADCConversionGroup adcgrpcfg2 = {
-  true,
+  TRUE,
   ADC_GRP2_NUM_CHANNELS,
   adccallback,
   adcerrorcallback,
@@ -187,9 +189,9 @@ int main(void) {
   chThdCreateStatic(waSPI3, sizeof(waSPI3), NORMALPRIO + 1, spi_thread, &SPID3);
 
   /* Allocating two DMA2 streams for memory copy operations.*/
-  if (dmaStreamAlloc(STM32_DMA_STREAM_ID(2, 6), 0, NULL, NULL) == NULL)
+  if (dmaStreamAllocate(STM32_DMA2_STREAM6, 0, NULL, NULL))
     chSysHalt("DMA already in use");
-  if (dmaStreamAlloc(STM32_DMA_STREAM_ID(2, 7), 0, NULL, NULL) == NULL)
+  if (dmaStreamAllocate(STM32_DMA2_STREAM7, 0, NULL, NULL))
     chSysHalt("DMA already in use");
   for (i = 0; i < sizeof (patterns1); i++)
     patterns1[i] = (uint8_t)i;

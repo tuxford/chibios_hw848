@@ -42,12 +42,14 @@
 #include "ref_aes.h"
 static const CRYConfig config_Polling = {
     TRANSFER_POLLING,
-    AES_CFBS_128       //cfbs
+    AES_CFBS_128,       //cfbs
+    0
 };
 
 static const CRYConfig config_DMA = {
     TRANSFER_DMA,
-    AES_CFBS_128       //cfbs
+    AES_CFBS_128,       //cfbs
+    0
 };
 
 

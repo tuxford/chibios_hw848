@@ -126,39 +126,53 @@ void cryStop(CRYDriver *cryp) {
 }
 
 /**
- * @brief   Initializes the AES transient key.
- * @note    It is the underlying implementation to decide which key sizes are
- *          allowable.
+ * @brief   Initializes the transient key for a specific algorithm.
+ * @note    It is the underlying implementation to decide which combinations
+ *          of algorithm and key size are allowable.
  *
  * @param[in] cryp              pointer to the @p CRYDriver object
+ * @param[in] algorithm         the algorithm identifier
  * @param[in] size              key size in bytes
  * @param[in] keyp              pointer to the key data
  * @return                      The operation status.
  * @retval CRY_NOERROR          if the operation succeeded.
- * @retval CRY_ERR_INV_ALGO     if the algorithm is unsupported.
+ * @retval CRY_ERR_INV_ALGO     if the specified algorithm is unknown or
+ *                              unsupported.
  * @retval CRY_ERR_INV_KEY_SIZE if the specified key size is invalid for
  *                              the specified algorithm.
  *
  * @api
  */
-cryerror_t cryLoadAESTransientKey(CRYDriver *cryp,
-                                  size_t size,
-                                  const uint8_t *keyp) {
+cryerror_t cryLoadTransientKey(CRYDriver *cryp,
+                               cryalgorithm_t algorithm,
+                               size_t size,
+                               const uint8_t *keyp) {
+  cryerror_t err;
 
-  osalDbgCheck((cryp != NULL) &&  (keyp != NULL));
+  osalDbgCheck((cryp != NULL) && (size <= HAL_CRY_MAX_KEY_SIZE) &&
+               (keyp != NULL));
 
 
-#if CRY_LLD_SUPPORTS_AES == TRUE
-  return cry_lld_aes_loadkey(cryp, size, keyp);
-#elif HAL_CRY_USE_FALLBACK == TRUE
-  return cry_fallback_aes_loadkey(cryp, size, keyp);
+#if HAL_CRY_ENFORCE_FALLBACK == FALSE
+  /* Key setup in the low level driver.*/
+  err = cry_lld_loadkey(cryp, algorithm, size, keyp);
 #else
-  (void)cryp;
-  (void)size;
-  (void)keyp;
-
-  return CRY_ERR_INV_ALGO;
+  err = CRY_ERR_INV_ALGO;
 #endif
+
+#if HAL_CRY_USE_FALLBACK == TRUE
+  if (err == CRY_ERR_INV_ALGO) {
+    err = cry_fallback_loadkey(cryp, algorithm, size, keyp);
+  }
+#endif
+
+  if (err == CRY_NOERROR) {
+    /* Storing the transient key info.*/
+    cryp->key0_type = algorithm;
+    cryp->key0_size = size;
+  }
+
+  return err;
 }
 
 /**
@@ -179,8 +193,6 @@ cryerror_t cryLoadAESTransientKey(CRYDriver *cryp,
  * @retval CRY_ERR_INV_KEY_TYPE the selected key is invalid for this operation.
  * @retval CRY_ERR_INV_KEY_ID   if the specified key identifier is invalid
  *                              or refers to an empty key slot.
- * @retval CRY_ERR_OP_FAILURE   if the operation failed, implementation
- *                              dependent.
  *
  * @special
  */
@@ -225,8 +237,6 @@ cryerror_t cryEncryptAES(CRYDriver *cryp,
  * @retval CRY_ERR_INV_KEY_TYPE the selected key is invalid for this operation.
  * @retval CRY_ERR_INV_KEY_ID   if the specified key identifier is invalid
  *                              or refers to an empty key slot.
- * @retval CRY_ERR_OP_FAILURE   if the operation failed, implementation
- *                              dependent.
  *
  * @special
  */
@@ -274,8 +284,6 @@ cryerror_t cryDecryptAES(CRYDriver *cryp,
  * @retval CRY_ERR_INV_KEY_TYPE the selected key is invalid for this operation.
  * @retval CRY_ERR_INV_KEY_ID   if the specified key identifier is invalid
  *                              or refers to an empty key slot.
- * @retval CRY_ERR_OP_FAILURE   if the operation failed, implementation
- *                              dependent.
  *
  * @api
  */
@@ -326,8 +334,6 @@ cryerror_t cryEncryptAES_ECB(CRYDriver *cryp,
  * @retval CRY_ERR_INV_KEY_TYPE the selected key is invalid for this operation.
  * @retval CRY_ERR_INV_KEY_ID   if the specified key identifier is invalid
  *                              or refers to an empty key slot.
- * @retval CRY_ERR_OP_FAILURE   if the operation failed, implementation
- *                              dependent.
  *
  * @api
  */
@@ -379,8 +385,6 @@ cryerror_t cryDecryptAES_ECB(CRYDriver *cryp,
  * @retval CRY_ERR_INV_KEY_TYPE the selected key is invalid for this operation.
  * @retval CRY_ERR_INV_KEY_ID   if the specified key identifier is invalid
  *                              or refers to an empty key slot.
- * @retval CRY_ERR_OP_FAILURE   if the operation failed, implementation
- *                              dependent.
  *
  * @api
  */
@@ -434,8 +438,6 @@ cryerror_t cryEncryptAES_CBC(CRYDriver *cryp,
  * @retval CRY_ERR_INV_KEY_TYPE the selected key is invalid for this operation.
  * @retval CRY_ERR_INV_KEY_ID   if the specified key identifier is invalid
  *                              or refers to an empty key slot.
- * @retval CRY_ERR_OP_FAILURE   if the operation failed, implementation
- *                              dependent.
  *
  * @api
  */
@@ -489,8 +491,6 @@ cryerror_t cryDecryptAES_CBC(CRYDriver *cryp,
  * @retval CRY_ERR_INV_KEY_TYPE the selected key is invalid for this operation.
  * @retval CRY_ERR_INV_KEY_ID   if the specified key identifier is invalid
  *                              or refers to an empty key slot.
- * @retval CRY_ERR_OP_FAILURE   if the operation failed, implementation
- *                              dependent.
  *
  * @api
  */
@@ -544,8 +544,6 @@ cryerror_t cryEncryptAES_CFB(CRYDriver *cryp,
  * @retval CRY_ERR_INV_KEY_TYPE the selected key is invalid for this operation.
  * @retval CRY_ERR_INV_KEY_ID   if the specified key identifier is invalid
  *                              or refers to an empty key slot.
- * @retval CRY_ERR_OP_FAILURE   if the operation failed, implementation
- *                              dependent.
  *
  * @api
  */
@@ -600,8 +598,6 @@ cryerror_t cryDecryptAES_CFB(CRYDriver *cryp,
  * @retval CRY_ERR_INV_KEY_TYPE the selected key is invalid for this operation.
  * @retval CRY_ERR_INV_KEY_ID   if the specified key identifier is invalid
  *                              or refers to an empty key slot.
- * @retval CRY_ERR_OP_FAILURE   if the operation failed, implementation
- *                              dependent.
  *
  * @api
  */
@@ -627,7 +623,8 @@ cryerror_t cryEncryptAES_CTR(CRYDriver *cryp,
   (void)size;
   (void)in;
   (void)out;
-  (void)iv;
+  (void)nonce;
+  (void)cnt;
 
   return CRY_ERR_INV_ALGO;
 #endif
@@ -656,8 +653,6 @@ cryerror_t cryEncryptAES_CTR(CRYDriver *cryp,
  * @retval CRY_ERR_INV_KEY_TYPE the selected key is invalid for this operation.
  * @retval CRY_ERR_INV_KEY_ID   if the specified key identifier is invalid
  *                              or refers to an empty key slot.
- * @retval CRY_ERR_OP_FAILURE   if the operation failed, implementation
- *                              dependent.
  *
  * @api
  */
@@ -683,7 +678,8 @@ cryerror_t cryDecryptAES_CTR(CRYDriver *cryp,
   (void)size;
   (void)in;
   (void)out;
-  (void)iv;
+  (void)nonce;
+  (void)cnt;
 
   return CRY_ERR_INV_ALGO;
 #endif
@@ -717,8 +713,6 @@ cryerror_t cryDecryptAES_CTR(CRYDriver *cryp,
  * @retval CRY_ERR_INV_KEY_TYPE the selected key is invalid for this operation.
  * @retval CRY_ERR_INV_KEY_ID   if the specified key identifier is invalid
  *                              or refers to an empty key slot.
- * @retval CRY_ERR_OP_FAILURE   if the operation failed, implementation
- *                              dependent.
  *
  * @api
  */
@@ -788,8 +782,6 @@ cryerror_t cryEncryptAES_GCM(CRYDriver *cryp,
  * @retval CRY_ERR_INV_KEY_TYPE the selected key is invalid for this operation.
  * @retval CRY_ERR_INV_KEY_ID   if the specified key identifier is invalid
  *                              or refers to an empty key slot.
- * @retval CRY_ERR_OP_FAILURE   if the operation failed, implementation
- *                              dependent.
  *
  * @api
  */
@@ -832,42 +824,6 @@ cryerror_t cryDecryptAES_GCM(CRYDriver *cryp,
 }
 
 /**
- * @brief   Initializes the DES transient key.
- * @note    It is the underlying implementation to decide which key sizes are
- *          allowable.
- *
- * @param[in] cryp              pointer to the @p CRYDriver object
- * @param[in] size              key size in bytes
- * @param[in] keyp              pointer to the key data
- * @return                      The operation status.
- * @retval CRY_NOERROR          if the operation succeeded.
- * @retval CRY_ERR_INV_ALGO     if the algorithm is unsupported.
- * @retval CRY_ERR_INV_KEY_SIZE if the specified key size is invalid for
- *                              the specified algorithm.
- *
- * @api
- */
-cryerror_t cryLoadDESTransientKey(CRYDriver *cryp,
-                                  size_t size,
-                                  const uint8_t *keyp) {
-
-  osalDbgCheck((cryp != NULL) &&  (keyp != NULL));
-
-
-#if CRY_LLD_SUPPORTS_DES == TRUE
-  return cry_lld_des_loadkey(cryp, size, keyp);
-#elif HAL_CRY_USE_FALLBACK == TRUE
-  return cry_fallback_des_loadkey(cryp, size, keyp);
-#else
-  (void)cryp;
-  (void)size;
-  (void)keyp;
-
-  return CRY_ERR_INV_ALGO;
-#endif
-}
-
-/**
  * @brief   Encryption of a single block using (T)DES.
  * @note    The implementation of this function must guarantee that it can
  *          be called from any context.
@@ -885,8 +841,6 @@ cryerror_t cryLoadDESTransientKey(CRYDriver *cryp,
  * @retval CRY_ERR_INV_KEY_TYPE the selected key is invalid for this operation.
  * @retval CRY_ERR_INV_KEY_ID   if the specified key identifier is invalid
  *                              or refers to an empty key slot.
- * @retval CRY_ERR_OP_FAILURE   if the operation failed, implementation
- *                              dependent.
  *
  * @special
  */
@@ -932,8 +886,6 @@ cryerror_t cryEncryptDES(CRYDriver *cryp,
  * @retval CRY_ERR_INV_KEY_TYPE the selected key is invalid for this operation.
  * @retval CRY_ERR_INV_KEY_ID   if the specified key identifier is invalid
  *                              or refers to an empty key slot.
- * @retval CRY_ERR_OP_FAILURE   if the operation failed, implementation
- *                              dependent.
  *
  * @special
  */
@@ -981,8 +933,6 @@ cryerror_t cryDecryptDES(CRYDriver *cryp,
  * @retval CRY_ERR_INV_KEY_TYPE the selected key is invalid for this operation.
  * @retval CRY_ERR_INV_KEY_ID   if the specified key identifier is invalid
  *                              or refers to an empty key slot.
- * @retval CRY_ERR_OP_FAILURE   if the operation failed, implementation
- *                              dependent.
  *
  * @api
  */
@@ -1033,8 +983,6 @@ cryerror_t cryEncryptDES_ECB(CRYDriver *cryp,
  * @retval CRY_ERR_INV_KEY_TYPE the selected key is invalid for this operation.
  * @retval CRY_ERR_INV_KEY_ID   if the specified key identifier is invalid
  *                              or refers to an empty key slot.
- * @retval CRY_ERR_OP_FAILURE   if the operation failed, implementation
- *                              dependent.
  *
  * @api
  */
@@ -1086,8 +1034,6 @@ cryerror_t cryDecryptDES_ECB(CRYDriver *cryp,
  * @retval CRY_ERR_INV_KEY_TYPE the selected key is invalid for this operation.
  * @retval CRY_ERR_INV_KEY_ID   if the specified key identifier is invalid
  *                              or refers to an empty key slot.
- * @retval CRY_ERR_OP_FAILURE   if the operation failed, implementation
- *                              dependent.
  *
  * @api
  */
@@ -1141,8 +1087,6 @@ cryerror_t cryEncryptDES_CBC(CRYDriver *cryp,
  * @retval CRY_ERR_INV_KEY_TYPE the selected key is invalid for this operation.
  * @retval CRY_ERR_INV_KEY_ID   if the specified key identifier is invalid
  *                              or refers to an empty key slot.
- * @retval CRY_ERR_OP_FAILURE   if the operation failed, implementation
- *                              dependent.
  *
  * @api
  */
@@ -1184,8 +1128,6 @@ cryerror_t cryDecryptDES_CBC(CRYDriver *cryp,
  * @retval CRY_NOERROR          if the operation succeeded.
  * @retval CRY_ERR_INV_ALGO     if the operation is unsupported on this
  *                              device instance.
- * @retval CRY_ERR_OP_FAILURE   if the operation failed, implementation
- *                              dependent.
  *
  * @api
  */
@@ -1219,8 +1161,6 @@ cryerror_t crySHA1Init(CRYDriver *cryp, SHA1Context *sha1ctxp) {
  * @retval CRY_NOERROR          if the operation succeeded.
  * @retval CRY_ERR_INV_ALGO     if the operation is unsupported on this
  *                              device instance.
- * @retval CRY_ERR_OP_FAILURE   if the operation failed, implementation
- *                              dependent.
  *
  * @api
  */
@@ -1256,8 +1196,6 @@ cryerror_t crySHA1Update(CRYDriver *cryp, SHA1Context *sha1ctxp,
  * @retval CRY_NOERROR          if the operation succeeded.
  * @retval CRY_ERR_INV_ALGO     if the operation is unsupported on this
  *                              device instance.
- * @retval CRY_ERR_OP_FAILURE   if the operation failed, implementation
- *                              dependent.
  *
  * @api
  */
@@ -1282,6 +1220,7 @@ cryerror_t crySHA1Final(CRYDriver *cryp, SHA1Context *sha1ctxp, uint8_t *out) {
 
 /**
  * @brief   Hash initialization using SHA256.
+ * @note    Use of this algorithm is not recommended because proven weak.
  *
  * @param[in] cryp              pointer to the @p CRYDriver object
  * @param[out] sha256ctxp       pointer to a SHA256 context to be initialized
@@ -1289,8 +1228,6 @@ cryerror_t crySHA1Final(CRYDriver *cryp, SHA1Context *sha1ctxp, uint8_t *out) {
  * @retval CRY_NOERROR          if the operation succeeded.
  * @retval CRY_ERR_INV_ALGO     if the operation is unsupported on this
  *                              device instance.
- * @retval CRY_ERR_OP_FAILURE   if the operation failed, implementation
- *                              dependent.
  *
  * @api
  */
@@ -1300,7 +1237,7 @@ cryerror_t crySHA256Init(CRYDriver *cryp, SHA256Context *sha256ctxp) {
 
   osalDbgAssert(cryp->state == CRY_READY, "not ready");
 
-#if CRY_LLD_SUPPORTS_SHA256 == TRUE
+#if CRY_LLD_SUPPORTS_SHA1 == TRUE
   return cry_lld_SHA256_init(cryp, sha256ctxp);
 #elif HAL_CRY_USE_FALLBACK == TRUE
   return cry_fallback_SHA256_init(cryp, sha256ctxp);
@@ -1314,6 +1251,7 @@ cryerror_t crySHA256Init(CRYDriver *cryp, SHA256Context *sha256ctxp) {
 
 /**
  * @brief   Hash update using SHA256.
+ * @note    Use of this algorithm is not recommended because proven weak.
  *
  * @param[in] cryp              pointer to the @p CRYDriver object
  * @param[in] sha256ctxp        pointer to a SHA256 context
@@ -1323,8 +1261,6 @@ cryerror_t crySHA256Init(CRYDriver *cryp, SHA256Context *sha256ctxp) {
  * @retval CRY_NOERROR          if the operation succeeded.
  * @retval CRY_ERR_INV_ALGO     if the operation is unsupported on this
  *                              device instance.
- * @retval CRY_ERR_OP_FAILURE   if the operation failed, implementation
- *                              dependent.
  *
  * @api
  */
@@ -1335,7 +1271,7 @@ cryerror_t crySHA256Update(CRYDriver *cryp, SHA256Context *sha256ctxp,
 
   osalDbgAssert(cryp->state == CRY_READY, "not ready");
 
-#if CRY_LLD_SUPPORTS_SHA256 == TRUE
+#if CRY_LLD_SUPPORTS_SHA1 == TRUE
   return cry_lld_SHA256_update(cryp, sha256ctxp, size, in);
 #elif HAL_CRY_USE_FALLBACK == TRUE
   return cry_fallback_SHA256_update(cryp, sha256ctxp, size, in);
@@ -1351,6 +1287,7 @@ cryerror_t crySHA256Update(CRYDriver *cryp, SHA256Context *sha256ctxp,
 
 /**
  * @brief   Hash finalization using SHA256.
+ * @note    Use of this algorithm is not recommended because proven weak.
  *
  * @param[in] cryp              pointer to the @p CRYDriver object
  * @param[in] sha256ctxp        pointer to a SHA256 context
@@ -1359,8 +1296,6 @@ cryerror_t crySHA256Update(CRYDriver *cryp, SHA256Context *sha256ctxp,
  * @retval CRY_NOERROR          if the operation succeeded.
  * @retval CRY_ERR_INV_ALGO     if the operation is unsupported on this
  *                              device instance.
- * @retval CRY_ERR_OP_FAILURE   if the operation failed, implementation
- *                              dependent.
  *
  * @api
  */
@@ -1371,7 +1306,7 @@ cryerror_t crySHA256Final(CRYDriver *cryp, SHA256Context *sha256ctxp,
 
   osalDbgAssert(cryp->state == CRY_READY, "not ready");
 
-#if CRY_LLD_SUPPORTS_SHA256 == TRUE
+#if CRY_LLD_SUPPORTS_SHA1 == TRUE
   return cry_lld_SHA256_final(cryp, sha256ctxp, out);
 #elif HAL_CRY_USE_FALLBACK == TRUE
   return cry_fallback_SHA256_final(cryp, sha256ctxp, out);
@@ -1386,6 +1321,7 @@ cryerror_t crySHA256Final(CRYDriver *cryp, SHA256Context *sha256ctxp,
 
 /**
  * @brief   Hash initialization using SHA512.
+ * @note    Use of this algorithm is not recommended because proven weak.
  *
  * @param[in] cryp              pointer to the @p CRYDriver object
  * @param[out] sha512ctxp       pointer to a SHA512 context to be initialized
@@ -1393,8 +1329,6 @@ cryerror_t crySHA256Final(CRYDriver *cryp, SHA256Context *sha256ctxp,
  * @retval CRY_NOERROR          if the operation succeeded.
  * @retval CRY_ERR_INV_ALGO     if the operation is unsupported on this
  *                              device instance.
- * @retval CRY_ERR_OP_FAILURE   if the operation failed, implementation
- *                              dependent.
  *
  * @api
  */
@@ -1404,7 +1338,7 @@ cryerror_t crySHA512Init(CRYDriver *cryp, SHA512Context *sha512ctxp) {
 
   osalDbgAssert(cryp->state == CRY_READY, "not ready");
 
-#if CRY_LLD_SUPPORTS_SHA512 == TRUE
+#if CRY_LLD_SUPPORTS_SHA1 == TRUE
   return cry_lld_SHA512_init(cryp, sha512ctxp);
 #elif HAL_CRY_USE_FALLBACK == TRUE
   return cry_fallback_SHA512_init(cryp, sha512ctxp);
@@ -1418,6 +1352,7 @@ cryerror_t crySHA512Init(CRYDriver *cryp, SHA512Context *sha512ctxp) {
 
 /**
  * @brief   Hash update using SHA512.
+ * @note    Use of this algorithm is not recommended because proven weak.
  *
  * @param[in] cryp              pointer to the @p CRYDriver object
  * @param[in] sha512ctxp        pointer to a SHA512 context
@@ -1427,8 +1362,6 @@ cryerror_t crySHA512Init(CRYDriver *cryp, SHA512Context *sha512ctxp) {
  * @retval CRY_NOERROR          if the operation succeeded.
  * @retval CRY_ERR_INV_ALGO     if the operation is unsupported on this
  *                              device instance.
- * @retval CRY_ERR_OP_FAILURE   if the operation failed, implementation
- *                              dependent.
  *
  * @api
  */
@@ -1439,7 +1372,7 @@ cryerror_t crySHA512Update(CRYDriver *cryp, SHA512Context *sha512ctxp,
 
   osalDbgAssert(cryp->state == CRY_READY, "not ready");
 
-#if CRY_LLD_SUPPORTS_SHA512 == TRUE
+#if CRY_LLD_SUPPORTS_SHA1 == TRUE
   return cry_lld_SHA512_update(cryp, sha512ctxp, size, in);
 #elif HAL_CRY_USE_FALLBACK == TRUE
   return cry_fallback_SHA512_update(cryp, sha512ctxp, size, in);
@@ -1455,6 +1388,7 @@ cryerror_t crySHA512Update(CRYDriver *cryp, SHA512Context *sha512ctxp,
 
 /**
  * @brief   Hash finalization using SHA512.
+ * @note    Use of this algorithm is not recommended because proven weak.
  *
  * @param[in] cryp              pointer to the @p CRYDriver object
  * @param[in] sha512ctxp        pointer to a SHA512 context
@@ -1463,8 +1397,6 @@ cryerror_t crySHA512Update(CRYDriver *cryp, SHA512Context *sha512ctxp,
  * @retval CRY_NOERROR          if the operation succeeded.
  * @retval CRY_ERR_INV_ALGO     if the operation is unsupported on this
  *                              device instance.
- * @retval CRY_ERR_OP_FAILURE   if the operation failed, implementation
- *                              dependent.
  *
  * @api
  */
@@ -1475,7 +1407,7 @@ cryerror_t crySHA512Final(CRYDriver *cryp, SHA512Context *sha512ctxp,
 
   osalDbgAssert(cryp->state == CRY_READY, "not ready");
 
-#if CRY_LLD_SUPPORTS_SHA512 == TRUE
+#if CRY_LLD_SUPPORTS_SHA1 == TRUE
   return cry_lld_SHA512_final(cryp, sha512ctxp, out);
 #elif HAL_CRY_USE_FALLBACK == TRUE
   return cry_fallback_SHA512_final(cryp, sha512ctxp, out);
@@ -1489,253 +1421,29 @@ cryerror_t crySHA512Final(CRYDriver *cryp, SHA512Context *sha512ctxp,
 }
 
 /**
- * @brief   Initializes the HMAC transient key.
- * @note    It is the underlying implementation to decide which key sizes are
- *          allowable.
+ * @brief   True random numbers generator.
  *
  * @param[in] cryp              pointer to the @p CRYDriver object
- * @param[in] size              key size in bytes
- * @param[in] keyp              pointer to the key data
- * @return                      The operation status.
- * @retval CRY_NOERROR          if the operation succeeded.
- * @retval CRY_ERR_INV_ALGO     if the algorithm is unsupported.
- * @retval CRY_ERR_INV_KEY_SIZE if the specified key size is invalid for
- *                              the specified algorithm.
- *
- * @api
- */
-cryerror_t cryLoadHMACTransientKey(CRYDriver *cryp,
-                                   size_t size,
-                                   const uint8_t *keyp) {
-
-  osalDbgCheck((cryp != NULL) &&  (keyp != NULL));
-
-#if (CRY_LLD_SUPPORTS_HMAC_SHA256 == TRUE) ||                               \
-    (CRY_LLD_SUPPORTS_HMAC_SHA512 == TRUE)
-  return cry_lld_hmac_loadkey(cryp, size, keyp);
-#elif HAL_CRY_USE_FALLBACK == TRUE
-  return cry_fallback_hmac_loadkey(cryp, size, keyp);
-#else
-  (void)cryp;
-  (void)size;
-  (void)keyp;
-
-  return CRY_ERR_INV_ALGO;
-#endif
-}
-
-/**
- * @brief   Hash initialization using HMAC_SHA256.
- *
- * @param[in] cryp              pointer to the @p CRYDriver object
- * @param[out] hmacsha256ctxp   pointer to a HMAC_SHA256 context to be
- *                              initialized
+ * @param[out] out              128 bits output buffer
  * @return                      The operation status.
  * @retval CRY_NOERROR          if the operation succeeded.
  * @retval CRY_ERR_INV_ALGO     if the operation is unsupported on this
  *                              device instance.
- * @retval CRY_ERR_OP_FAILURE   if the operation failed, implementation
- *                              dependent.
  *
  * @api
  */
-cryerror_t cryHMACSHA256Init(CRYDriver *cryp,
-                             HMACSHA256Context *hmacsha256ctxp) {
+cryerror_t cryTRNG(CRYDriver *cryp, uint8_t *out) {
 
-  osalDbgCheck((cryp != NULL) && (hmacsha256ctxp != NULL));
-
-  osalDbgAssert(cryp->state == CRY_READY, "not ready");
-
-#if CRY_LLD_SUPPORTS_HMAC_SHA256 == TRUE
-  return cry_lld_HMACSHA256_init(cryp, hmacsha256ctxp);
-#elif HAL_CRY_USE_FALLBACK == TRUE
-  return cry_fallback_HMACSHA256_init(cryp, hmacsha256ctxp);
-#else
-  (void)cryp;
-  (void)hmacsha256ctxp;
-
-  return CRY_ERR_INV_ALGO;
-#endif
-}
-
-/**
- * @brief   Hash update using HMAC.
- *
- * @param[in] cryp              pointer to the @p CRYDriver object
- * @param[in] hmacsha256ctxp    pointer to a HMAC_SHA256 context
- * @param[in] size              size of input buffer
- * @param[in] in                buffer containing the input text
- * @return                      The operation status.
- * @retval CRY_NOERROR          if the operation succeeded.
- * @retval CRY_ERR_INV_ALGO     if the operation is unsupported on this
- *                              device instance.
- * @retval CRY_ERR_OP_FAILURE   if the operation failed, implementation
- *                              dependent.
- *
- * @api
- */
-cryerror_t cryHMACSHA256Update(CRYDriver *cryp,
-                               HMACSHA256Context *hmacsha256ctxp,
-                               size_t size,
-                               const uint8_t *in) {
-
-  osalDbgCheck((cryp != NULL) && (hmacsha256ctxp != NULL) && (in != NULL));
+  osalDbgCheck((cryp != NULL) && (out != NULL));
 
   osalDbgAssert(cryp->state == CRY_READY, "not ready");
 
-#if CRY_LLD_SUPPORTS_HMAC_SHA256 == TRUE
-  return cry_lld_HMACSHA256_update(cryp, hmacsha256ctxp, size, in);
+#if CRY_LLD_SUPPORTS_TRNG == TRUE
+  return cry_lld_TRNG(cryp, out);
 #elif HAL_CRY_USE_FALLBACK == TRUE
-  return cry_fallback_HMACSHA256_update(cryp, hmacsha256ctxp, size, in);
+  return cry_fallback_TRNG(cryp, out);
 #else
   (void)cryp;
-  (void)hmacsha256ctxp;
-  (void)size;
-  (void)in;
-
-  return CRY_ERR_INV_ALGO;
-#endif
-}
-
-/**
- * @brief   Hash finalization using HMAC.
- *
- * @param[in] cryp              pointer to the @p CRYDriver object
- * @param[in] hmacsha256ctxp    pointer to a HMAC_SHA256 context
- * @param[out] out              256 bits output buffer
- * @return                      The operation status.
- * @retval CRY_NOERROR          if the operation succeeded.
- * @retval CRY_ERR_INV_ALGO     if the operation is unsupported on this
- *                              device instance.
- * @retval CRY_ERR_OP_FAILURE   if the operation failed, implementation
- *                              dependent.
- *
- * @api
- */
-cryerror_t cryHMACSHA256Final(CRYDriver *cryp,
-                              HMACSHA256Context *hmacsha256ctxp,
-                              uint8_t *out) {
-
-  osalDbgCheck((cryp != NULL) && (hmacsha256ctxp != NULL) && (out != NULL));
-
-  osalDbgAssert(cryp->state == CRY_READY, "not ready");
-
-#if CRY_LLD_SUPPORTS_HMAC_SHA256 == TRUE
-  return cry_lld_HMACSHA256_final(cryp, hmacsha256ctxp, out);
-#elif HAL_CRY_USE_FALLBACK == TRUE
-  return cry_fallback_HMACSHA256_final(cryp, hmacsha256ctxp, out);
-#else
-  (void)cryp;
-  (void)hmacsha256ctxp;
-  (void)out;
-
-  return CRY_ERR_INV_ALGO;
-#endif
-}
-
-/**
- * @brief   Hash initialization using HMAC_SHA512.
- *
- * @param[in] cryp              pointer to the @p CRYDriver object
- * @param[out] hmacsha512ctxp   pointer to a HMAC_SHA512 context to be
- *                              initialized
- * @return                      The operation status.
- * @retval CRY_NOERROR          if the operation succeeded.
- * @retval CRY_ERR_INV_ALGO     if the operation is unsupported on this
- *                              device instance.
- * @retval CRY_ERR_OP_FAILURE   if the operation failed, implementation
- *                              dependent.
- *
- * @api
- */
-cryerror_t cryHMACSHA512Init(CRYDriver *cryp,
-                             HMACSHA512Context *hmacsha512ctxp) {
-
-  osalDbgCheck((cryp != NULL) && (hmacsha512ctxp != NULL));
-
-  osalDbgAssert(cryp->state == CRY_READY, "not ready");
-
-#if CRY_LLD_SUPPORTS_HMAC_SHA512 == TRUE
-  return cry_lld_HMACSHA512_init(cryp, hmacsha512ctxp);
-#elif HAL_CRY_USE_FALLBACK == TRUE
-  return cry_fallback_HMACSHA512_init(cryp, hmacsha512ctxp);
-#else
-  (void)cryp;
-  (void)hmacsha512ctxp;
-
-  return CRY_ERR_INV_ALGO;
-#endif
-}
-
-/**
- * @brief   Hash update using HMAC.
- *
- * @param[in] cryp              pointer to the @p CRYDriver object
- * @param[in] hmacsha512ctxp    pointer to a HMAC_SHA512 context
- * @param[in] size              size of input buffer
- * @param[in] in                buffer containing the input text
- * @return                      The operation status.
- * @retval CRY_NOERROR          if the operation succeeded.
- * @retval CRY_ERR_INV_ALGO     if the operation is unsupported on this
- *                              device instance.
- * @retval CRY_ERR_OP_FAILURE   if the operation failed, implementation
- *                              dependent.
- *
- * @api
- */
-cryerror_t cryHMACSHA512Update(CRYDriver *cryp,
-                               HMACSHA512Context *hmacsha512ctxp,
-                               size_t size,
-                               const uint8_t *in) {
-
-  osalDbgCheck((cryp != NULL) && (hmacsha512ctxp != NULL) && (in != NULL));
-
-  osalDbgAssert(cryp->state == CRY_READY, "not ready");
-
-#if CRY_LLD_SUPPORTS_HMAC_SHA512 == TRUE
-  return cry_lld_HMACSHA512_update(cryp, hmacsha512ctxp, size, in);
-#elif HAL_CRY_USE_FALLBACK == TRUE
-  return cry_fallback_HMACSHA512_update(cryp, hmacsha512ctxp, size, in);
-#else
-  (void)cryp;
-  (void)hmacsha512ctxp;
-  (void)size;
-  (void)in;
-
-  return CRY_ERR_INV_ALGO;
-#endif
-}
-
-/**
- * @brief   Hash finalization using HMAC.
- *
- * @param[in] cryp              pointer to the @p CRYDriver object
- * @param[in] hmacsha512ctxp    pointer to a HMAC_SHA512 context
- * @param[out] out              512 bits output buffer
- * @return                      The operation status.
- * @retval CRY_NOERROR          if the operation succeeded.
- * @retval CRY_ERR_INV_ALGO     if the operation is unsupported on this
- *                              device instance.
- * @retval CRY_ERR_OP_FAILURE   if the operation failed, implementation
- *                              dependent.
- *
- * @api
- */
-cryerror_t cryHMACSHA512Final(CRYDriver *cryp,
-                              HMACSHA512Context *hmacsha512ctxp,
-                              uint8_t *out) {
-
-  osalDbgCheck((cryp != NULL) && (hmacsha512ctxp != NULL) && (out != NULL));
-
-  osalDbgAssert(cryp->state == CRY_READY, "not ready");
-
-#if CRY_LLD_SUPPORTS_HMAC_SHA512 == TRUE
-  return cry_lld_HMACSHA512_final(cryp, hmacsha512ctxp, out);
-#elif HAL_CRY_USE_FALLBACK == TRUE
-  return cry_fallback_HMACSHA512_final(cryp, hmacsha512ctxp, out);
-#else
-  (void)cryp;
-  (void)hmacsha512ctxp;
   (void)out;
 
   return CRY_ERR_INV_ALGO;

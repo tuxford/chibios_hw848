@@ -85,6 +85,23 @@
 /*===========================================================================*/
 
 /**
+ * @brief   FileStream specific methods.
+ */
+#define _rtc_driver_methods                                                 \
+  _file_stream_methods
+
+/**
+ * @brief   Type of a structure representing an RTC alarm time stamp.
+ */
+typedef struct RTCAlarm RTCAlarm;
+
+/**
+ * @brief   Type of an RTC alarm.
+ * @details Meaningful on platforms with more than 1 alarm comparator.
+ */
+typedef uint32_t rtcalarm_t;
+
+/**
  * @brief   Type of an RTC event.
  */
 typedef enum {
@@ -99,23 +116,45 @@ typedef enum {
 typedef void (*rtccb_t)(RTCDriver *rtcp, rtcevent_t event);
 
 /**
- * @brief   Type of a structure representing an RTC alarm time stamp.
+ * @brief   Structure representing an RTC alarm time stamp.
  */
-typedef struct hal_rtc_alarm {
+struct RTCAlarm {
   /**
    * @brief Seconds since UNIX epoch.
    */
   uint32_t          tv_sec;
-} RTCAlarm;
+};
+
+#if RTC_HAS_STORAGE || defined(__DOXYGEN__)
+/**
+ * @extends FileStream
+ *
+ * @brief   @p RTCDriver virtual methods table.
+ */
+struct RTCDriverVMT {
+  _rtc_driver_methods
+};
+#endif
 
 /**
- * @brief   Implementation-specific @p RTCDriver fields.
+ * @brief   Structure representing an RTC driver.
  */
-#define rtc_lld_driver_fields                                               \
-  /* Pointer to the RTC registers block.*/                                  \
-  RTC_TypeDef               *rtc;                                           \
-  /* Callback pointer.*/                                                    \
-  rtccb_t           callback
+struct RTCDriver{
+#if RTC_HAS_STORAGE || defined(__DOXYGEN__)
+  /**
+   * @brief Virtual Methods Table.
+   */
+  const struct RTCDriverVMT *vmt;
+#endif
+  /**
+   * @brief   Pointer to the RTC registers block.
+   */
+  RTC_TypeDef       *rtc;
+  /**
+   * @brief   Callback pointer.
+   */
+  rtccb_t           callback;
+};
 
 /*===========================================================================*/
 /* Driver macros.                                                            */
@@ -124,6 +163,13 @@ typedef struct hal_rtc_alarm {
 /*===========================================================================*/
 /* External declarations.                                                    */
 /*===========================================================================*/
+
+#if !defined(__DOXYGEN__)
+extern RTCDriver RTCD1;
+#if RTC_HAS_STORAGE
+extern struct RTCDriverVMT _rtc_lld_vmt;
+#endif
+#endif
 
 #ifdef __cplusplus
 extern "C" {

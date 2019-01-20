@@ -3,15 +3,11 @@
 ifeq ($(USE_SMART_BUILD),yes)
 
 # Configuration files directory
-ifeq ($(HALCONFDIR),)
-  ifeq ($(CONFDIR),)
-    HALCONFDIR = .
-  else
-    HALCONFDIR := $(CONFDIR)
-  endif
+ifeq ($(CONFDIR),)
+  CONFDIR = .
 endif
 
-HALCONF := $(strip $(shell cat $(HALCONFDIR)/halconf.h | egrep -e "\#define"))
+HALCONF := $(strip $(shell cat $(CONFDIR)/halconf.h | egrep -e "\#define"))
 
 HALSRC := $(CHIBIOS)/os/hal/src/hal.c \
           $(CHIBIOS)/os/hal/src/hal_st.c \
@@ -57,6 +53,9 @@ endif
 ifneq ($(findstring HAL_USE_PWM TRUE,$(HALCONF)),)
 HALSRC += $(CHIBIOS)/os/hal/src/hal_pwm.c
 endif
+ifneq ($(findstring HAL_USE_QSPI TRUE,$(HALCONF)),)
+HALSRC += $(CHIBIOS)/os/hal/src/hal_qspi.c
+endif
 ifneq ($(findstring HAL_USE_RTC TRUE,$(HALCONF)),)
 HALSRC += $(CHIBIOS)/os/hal/src/hal_rtc.c
 endif
@@ -69,14 +68,8 @@ endif
 ifneq ($(findstring HAL_USE_SERIAL_USB TRUE,$(HALCONF)),)
 HALSRC += $(CHIBIOS)/os/hal/src/hal_serial_usb.c
 endif
-ifneq ($(findstring HAL_USE_SIO TRUE,$(HALCONF)),)
-HALSRC += $(CHIBIOS)/os/hal/src/hal_sio.c
-endif
 ifneq ($(findstring HAL_USE_SPI TRUE,$(HALCONF)),)
 HALSRC += $(CHIBIOS)/os/hal/src/hal_spi.c
-endif
-ifneq ($(findstring HAL_USE_TRNG TRUE,$(HALCONF)),)
-HALSRC += $(CHIBIOS)/os/hal/src/hal_trng.c
 endif
 ifneq ($(findstring HAL_USE_UART TRUE,$(HALCONF)),)
 HALSRC += $(CHIBIOS)/os/hal/src/hal_uart.c
@@ -86,9 +79,6 @@ HALSRC += $(CHIBIOS)/os/hal/src/hal_usb.c
 endif
 ifneq ($(findstring HAL_USE_WDG TRUE,$(HALCONF)),)
 HALSRC += $(CHIBIOS)/os/hal/src/hal_wdg.c
-endif
-ifneq ($(findstring HAL_USE_WSPI TRUE,$(HALCONF)),)
-HALSRC += $(CHIBIOS)/os/hal/src/hal_wspi.c
 endif
 else
 HALSRC = $(CHIBIOS)/os/hal/src/hal.c \
@@ -108,18 +98,16 @@ HALSRC = $(CHIBIOS)/os/hal/src/hal.c \
          $(CHIBIOS)/os/hal/src/hal_mmc_spi.c \
          $(CHIBIOS)/os/hal/src/hal_pal.c \
          $(CHIBIOS)/os/hal/src/hal_pwm.c \
+         $(CHIBIOS)/os/hal/src/hal_qspi.c \
          $(CHIBIOS)/os/hal/src/hal_rtc.c \
          $(CHIBIOS)/os/hal/src/hal_sdc.c \
          $(CHIBIOS)/os/hal/src/hal_serial.c \
          $(CHIBIOS)/os/hal/src/hal_serial_usb.c \
-         $(CHIBIOS)/os/hal/src/hal_sio.c \
          $(CHIBIOS)/os/hal/src/hal_spi.c \
          $(CHIBIOS)/os/hal/src/hal_st.c \
-         $(CHIBIOS)/os/hal/src/hal_trng.c \
          $(CHIBIOS)/os/hal/src/hal_uart.c \
          $(CHIBIOS)/os/hal/src/hal_usb.c \
-         $(CHIBIOS)/os/hal/src/hal_wdg.c \
-         $(CHIBIOS)/os/hal/src/hal_wspi.c
+         $(CHIBIOS)/os/hal/src/hal_wdg.c
 endif
 
 # Required include directories

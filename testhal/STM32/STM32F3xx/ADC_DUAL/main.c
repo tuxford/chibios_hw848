@@ -30,13 +30,14 @@ static adcsample_t samples2[ADC_GRP2_NUM_CHANNELS * ADC_GRP2_BUF_DEPTH];
  * ADC streaming callback.
  */
 size_t nx = 0, ny = 0;
-static void adccallback(ADCDriver *adcp) {
+static void adccallback(ADCDriver *adcp, adcsample_t *buffer, size_t n) {
 
-  if (adcIsBufferComplete(adcp)) {
-    nx += 1;
+  (void)adcp;
+  if (samples2 == buffer) {
+    nx += n;
   }
   else {
-    ny += 1;
+    ny += n;
   }
 }
 

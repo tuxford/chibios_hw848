@@ -28,7 +28,7 @@ ifeq ($(USE_LDOPT),)
   USE_LDOPT = 
 endif
 
-# Enable this if you want link time optimizations (LTO).
+# Enable this if you want link time optimizations (LTO)
 ifeq ($(USE_LTO),)
   USE_LTO = no
 endif
@@ -65,12 +65,6 @@ PROJECT = ch.exe
 
 # Imported source files and paths
 CHIBIOS = ../../..
-CONFDIR  := ./cfg
-BUILDDIR := ./build
-DEPDIR   := ./.dep
-
-# Licensing files.
-include $(CHIBIOS)/os/license/license.mk
 # Startup files.
 # HAL-OSAL files (optional).
 include $(CHIBIOS)/os/hal/hal.mk
@@ -88,21 +82,63 @@ include $(CHIBIOS)/os/hal/lib/streams/streams.mk
 include $(CHIBIOS)/os/various/shell/shell.mk
 
 # C sources here.
-CSRC = $(ALLCSRC) \
+CSRC = $(STARTUPSRC) \
+       $(KERNSRC) \
+       $(PORTSRC) \
+       $(OSALSRC) \
+       $(HALSRC) \
+       $(PLATFORMSRC) \
+       $(BOARDSRC) \
        $(TESTSRC) \
+       $(STREAMSSRC) \
+       $(SHELLSRC) \
        main.c
 
 # C++ sources here.
-CPPSRC = $(ALLCPPSRC)
+CPPSRC =
 
-# List ASM source files here.
-ASMSRC = $(ALLASMSRC)
-ASMXSRC = $(ALLXASMSRC)
+# List ASM source files here
+ASMSRC =
+ASMXSRC = $(STARTUPASM) $(PORTASM) $(OSALASM)
 
-INCDIR = $(CONFDIR) $(ALLINC) $(TESTINC)
+INCDIR = $(CHIBIOS)/os/license \
+         $(STARTUPINC) $(KERNINC) $(PORTINC) $(OSALINC) \
+         $(HALINC) $(PLATFORMINC) $(BOARDINC) $(TESTINC) \
+         $(STREAMSINC) $(SHELLINC)
 
 #
 # Project, sources and paths
+##############################################################################
+
+##############################################################################
+# Compiler settings
+#
+
+#TRGT = powerpc-eabi-
+TRGT = mingw32-
+CC   = $(TRGT)gcc
+CPPC = $(TRGT)g++
+# Enable loading with g++ only if you need C++ runtime support.
+# NOTE: You can use C++ even without C++ support if you are careful. C++
+#       runtime support makes code size explode.
+LD   = $(TRGT)gcc
+#LD   = $(TRGT)g++
+CP   = $(TRGT)objcopy
+AS   = $(TRGT)gcc -x assembler-with-cpp
+AR   = $(TRGT)ar
+OD   = $(TRGT)objdump
+SZ   = $(TRGT)size
+BIN  = $(CP) -O binary
+COV  = gcov
+
+# Define C warning options here
+CWARN = -Wall -Wextra -Wundef -Wstrict-prototypes
+
+# Define C++ warning options here
+CPPWARN = -Wall -Wextra -Wundef
+
+#
+# Compiler settings
 ##############################################################################
 
 ##############################################################################
@@ -126,37 +162,6 @@ ULIBS = -lws2_32
 
 #
 # End of user defines
-##############################################################################
-
-##############################################################################
-# Compiler settings
-#
-
-TRGT = 
-CC   = $(TRGT)gcc
-CPPC = $(TRGT)g++
-# Enable loading with g++ only if you need C++ runtime support.
-# NOTE: You can use C++ even without C++ support if you are careful. C++
-#       runtime support makes code size explode.
-LD   = $(TRGT)gcc
-#LD   = $(TRGT)g++
-CP   = $(TRGT)objcopy
-AS   = $(TRGT)gcc -x assembler-with-cpp
-AR   = $(TRGT)ar
-OD   = $(TRGT)objdump
-SZ   = $(TRGT)size
-HEX  = $(CP) -O ihex
-BIN  = $(CP) -O binary
-COV  = gcov
-
-# Define C warning options here
-CWARN = -Wall -Wextra -Wundef -Wstrict-prototypes
-
-# Define C++ warning options here
-CPPWARN = -Wall -Wextra -Wundef
-
-#
-# Compiler settings
 ##############################################################################
 
 RULESPATH = $(CHIBIOS)/os/common/startup/SIMIA32/compilers/GCC

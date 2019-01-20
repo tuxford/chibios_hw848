@@ -139,7 +139,7 @@ void _thread_memfill(uint8_t *startp, uint8_t *endp, uint8_t v) {
     *startp++ = v;
   }
 }
-#endif /* CH_DBG_FILL_THREADS */
+#endif /* CH_DBG_FILL_THREADS == TRUE */
 
 /**
  * @brief   Creates a new thread into a static memory area.

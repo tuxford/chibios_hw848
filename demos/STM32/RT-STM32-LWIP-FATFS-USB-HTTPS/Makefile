@@ -5,13 +5,13 @@
 all:
 	@echo
 	@echo === Building for STM32F746-Discovery ===============================
-	+@make --no-print-directory -f make/stm32f746_discovery.make all
+	+@make --no-print-directory -f Makefile-stm32f746_discovery all
 	@echo ====================================================================
 	@echo
 
 clean:
 	@echo
-	+@make --no-print-directory -f make/stm32f746_discovery.make clean
+	+@make --no-print-directory -f Makefile-stm32f746_discovery clean
 	@echo
 
 #

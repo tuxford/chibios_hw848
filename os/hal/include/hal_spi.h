@@ -97,15 +97,6 @@
 #error "invalid SPI_SELECT_MODE setting"
 #endif
 
-/* Some modes have a dependency on the PAL driver, making the required
-   checks here.*/
-#if ((SPI_SELECT_MODE != SPI_SELECT_MODE_PAD)  ||                           \
-     (SPI_SELECT_MODE != SPI_SELECT_MODE_PORT) ||                           \
-     (SPI_SELECT_MODE != SPI_SELECT_MODE_LINE)) &&                          \
-    (HAL_USE_PAL != TRUE)
-#error "current SPI_SELECT_MODE requires HAL_USE_PAL"
-#endif
-
 /*===========================================================================*/
 /* Driver data structures and types.                                         */
 /*===========================================================================*/
@@ -121,101 +112,13 @@ typedef enum {
   SPI_COMPLETE = 4                  /**< Asynchronous operation complete.   */
 } spistate_t;
 
-/**
- * @brief   Type of a structure representing an SPI driver.
- */
-typedef struct hal_spi_driver SPIDriver;
-/**
- * @brief   Type of a SPI driver configuration structure.
- */
-typedef struct hal_spi_config SPIConfig;
-
-/**
- * @brief   SPI notification callback type.
- *
- * @param[in] spip      pointer to the @p SPIDriver object triggering the
- *                      callback
- */
-typedef void (*spicallback_t)(SPIDriver *spip);
-
-/* Including the low level driver header, it exports information required
-   for completing types.*/
 #include "hal_spi_lld.h"
 
-/**
- * @brief   Driver configuration structure.
- */
-struct hal_spi_config {
-#if (SPI_SUPPORTS_CIRCULAR == TRUE) || defined(__DOXYGEN__)
-  /**
-   * @brief   Enables the circular buffer mode.
-   */
-  bool                      circular;
+/* Some more checks, must happen after inclusion of the LLD header, this is
+   why are placed here.*/
+#if !defined(SPI_SUPPORTS_CIRCULAR)
+#define SPI_SUPPORTS_CIRCULAR               FALSE
 #endif
-  /**
-   * @brief Operation complete callback or @p NULL.
-   */
-  spicallback_t             end_cb;
-#if (SPI_SELECT_MODE == SPI_SELECT_MODE_LINE) || defined(__DOXYGEN__)
-  /**
-   * @brief The chip select line.
-   */
-  ioline_t                  ssline;
-#endif
-#if (SPI_SELECT_MODE == SPI_SELECT_MODE_PORT) || defined(__DOXYGEN__)
-  /**
-   * @brief The chip select port.
-   */
-  ioportid_t                ssport;
-  /**
-   * @brief The chip select port mask.
-   */
-  ioportmask_t              ssmask;
-#endif
-#if (SPI_SELECT_MODE == SPI_SELECT_MODE_PAD) || defined(__DOXYGEN__)
-  /**
-   * @brief The chip select port.
-   */
-  ioportid_t                ssport;
-  /**
-   * @brief The chip select pad number.
-   */
-  uint_fast8_t              sspad;
-#endif
-  /* End of the mandatory fields.*/
-  spi_lld_config_fields;
-};
-
-/**
- * @brief   Structure representing an SPI driver.
- */
-struct hal_spi_driver {
-  /**
-   * @brief Driver state.
-   */
-  spistate_t                state;
-  /**
-   * @brief Current configuration data.
-   */
-  const SPIConfig           *config;
-#if SPI_USE_WAIT || defined(__DOXYGEN__)
-  /**
-   * @brief   Waiting thread.
-   */
-  thread_reference_t        thread;
-#endif /* SPI_USE_WAIT */
-#if SPI_USE_MUTUAL_EXCLUSION || defined(__DOXYGEN__)
-  /**
-   * @brief   Mutex protecting the peripheral.
-   */
-  mutex_t                   mutex;
-#endif /* SPI_USE_MUTUAL_EXCLUSION */
-#if defined(SPI_DRIVER_EXT_FIELDS)
-  SPI_DRIVER_EXT_FIELDS
-#endif
-  /* End of the mandatory fields.*/
-  spi_lld_driver_fields;
-};
 
 /*===========================================================================*/
 /* Driver macros.                                                            */
@@ -225,21 +128,6 @@ struct hal_spi_driver {
  * @name    Macro Functions
  * @{
  */
-/**
- * @brief   Buffer state.
- * @note    This function is meant to be called from the SPI callback only.
- *
- * @param[in] spip      pointer to the @p SPIDriver object
- * @return              The buffer state.
- * @retval              false if the driver filled/sent the first half of the
- *                      buffer.
- * @retval              true if the driver filled/sent the second half of the
- *                      buffer.
- *
- * @special
- */
-#define spiIsBufferComplete(spip) ((bool)((spip)->state == SPI_COMPLETE))
-
 #if (SPI_SELECT_MODE == SPI_SELECT_MODE_LLD) || defined(__DOXYGEN__)
 /**
  * @brief   Asserts the slave select signal and prepares for transfers.
@@ -423,7 +311,7 @@ do {                                                                        \
 #endif /* !SPI_USE_WAIT */
 
 /**
- * @brief   Common ISR code when circular mode is not supported.
+ * @brief   Common ISR code.
  * @details This code handles the portable part of the ISR code:
  *          - Callback invocation.
  *          - Waiting thread wakeup, if any.
@@ -449,7 +337,7 @@ do {                                                                        \
 }
 
 /**
- * @brief   Half buffer filled ISR code in circular mode.
+ * @brief   Common ISR code in circular mode.
  * @details This code handles the portable part of the ISR code:
  *          - Callback invocation.
  *          .
@@ -460,14 +348,14 @@ do {                                                                        \
  *
  * @notapi
  */
-#define _spi_isr_half_code(spip) {                                          \
+#define _spi_isr_code_half1(spip) {                                         \
   if ((spip)->config->end_cb) {                                             \
     (spip)->config->end_cb(spip);                                           \
   }                                                                         \
 }
 
 /**
- * @brief   Full buffer filled ISR code in circular mode.
+ * @brief   Common ISR code in circular mode.
  * @details This code handles the portable part of the ISR code:
  *          - Callback invocation.
  *          - Driver state transitions.
@@ -479,7 +367,7 @@ do {                                                                        \
  *
  * @notapi
  */
-#define _spi_isr_full_code(spip) {                                          \
+#define _spi_isr_code_half2(spip) {                                         \
   if ((spip)->config->end_cb) {                                             \
     (spip)->state = SPI_COMPLETE;                                           \
     (spip)->config->end_cb(spip);                                           \
