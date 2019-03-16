@@ -549,7 +549,7 @@ typedef struct {
    * @brief LSM303DLHC accelerometer subsystem output data rate.
    */
   lsm303dlhc_acc_odr_t      accoutdatarate;
-#if LSM303DLHC_USE_ADVANCED || defined(__DOXYGEN__)
+#if LSM303DLHC_ACC_USE_ADVANCED || defined(__DOXYGEN__)
   /**
    * @brief LSM303DLHC accelerometer subsystem low power mode.
    */
@@ -583,7 +583,7 @@ typedef struct {
    * @brief LSM303DLHC compass subsystem output data rate.
    */
   lsm303dlhc_comp_odr_t     compoutputdatarate;
-#if LSM303DLHC_USE_ADVANCED || defined(__DOXYGEN__)
+#if LSM303DLHC_COMP_USE_ADVANCED || defined(__DOXYGEN__)
   /**
    * @brief LSM303DLHC compass subsystem working mode.
    */

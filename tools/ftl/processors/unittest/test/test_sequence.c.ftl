@@ -179,7 +179,6 @@ static void ${prefix_lower}test_${(sequence_index + 1)?string("000")}_${(case_in
 [@utils.EmitIndentedCCode "    " 2 step.code.value[0] /]
       [/#if]
   }
-  test_end_step(${(step_index + 1)?string});
     [/#list]
 }
 
