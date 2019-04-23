@@ -29,7 +29,7 @@
 #define HALCONF_H
 
 #define _CHIBIOS_HAL_CONF_
-#define _CHIBIOS_HAL_CONF_VER_7_1_
+#define _CHIBIOS_HAL_CONF_VER_7_0_
 
 #include "mcuconf.h"
 
@@ -66,13 +66,6 @@
  */
 #if !defined(HAL_USE_DAC) || defined(__DOXYGEN__)
 #define HAL_USE_DAC                         TRUE
-#endif
-
-/**
- * @brief   Enables the EFlash subsystem.
- */
-#if !defined(HAL_USE_EFL) || defined(__DOXYGEN__)
-#define HAL_USE_EFL                         TRUE
 #endif
 
 /**

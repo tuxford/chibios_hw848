@@ -30,10 +30,11 @@ static THD_FUNCTION(Thread1, arg) {
 }
 
 /*
- * Threads creation table, one entry per thread.
+ * Threads static table, one entry per thread. The number of entries must
+ * match NIL_CFG_NUM_THREADS.
  */
 THD_TABLE_BEGIN
-  THD_TABLE_THREAD(0, "sleeper", waThread1, Thread1, NULL)
+  THD_TABLE_ENTRY(waThread1, "sleeper", Thread1, NULL)
 THD_TABLE_END
 
 /*

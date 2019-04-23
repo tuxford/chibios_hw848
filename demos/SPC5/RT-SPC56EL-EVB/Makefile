@@ -82,19 +82,13 @@ PROJECT = ch
 
 # Imported source files and paths
 CHIBIOS = ../../..
-CONFDIR  := .
-BUILDDIR := ./build
-DEPDIR   := ./.dep
-
-# Licensing files.
-include $(CHIBIOS)/os/license/license.mk
 # Startup files.
 include $(CHIBIOS)/os/common/startup/e200/compilers/GCC/mk/startup_spc56elxx.mk
 # HAL-OSAL files (optional).
 include $(CHIBIOS)/os/hal/hal.mk
 include $(CHIBIOS)/os/hal/boards/ST_EVB_SPC56EL/board.mk
 include $(CHIBIOS)/os/hal/ports/SPC5/SPC56ELxx/platform.mk
-include $(CHIBIOS)/os/hal/osal/rt-nil/osal.mk
+include $(CHIBIOS)/os/hal/osal/rt/osal.mk
 # RTOS files (optional).
 include $(CHIBIOS)/os/rt/rt.mk
 include $(CHIBIOS)/os/common/ports/e200/compilers/GCC/mk/port.mk
@@ -109,18 +103,29 @@ include $(CHIBIOS)/os/various/shell/shell.mk
 LDSCRIPT= $(STARTUPLD)/SPC56EL60_LSM.ld
 
 # C sources here.
-CSRC = $(ALLCSRC) \
+CSRC = $(STARTUPSRC) \
+       $(KERNSRC) \
+       $(PORTSRC) \
+       $(OSALSRC) \
+       $(HALSRC) \
+       $(PLATFORMSRC) \
+       $(BOARDSRC) \
        $(TESTSRC) \
+       $(STREAMSSRC) \
+       $(SHELLSRC) \
        main.c
 
 # C++ sources here.
-CPPSRC = $(ALLCPPSRC)
+CPPSRC =
 
 # List ASM source files here
-ASMSRC = $(ALLASMSRC)
-ASMXSRC = $(ALLXASMSRC)
+ASMSRC =
+ASMXSRC = $(STARTUPASM) $(PORTASM) $(OSALASM)
 
-INCDIR = $(ALLINC) $(TESTINC) $(CONFDIR)
+INCDIR = $(CHIBIOS)/os/license \
+         $(STARTUPINC) $(KERNINC) $(PORTINC) $(OSALINC) \
+         $(HALINC) $(PLATFORMINC) $(BOARDINC) $(TESTINC) \
+         $(STREAMSINC) $(SHELLINC)
 
 #
 # Project, sources and paths

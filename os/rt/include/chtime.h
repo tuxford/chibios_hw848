@@ -482,8 +482,7 @@ static inline bool chTimeIsInRangeX(systime_t time,
                                     systime_t start,
                                     systime_t end) {
 
-  return (bool)((systime_t)((systime_t)time - (systime_t)start) <
-                (systime_t)((systime_t)end - (systime_t)start));
+  return (bool)((time - start) < (end - start));
 }
 
 /** @} */

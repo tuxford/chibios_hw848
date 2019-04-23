@@ -50,33 +50,7 @@
 
 #include "ch.h"
 
-static thread_t *tp1;
-static bool terminate;
-static semaphore_t sem1, sem2;
-
-/*
- * Signaler thread.
- */
-static THD_FUNCTION(signaler, arg) {
-
-  (void)arg;
-
-  /* Initializing global resources.*/
-  terminate = false;
-  chSemObjectInit(&sem1, 0);
-  chSemObjectInit(&sem2, 0);
-
-  while (!terminate) {
-    chSysLock();
-    if (chSemGetCounterI(&sem1) < 0)
-      chSemSignalI(&sem1);
-    chSemResetI(&sem2, 0);
-    chSchRescheduleS();
-    chSysUnlock();
-
-    chThdSleepMilliseconds(250);
-  }
-}
+static semaphore_t sem1;
 
 /****************************************************************************
  * Test cases.
@@ -162,20 +136,11 @@ static const testcase_t nil_test_003_001 = {
  */
 
 static void nil_test_003_002_setup(void) {
-  thread_config_t tc = {
-    chThdGetPriorityX() - 1,
-    "signaler",
-    wa_common,
-    THD_WORKING_AREA_END(wa_common),
-    signaler,
-    NULL
-  };
-  tp1 = chThdCreate(&tc);
+  chSemObjectInit(&gsem1, 0);
 }
 
 static void nil_test_003_002_teardown(void) {
-  terminate = true;
-  chThdWait(tp1);
+  chSemReset(&gsem1, 0);
 }
 
 static void nil_test_003_002_execute(void) {
@@ -187,8 +152,8 @@ static void nil_test_003_002_execute(void) {
   {
     msg_t msg;
 
-    msg = chSemWait(&sem1);
-    test_assert_lock(chSemGetCounterI(&sem1) == 0, "wrong counter value");
+    msg = chSemWait(&gsem1);
+    test_assert_lock(chSemGetCounterI(&gsem1) == 0, "wrong counter value");
     test_assert(MSG_OK == msg, "wrong returned message");
   }
 
@@ -199,8 +164,8 @@ static void nil_test_003_002_execute(void) {
   {
     msg_t msg;
 
-    msg = chSemWait(&sem2);
-    test_assert_lock(chSemGetCounterI(&sem2) == 0,"wrong counter value");
+    msg = chSemWait(&gsem2);
+    test_assert_lock(chSemGetCounterI(&gsem2) == 0,"wrong counter value");
     test_assert(MSG_RESET == msg, "wrong returned message");
   }
 }

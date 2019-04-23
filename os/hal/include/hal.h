@@ -50,10 +50,6 @@
 #define HAL_USE_DAC                         FALSE
 #endif
 
-#if !defined(HAL_USE_EFL)
-#define HAL_USE_EFL                         FALSE
-#endif
-
 #if !defined(HAL_USE_GPT)
 #define HAL_USE_GPT                         FALSE
 #endif
@@ -129,7 +125,6 @@
 #include "hal_ioblock.h"
 #include "hal_mmcsd.h"
 #include "hal_persistent.h"
-#include "hal_flash.h"
 
 /* Shared headers.*/
 #include "hal_buffers.h"
@@ -141,7 +136,6 @@
 #include "hal_can.h"
 #include "hal_crypto.h"
 #include "hal_dac.h"
-#include "hal_efl.h"
 #include "hal_gpt.h"
 #include "hal_i2c.h"
 #include "hal_i2s.h"
@@ -190,7 +184,7 @@
 /**
  * @brief   Stable release flag.
  */
-#define CH_HAL_STABLE           0
+#define CH_HAL_STABLE           1
 
 /**
  * @name    ChibiOS/HAL version identification
@@ -199,7 +193,7 @@
 /**
  * @brief   HAL version string.
  */
-#define HAL_VERSION             "7.1.0"
+#define HAL_VERSION             "7.0.2"
 
 /**
  * @brief   HAL version major number.
@@ -209,12 +203,12 @@
 /**
  * @brief   HAL version minor number.
  */
-#define CH_HAL_MINOR            1
+#define CH_HAL_MINOR            0
 
 /**
  * @brief   HAL version patch number.
  */
-#define CH_HAL_PATCH            0
+#define CH_HAL_PATCH            2
 /** @} */
 
 /**
@@ -238,7 +232,7 @@
 #error "invalid configuration file"
 #endif
 
-#if !defined(_CHIBIOS_HAL_CONF_VER_7_1_)
+#if !defined(_CHIBIOS_HAL_CONF_VER_7_0_)
 #error "obsolete or unknown configuration file"
 #endif
 

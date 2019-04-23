@@ -59,6 +59,7 @@ ICSR_PENDSVSET  EQU     0x10000000
                 AREA    |.text|, CODE, READONLY
 
                 IMPORT  chThdExit
+                IMPORT  chSysHalt
                 IMPORT  chSchDoReschedule
 #if CH_DBG_ENABLE_STACK_CHECK || PORT_ENABLE_GUARD_PAGES
                 IMPORT  _port_set_region
@@ -122,9 +123,14 @@ _port_thread_start PROC
 #endif
                 mov     r0, r5
                 blx     r4
+#if defined(_CHIBIOS_RT_CONF_)
                 movs    r0, #0              /* MSG_OK */
                 bl      chThdExit
-_zombies        b       _zombies
+#endif
+#if defined(_CHIBIOS_NIL_CONF_)
+                mov     r3, #0
+                bl      chSysHalt
+#endif
                 ENDP
 
 /*
