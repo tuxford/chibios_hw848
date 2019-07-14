@@ -56,8 +56,7 @@ flash_descriptor_t snor_descriptor = {
   .sectors_count    = 0U,           /* It is overwritten.*/
   .sectors          = NULL,
   .sectors_size     = SECTOR_SIZE,
-  .address          = 0U,
-  .size             = 0U            /* It is overwritten.*/
+  .address          = 0U
 };
 
 #if (SNOR_BUS_DRIVER == SNOR_BUS_DRIVER_WSPI) || defined(__DOXYGEN__)
@@ -394,9 +393,8 @@ void snor_device_init(SNORDriver *devp) {
 #endif
 
   /* Setting up the device size.*/
-  snor_descriptor.sectors_count = (1U << ((size_t)devp->device_id[2] & 0x1FU)) /
+  snor_descriptor.sectors_count = (1U << ((uint32_t)devp->device_id[2] & 0x1FU)) /
                                   SECTOR_SIZE;
-  snor_descriptor.size = (size_t)snor_descriptor.sectors_count * SECTOR_SIZE;
 }
 
 /**

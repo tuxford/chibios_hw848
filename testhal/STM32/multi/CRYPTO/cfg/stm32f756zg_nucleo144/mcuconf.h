@@ -62,7 +62,6 @@
 #define STM32_MCO1PRE                       STM32_MCO1PRE_DIV1
 #define STM32_MCO2SEL                       STM32_MCO2SEL_SYSCLK
 #define STM32_MCO2PRE                       STM32_MCO2PRE_DIV4
-#define STM32_TIMPRE_ENABLE                 FALSE
 #define STM32_I2SSRC                        STM32_I2SSRC_OFF
 #define STM32_PLLI2SN_VALUE                 192
 #define STM32_PLLI2SP_VALUE                 4
@@ -145,18 +144,13 @@
 /*
  * CRY driver system settings.
  */
-#define STM32_CRY_USE_CRYP1                 TRUE
+#define STM32_CRY_USE_CRYP1                 FALSE
 #define STM32_CRY_USE_HASH1                 TRUE
 #define STM32_CRY_CRYP1_IRQ_PRIORITY        9
 #define STM32_CRY_HASH1_IRQ_PRIORITY        9
-#define STM32_CRY_CRYP1_IN_DMA_STREAM       STM32_DMA_STREAM_ID(2, 6)
-#define STM32_CRY_CRYP1_OUT_DMA_STREAM      STM32_DMA_STREAM_ID(2, 5)
 #define STM32_CRY_HASH1_DMA_STREAM          STM32_DMA_STREAM_ID(2, 7)
-#define STM32_CRY_CRYP1_IN_DMA_PRIORITY     0
-#define STM32_CRY_CRYP1_OUT_DMA_PRIORITY    1
 #define STM32_CRY_HASH1_DMA_PRIORITY        0
 #define STM32_CRY_HASH_SIZE_THRESHOLD       1024
-#define STM32_CRY_CRYP_DMA_ERROR_HOOK(cryp) osalSysHalt("DMA failure")
 #define STM32_CRY_HASH_DMA_ERROR_HOOK(cryp) osalSysHalt("DMA failure")
 
 /*

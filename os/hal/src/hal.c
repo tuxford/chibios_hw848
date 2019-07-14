@@ -80,9 +80,6 @@ void halInit(void) {
 #if (HAL_USE_DAC == TRUE) || defined(__DOXYGEN__)
   dacInit();
 #endif
-#if (HAL_USE_EFL == TRUE) || defined(__DOXYGEN__)
-  eflInit();
-#endif
 #if (HAL_USE_GPT == TRUE) || defined(__DOXYGEN__)
   gptInit();
 #endif

@@ -742,6 +742,7 @@
  */
 #define rccResetTIM13() rccResetAPB1(RCC_APB1RSTR_TIM13RST)
 
+
 /**
  * @brief   Enables the TIM14 peripheral clock.
  *

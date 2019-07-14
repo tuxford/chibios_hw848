@@ -44,17 +44,8 @@
 #define EXTI_MODE_ACTION_EVENT      4U  /**< @brief Event mode.             */
 /** @} */
 
-/**
- * @name    EXTI types
- * @{
- */
-#define EXTI_TYPE_CLASSIC           0   /**< @brief Classic EXTI.           */
-#define EXTI_TYPE_NEWG0             1   /**< @brief EXTI introduced in G0.  */
-/** @} */
-
 /* Handling differences in ST headers.*/
-#if !defined(STM32H7XX) && !defined(STM32L4XX) && !defined(STM32L4XXP) &&   \
-    !defined(STM32G0XX)
+#if !defined(STM32H7XX) && !defined(STM32L4XX) && !defined(STM32L4XXP)
 #define EMR1    EMR
 #define IMR1    IMR
 #define PR1     PR
@@ -72,28 +63,6 @@
 
 #if !defined(STM32_EXTI_NUM_LINES)
 #error "STM32_EXTI_NUM_LINES not defined in registry"
-#endif
-
-/* Checking for presence of bank 2 registers. If the definition is not
-   present in registry then it is iferred by the number of channels (which
-   is not an always-good method, see G0.*/
-#if !defined(STM32_EXTI_HAS_GROUP2)
-#if STM32_EXTI_NUM_LINES <= 32
-#define STM32_EXTI_HAS_GROUP2       FALSE
-#else
-#define STM32_EXTI_HAS_GROUP2       TRUE
-#endif
-#endif /* !defined(STM32_EXTI_TYPE) */
-
-/* If not defined then it is a classic EXTI (without EXTICR and separate PR
-   registers for raising and falling edges.*/
-#if !defined(STM32_EXTI_TYPE)
-#define STM32_EXTI_TYPE             EXTI_TYPE_CLASSIC
-#endif
-
-#if (STM32_EXTI_TYPE != EXTI_TYPE_CLASSIC) &&                               \
-    (STM32_EXTI_TYPE != EXTI_TYPE_NEWG0)
-#error "invalid STM32_EXTI_TYPE"
 #endif
 
 #if (STM32_EXTI_NUM_LINES < 0) || (STM32_EXTI_NUM_LINES > 63)
@@ -149,20 +118,12 @@ typedef uint32_t extimode_t;
  *
  * @api
  */
-#if (STM32_EXTI_TYPE == EXTI_TYPE_CLASSIC) || defined(__DOXYGEN__)
 #define extiClearGroup1(mask) do {                                          \
   osalDbgAssert(((mask) & STM32_EXTI_IMR1_MASK) == 0U, "fixed lines");      \
   EXTI->PR1 = (uint32_t)(mask);                                             \
 } while (false)
-#else
-#define extiClearGroup1(mask) do {                                          \
-  osalDbgAssert(((mask) & STM32_EXTI_IMR1_MASK) == 0U, "fixed lines");      \
-  EXTI->RPR1 = (uint32_t)(mask);                                            \
-  EXTI->FPR1 = (uint32_t)(mask);                                            \
-} while (false)
-#endif
 
-#if (STM32_EXTI_HAS_GROUP2 == TRUE) || defined(__DOXYGEN__)
+#if (STM32_EXTI_NUM_LINES > 32) || defined(__DOXYGEN__)
 /**
  * @brief   STM32 EXTI group 2 IRQ status clearing.
  *
@@ -170,19 +131,11 @@ typedef uint32_t extimode_t;
  *
  * @api
  */
-#if (STM32_EXTI_TYPE == EXTI_TYPE_CLASSIC) || defined(__DOXYGEN__)
 #define extiClearGroup2(mask) do {                                          \
   osalDbgAssert(((mask) & STM32_EXTI_IMR2_MASK) == 0U, "fixed lines");      \
   EXTI->PR2 = (uint32_t)(mask);                                             \
 } while (false)
-#else
-#define extiClearGroup2(mask) do {                                          \
-  osalDbgAssert(((mask) & STM32_EXTI_IMR2_MASK) == 0U, "fixed lines");      \
-  EXTI->RPR2 = (uint32_t)(mask);                                            \
-  EXTI->FPR2 = (uint32_t)(mask);                                            \
-} while (false)
-#endif
-#endif /* STM32_EXTI_HAS_GROUP2 == TRUE */
+#endif /* STM32_EXTI_NUM_LINES > 32 */
 
 /*===========================================================================*/
 /* External declarations.                                                    */
@@ -192,9 +145,9 @@ typedef uint32_t extimode_t;
 extern "C" {
 #endif
   void extiEnableGroup1(uint32_t mask, extimode_t mode);
-#if (STM32_EXTI_HAS_GROUP2 == TRUE) || defined(__DOXYGEN__)
+#if (STM32_EXTI_NUM_LINES > 32) || defined(__DOXYGEN__)
   void extiEnableGroup2(uint32_t mask, extimode_t mode);
-#endif /* STM32_EXTI_HAS_GROUP2 == TRUE */
+#endif /* STM32_EXTI_NUM_LINES > 32 */
   void extiEnableLine(extiline_t line, extimode_t mode);
   void extiClearLine(extiline_t line);
   #ifdef __cplusplus

@@ -260,7 +260,7 @@ static void otg_fifo_read_to_buffer(volatile uint32_t *fifop,
   size_t i = 0;
 
   while (i < n) {
-    if ((i & 3) == 0) {
+    if ((i & 3) == 0){
       w = *fifop;
     }
     if (i < max) {
@@ -508,11 +508,11 @@ static void otg_isoc_out_failed_handler(USBDriver *usbp) {
         ((otgp->oe[ep].DOEPCTL & DOEPCTL_EPENA) != 0)) {
       /* Endpoint enabled -> ISOC OUT transfer failed */
       /* Disable endpoint */
-      /* CHTODO:: Core stucks here */
+      /* FIXME: Core stucks here */
       /*otgp->oe[ep].DOEPCTL |= (DOEPCTL_EPDIS | DOEPCTL_SNAK);
       while (otgp->oe[ep].DOEPCTL & DOEPCTL_EPENA)
         ;*/
-      /* Prepare transfer for next frame.*/
+      /* Prepare transfer for next frame */
       _usb_isr_invoke_out_cb(usbp, ep);
     }
   }
@@ -1182,7 +1182,7 @@ void usb_lld_start_in(USBDriver *usbp, usbep_t ep) {
     /* Normal case.*/
     uint32_t pcnt = (isp->txsize + usbp->epc[ep]->in_maxsize - 1) /
                     usbp->epc[ep]->in_maxsize;
-    /* CHTODO: Support more than one packet per frame for isochronous transfers.*/
+    /* TODO: Support more than one packet per frame for isochronous transfers.*/
     usbp->otg->ie[ep].DIEPTSIZ = DIEPTSIZ_MCNT(1) | DIEPTSIZ_PKTCNT(pcnt) |
                                  DIEPTSIZ_XFRSIZ(isp->txsize);
   }

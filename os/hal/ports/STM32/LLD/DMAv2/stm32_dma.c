@@ -49,6 +49,7 @@
  */
 #define STM32_DMA2_STREAMS_MASK     0x0000FF00U
 
+
 #if STM32_DMA_SUPPORTS_DMAMUX == TRUE
 
 #define DMA1_CH0_VARIANT            DMAMUX1_Channel0
@@ -515,6 +516,7 @@ const stm32_dma_stream_t *dmaStreamAllocI(uint32_t id,
 #endif
   else {
     osalDbgCheck(false);
+    return NULL;
   }
 
   for (i = startid; i <= endid; i++) {

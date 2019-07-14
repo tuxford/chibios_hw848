@@ -905,6 +905,7 @@
 
 /**
  * @brief   SAI1SEL value (SAI1 clock source).
+ * @todo    Add check.
  */
 #if !defined(STM32_SAI1SEL) || defined(__DOXYGEN__)
 #define STM32_SAI1SEL               STM32_SAI1SEL_OFF
@@ -912,6 +913,7 @@
 
 /**
  * @brief   SAI2SEL value (SAI2 clock source).
+ * @todo    Add check.
  */
 #if !defined(STM32_SAI2SEL) || defined(__DOXYGEN__)
 #define STM32_SAI2SEL               STM32_SAI2SEL_OFF
@@ -1009,22 +1011,6 @@
  */
 #if !defined(STM32F4xx_MCUCONF)
 #error "Using a wrong mcuconf.h file, STM32F4xx_MCUCONF not defined"
-#endif
-
-#if defined(STM32F405xx) && !defined(STM32F405_MCUCONF)
-#error "Using a wrong mcuconf.h file, STM32F405_MCUCONF not defined"
-#endif
-
-#if defined(STM32F415xx) && !defined(STM32F415_MCUCONF)
-#error "Using a wrong mcuconf.h file, STM32F415_MCUCONF not defined"
-#endif
-
-#if defined(STM32F407xx) && !defined(STM32F407_MCUCONF)
-#error "Using a wrong mcuconf.h file, STM32F407_MCUCONF not defined"
-#endif
-
-#if defined(STM32F417xx) && !defined(STM32F417_MCUCONF)
-#error "Using a wrong mcuconf.h file, STM32F417_MCUCONF not defined"
 #endif
 
 #else /* !defined(STM32F4XX) */

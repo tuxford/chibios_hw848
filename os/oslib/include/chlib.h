@@ -43,7 +43,7 @@
 /**
  * @brief   Stable release flag.
  */
-#define CH_OSLIB_STABLE         0
+#define CH_OSLIB_STABLE         1
 
 /**
  * @name    ChibiOS/LIB version identification
@@ -52,7 +52,7 @@
 /**
  * @brief   OS Library version string.
  */
-#define CH_OSLIB_VERSION        "1.1.0"
+#define CH_OSLIB_VERSION        "1.1.2"
 
 /**
  * @brief   OS Library version major number.
@@ -67,7 +67,7 @@
 /**
  * @brief   OS Library version patch number.
  */
-#define CH_OSLIB_PATCH          0
+#define CH_OSLIB_PATCH          2
 /** @} */
 
 /*===========================================================================*/
@@ -142,7 +142,7 @@
 #error "malformed chlicense.h"
 #endif
 
-#if CH_CUSTOMER_LIC_OSLIB == FALSE
+#if CH_CUSTOMER_LIC_OSLIB== FALSE
 #error "ChibiOS/LIB not licensed"
 #endif
 
@@ -211,28 +211,6 @@
 #include "chobjfifos.h"
 #include "chpipes.h"
 #include "chfactory.h"
-
-/*===========================================================================*/
-/* Module inline functions.                                                  */
-/*===========================================================================*/
-
-/**
- * @brief   Initialization of all library modules.
- *
- * @notapi
- */
-static inline void _oslib_init(void) {
-
-#if CH_CFG_USE_MEMCORE == TRUE
-  _core_init();
-#endif
-#if CH_CFG_USE_HEAP == TRUE
-  _heap_init();
-#endif
-#if CH_CFG_USE_FACTORY == TRUE
-  _factory_init();
-#endif
-}
 
 #endif /* CHLIB_H */
 
