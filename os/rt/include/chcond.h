@@ -21,7 +21,7 @@
  */
 
 /**
- * @file    rt/include/chcond.h
+ * @file    chcond.h
  * @brief   Condition Variables macros and structures.
  *
  * @addtogroup condvars

@@ -67,7 +67,7 @@ ADCDriver ADCD3;
 /*===========================================================================*/
 
 /**
- * @brief   ADC DMA service routine.
+ * @brief   ADC DMA ISR service routine.
  *
  * @param[in] adcp      pointer to the @p ADCDriver object
  * @param[in] flags     pre-shifted content of the ISR register

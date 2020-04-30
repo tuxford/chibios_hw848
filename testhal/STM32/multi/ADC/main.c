@@ -45,6 +45,8 @@ adcsample_t samples2[CACHE_SIZE_ALIGN(adcsample_t, ADC_GRP2_NUM_CHANNELS * ADC_G
 size_t n= 0, nx = 0, ny = 0;
 void adccallback(ADCDriver *adcp) {
 
+  (void)adcp;
+
   /* Updating counters.*/
   n++;
   if (adcIsBufferComplete(adcp)) {
@@ -55,9 +57,7 @@ void adccallback(ADCDriver *adcp) {
   }
 
   if ((n % 200) == 0U) {
-#if defined(PORTAB_LINE_LED2)
     palToggleLine(PORTAB_LINE_LED2);
-#endif
   }
 }
 

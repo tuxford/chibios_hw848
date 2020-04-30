@@ -51,11 +51,12 @@ THD_FUNCTION(Thread2, arg) {
 
 
 /*
- * Threads creation table, one entry per thread.
+ * Threads static table, one entry per thread. The number of entries must
+ * match NIL_CFG_NUM_THREADS.
  */
 THD_TABLE_BEGIN
-  THD_TABLE_THREAD(0, "blinker", waThread1, Thread1, NULL)
-  THD_TABLE_THREAD(1, "hello",   waThread2, Thread2, NULL)
+  THD_TABLE_ENTRY(waThread1, "blinker", Thread1, NULL)
+  THD_TABLE_ENTRY(waThread2, "hello", Thread2, NULL)
 THD_TABLE_END
 
 /*

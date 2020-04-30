@@ -34,22 +34,7 @@
  */
 
 /**
- * @defgroup NIL_KERNEL Base API
- * @ingroup NIL
- */
-
-/**
- * @defgroup NIL_SEMAPHORES Semaphores
- * @ingroup NIL
- */
-
-/**
- * @defgroup NIL_EVENTS Events
- * @ingroup NIL
- */
-
-/**
- * @defgroup NIL_MESSAGES Synchronous Messages
+ * @defgroup NIL_KERNEL API
  * @ingroup NIL
  */
 

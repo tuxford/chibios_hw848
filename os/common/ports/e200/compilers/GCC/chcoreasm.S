@@ -56,18 +56,9 @@
  * RTOS-specific context offset.
  */
 #if defined(_CHIBIOS_RT_CONF_)
-#if CH_CFG_USE_REGISTRY
-#define CURRENT_OFFSET  20          /* ch.rlist.current */
-#define CONTEXT_OFFSET  20
-#else
-#define CURRENT_OFFSET  12
 #define CONTEXT_OFFSET  12
-#endif
-
 #elif defined(_CHIBIOS_NIL_CONF_)
-#define CURRENT_OFFSET  0           /* nil.current */
 #define CONTEXT_OFFSET  0
-
 #else
 #error "invalid chconf.h"
 #endif
@@ -114,8 +105,14 @@ _port_thread_start:
         mr          r3, r31
         mtctr       r30
         se_bctrl
+#if defined(_CHIBIOS_RT_CONF_)
         e_li        r0, 0
         e_bl        chThdExit
+#endif
+#if defined(_CHIBIOS_NIL_CONF_)
+        se_li       r0, 0
+        e_bl        chSysHalt
+#endif
 
 #endif /* !defined(__DOXYGEN__) */
 

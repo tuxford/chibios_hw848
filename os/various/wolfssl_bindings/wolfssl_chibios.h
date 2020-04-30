@@ -38,13 +38,12 @@
  */
 #ifndef WOLFSSL_SK_H
 #define WOLFSSL_SK_H
-#include "user_settings.h"
-#include "wolfssl/wolfcrypt/settings.h"
-#include "wolfssl/wolfcrypt/types.h"
 #include "wolfssl/ssl.h"
+#include "wolfssl/wolfcrypt/types.h"
 #include "lwip/opt.h"
 #include "lwip/arch.h"
 #include "lwip/api.h"
+#include "user_settings.h"
 #define XMALLOC(s,h,t) chibios_alloc(h,s)
 #define XFREE(p,h,t)   chibios_free(p)
 

@@ -115,13 +115,6 @@
 #define STM32_EXTI_NUM_LINES                19
 #define STM32_EXTI_IMR_MASK                 0x00000000U
 
-/* Flash attributes.*/
-#define STM32_FLASH_NUMBER_OF_BANKS         1
-#define STM32_FLASH_SECTOR_SIZE             1024U
-#if !defined(STM32_FLASH_SECTORS_PER_BANK) || defined(__DOXYGEN__)
-#define STM32_FLASH_SECTORS_PER_BANK        32 /* Maximum, can be redefined.*/
-#endif
-
 /* GPIO attributes.*/
 #define STM32_HAS_GPIOA                     TRUE
 #define STM32_HAS_GPIOB                     TRUE
@@ -328,13 +321,6 @@
 #define STM32_EXTI_NUM_LINES                19
 #define STM32_EXTI_IMR_MASK                 0x00000000U
 
-/* Flash attributes.*/
-#define STM32_FLASH_NUMBER_OF_BANKS         1
-#define STM32_FLASH_SECTOR_SIZE             1024U
-#if !defined(STM32_FLASH_SECTORS_PER_BANK) || defined(__DOXYGEN__)
-#define STM32_FLASH_SECTORS_PER_BANK        32 /* Maximum, can be redefined.*/
-#endif
-
 /* GPIO attributes.*/
 #define STM32_HAS_GPIOA                     TRUE
 #define STM32_HAS_GPIOB                     TRUE
@@ -512,13 +498,6 @@
 /* EXTI attributes.*/
 #define STM32_EXTI_NUM_LINES                19
 #define STM32_EXTI_IMR_MASK                 0x00000000U
-
-/* Flash attributes.*/
-#define STM32_FLASH_NUMBER_OF_BANKS         1
-#define STM32_FLASH_SECTOR_SIZE             1024U
-#if !defined(STM32_FLASH_SECTORS_PER_BANK) || defined(__DOXYGEN__)
-#define STM32_FLASH_SECTORS_PER_BANK        128 /* Maximum, can be redefined.*/
-#endif
 
 /* GPIO attributes.*/
 #define STM32_HAS_GPIOA                     TRUE
@@ -730,13 +709,6 @@
 /* EXTI attributes.*/
 #define STM32_EXTI_NUM_LINES                19
 #define STM32_EXTI_IMR_MASK                 0x00000000U
-
-/* Flash attributes.*/
-#define STM32_FLASH_NUMBER_OF_BANKS         1
-#define STM32_FLASH_SECTOR_SIZE             2048U
-#if !defined(STM32_FLASH_SECTORS_PER_BANK) || defined(__DOXYGEN__)
-#define STM32_FLASH_SECTORS_PER_BANK        256 /* Maximum, can be redefined.*/
-#endif
 
 /* GPIO attributes.*/
 #define STM32_HAS_GPIOA                     TRUE
@@ -970,13 +942,6 @@
 /* EXTI attributes.*/
 #define STM32_EXTI_NUM_LINES                19
 #define STM32_EXTI_IMR_MASK                 0x00000000U
-
-/* Flash attributes.*/
-#define STM32_FLASH_NUMBER_OF_BANKS         2
-#define STM32_FLASH_SECTOR_SIZE             2048U
-#if !defined(STM32_FLASH_SECTORS_PER_BANK) || defined(__DOXYGEN__)
-#define STM32_FLASH_SECTORS_PER_BANK        256 /* Maximum, can be redefined.*/
-#endif
 
 /* GPIO attributes.*/
 #define STM32_HAS_GPIOA                     TRUE
@@ -1230,13 +1195,6 @@
 /* EXTI attributes.*/
 #define STM32_EXTI_NUM_LINES                20
 #define STM32_EXTI_IMR_MASK                 0x00000000U
-
-/* Flash attributes.*/
-#define STM32_FLASH_NUMBER_OF_BANKS         1
-#define STM32_FLASH_SECTOR_SIZE             2048U
-#if !defined(STM32_FLASH_SECTORS_PER_BANK) || defined(__DOXYGEN__)
-#define STM32_FLASH_SECTORS_PER_BANK        128 /* Maximum, can be redefined.*/
-#endif
 
 /* GPIO attributes.*/
 #define STM32_HAS_GPIOA                     TRUE

@@ -83,10 +83,7 @@ endif
 PROJECT = ch
 
 # Imported source files and paths
-CHIBIOS  := ../../..
-CONFDIR  := ./cfg
-BUILDDIR := ./build
-DEPDIR   := ./.dep
+CHIBIOS = ../../..
 
 # Licensing files.
 include $(CHIBIOS)/os/license/license.mk
@@ -95,7 +92,7 @@ include $(CHIBIOS)/os/license/license.mk
 include $(CHIBIOS)/os/hal/hal.mk
 include $(CHIBIOS)/os/hal/boards/PJRC_TEENSY_2PLUSPLUS/board.mk
 include $(CHIBIOS)/os/hal/ports/AVR/MEGA/ATMEGAxx/platform.mk
-include $(CHIBIOS)/os/hal/osal/rt-nil/osal.mk
+include $(CHIBIOS)/os/hal/osal/rt/osal.mk
 
 # RTOS files (optional).
 include $(CHIBIOS)/os/rt/rt.mk

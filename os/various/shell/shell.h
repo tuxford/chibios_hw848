@@ -106,13 +106,6 @@
 #define SHELL_NEWLINE_STR            "\r\n"
 #endif
 
-/**
- * @brief   Default shell thread name.
- */
-#if !defined(SHELL_THREAD_NAME) || defined(__DOXYGEN__)
-#define SHELL_THREAD_NAME           "shell"
-#endif
-
 /*===========================================================================*/
 /* Derived constants and error checks.                                       */
 /*===========================================================================*/

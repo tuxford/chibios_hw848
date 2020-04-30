@@ -18,7 +18,7 @@
 */
 
 /**
- * @file    oslib/src/chfactory.c
+ * @file    chfactory.c
  * @brief   ChibiOS objects factory and registry code.
  *
  * @addtogroup oslib_objects_factory
@@ -159,6 +159,7 @@ static void dyn_release_object_heap(dyn_element_t *dep,
 
   chDbgCheck(dep != NULL);
   chDbgAssert(dep->refs > (ucnt_t)0, "invalid references number");
+
 
   dep->refs--;
   if (dep->refs == (ucnt_t)0) {
@@ -380,7 +381,7 @@ registered_object_t *chFactoryFindObjectByPointer(void *objp) {
  *
  * @api
  */
-void chFactoryReleaseObject(registered_object_t *rop) {
+void chFactoryReleaseObject(registered_object_t *rop){
 
   F_LOCK();
 
@@ -418,7 +419,7 @@ dyn_buffer_t *chFactoryCreateBuffer(const char *name, size_t size) {
                                                size);
   if (dbp != NULL) {
     /* Initializing buffer object data.*/
-    memset((void *)(dbp + 1), 0, size);
+    memset((void *)dbp->buffer, 0, size);
   }
 
   F_UNLOCK();
@@ -579,7 +580,7 @@ dyn_mailbox_t *chFactoryCreateMailbox(const char *name, size_t n) {
                                                 (n * sizeof (msg_t)));
   if (dmp != NULL) {
     /* Initializing mailbox object data.*/
-    chMBObjectInit(&dmp->mbx, (msg_t *)(dmp + 1), n);
+    chMBObjectInit(&dmp->mbx, dmp->msgbuf, n);
   }
 
   F_UNLOCK();
@@ -666,11 +667,9 @@ dyn_objects_fifo_t *chFactoryCreateObjectsFIFO(const char *name,
                                                       (objn * sizeof (msg_t)) +
                                                       (objn * objsize));
   if (dofp != NULL) {
-    msg_t *msgbuf = (msg_t *)(dofp + 1);
-
     /* Initializing mailbox object data.*/
     chFifoObjectInitAligned(&dofp->fifo, objsize, objn, objalign,
-                            (void *)&msgbuf[objn], msgbuf);
+                            (void *)&dofp->msgbuf[objn], dofp->msgbuf);
   }
 
   F_UNLOCK();
@@ -752,7 +751,7 @@ dyn_pipe_t *chFactoryCreatePipe(const char *name, size_t size) {
                                              sizeof (dyn_pipe_t) + size);
   if (dpp != NULL) {
     /* Initializing mailbox object data.*/
-    chPipeObjectInit(&dpp->pipe, (uint8_t *)(dpp + 1), size);
+    chPipeObjectInit(&dpp->pipe, dpp->buffer, size);
   }
 
   F_UNLOCK();

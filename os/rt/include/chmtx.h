@@ -18,7 +18,7 @@
 */
 
 /**
- * @file    rt/include/chmtx.h
+ * @file    chmtx.h
  * @brief   Mutexes macros and structures.
  *
  * @addtogroup mutexes

@@ -104,7 +104,6 @@ static UARTConfig uart_cfg_1 = {
   rxend,
   rxchar,
   rxerr,
-  NULL,
   38400,
   0,
   USART_CR2_LINEN,

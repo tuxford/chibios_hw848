@@ -42,8 +42,8 @@
 /**
  * @brief   Use OSAL delays.
  * @details If set to @p TRUE then delays are implemented using the
- *          thread-friendly delay function else a delay function must
- *          be provided externally.
+ *          thread-friendy delay function else a delay function must
+ *          be provided extenally.
  */
 #if !defined(SW_I2C_USE_OSAL_DELAY) || defined(__DOXYGEN__)
 #define SW_I2C_USE_OSAL_DELAY               TRUE

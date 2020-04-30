@@ -21,13 +21,13 @@
  * @file    nil_test_sequence_002.c
  * @brief   Test Sequence 002 code.
  *
- * @page nil_test_sequence_002 [2] Time and Intervals Functionality
+ * @page nil_test_sequence_002 [2] Threads Functionality
  *
  * File: @ref nil_test_sequence_002.c
  *
  * <h2>Description</h2>
- * This sequence tests the ChibiOS/NIL functionalities related to time
- * and intervals management.
+ * This sequence tests the ChibiOS/NIL functionalities related to
+ * threading.
  *
  * <h2>Test Cases</h2>
  * - @subpage nil_test_002_001
@@ -67,7 +67,6 @@ static void nil_test_002_001_execute(void) {
     while (time == chVTGetSystemTimeX()) {
     }
   }
-  test_end_step(1);
 }
 
 static const testcase_t nil_test_002_001 = {
@@ -78,73 +77,92 @@ static const testcase_t nil_test_002_001 = {
 };
 
 /**
- * @page nil_test_002_002 [2.2] Time ranges functionality
+ * @page nil_test_002_002 [2.2] Thread Sleep functionality
  *
  * <h2>Description</h2>
- * The functionality of the API @p chTimeIsInRangeX() is tested.
+ * The functionality of @p chThdSleep() and derivatives is tested.
  *
  * <h2>Test Steps</h2>
- * - [2.2.1] Checking case where start == end, it must always evaluate
- *   as not in range.
- * - [2.2.2] Checking boundaries for start < end.
- * - [2.2.3] Checking boundaries for start > end.
+ * - [2.2.1] The current system time is read then a sleep is performed
+ *   for 100 system ticks and on exit the system time is verified
+ *   again.
+ * - [2.2.2] The current system time is read then a sleep is performed
+ *   for 100000 microseconds and on exit the system time is verified
+ *   again.
+ * - [2.2.3] The current system time is read then a sleep is performed
+ *   for 100 milliseconds and on exit the system time is verified
+ *   again.
+ * - [2.2.4] The current system time is read then a sleep is performed
+ *   for 1 second and on exit the system time is verified again.
+ * - [2.2.5] Function chThdSleepUntil() is tested with a timeline of
+ *   "now" + 100 ticks.
  * .
  */
 
 static void nil_test_002_002_execute(void) {
+  systime_t time;
 
-  /* [2.2.1] Checking case where start == end, it must always evaluate
-     as not in range.*/
+  /* [2.2.1] The current system time is read then a sleep is performed
+     for 100 system ticks and on exit the system time is verified
+     again.*/
   test_set_step(1);
   {
-    bool b;
-
-    b = chTimeIsInRangeX((systime_t)0, (systime_t)0, (systime_t)0);
-    test_assert(b == false, "in range");
-    b = chTimeIsInRangeX((systime_t)-1, (systime_t)0, (systime_t)0);
-    test_assert(b == false, "in range");
-    b = chTimeIsInRangeX((systime_t)0, (systime_t)-1, (systime_t)-1);
-    test_assert(b == false, "in range");
-    b = chTimeIsInRangeX((systime_t)-1, (systime_t)-1, (systime_t)-1);
-    test_assert(b == false, "in range");
+    time = chVTGetSystemTimeX();
+    chThdSleep(100);
+    test_assert_time_window(chTimeAddX(time, 100),
+                            chTimeAddX(time, 100 + 1),
+                            "out of time window");
   }
-  test_end_step(1);
 
-  /* [2.2.2] Checking boundaries for start < end.*/
+  /* [2.2.2] The current system time is read then a sleep is performed
+     for 100000 microseconds and on exit the system time is verified
+     again.*/
   test_set_step(2);
   {
-    bool b;
-
-    b = chTimeIsInRangeX((systime_t)10, (systime_t)10, (systime_t)100);
-    test_assert(b == true, "not in range");
-    b = chTimeIsInRangeX((systime_t)9, (systime_t)10, (systime_t)100);
-    test_assert(b == false, "in range");
-    b = chTimeIsInRangeX((systime_t)99, (systime_t)10, (systime_t)100);
-    test_assert(b == true, "not in range");
-    b = chTimeIsInRangeX((systime_t)100, (systime_t)10, (systime_t)100);
-    test_assert(b == false, "in range");
+    time = chVTGetSystemTimeX();
+    chThdSleepMicroseconds(100000);
+    test_assert_time_window(chTimeAddX(time, TIME_US2I(100000)),
+                            chTimeAddX(time, TIME_US2I(100000) + 1),
+                            "out of time window");
   }
-  test_end_step(2);
 
-  /* [2.2.3] Checking boundaries for start > end.*/
+  /* [2.2.3] The current system time is read then a sleep is performed
+     for 100 milliseconds and on exit the system time is verified
+     again.*/
   test_set_step(3);
   {
-    bool b;
-
-    b = chTimeIsInRangeX((systime_t)100, (systime_t)100, (systime_t)10);
-    test_assert(b == true, "not in range");
-    b = chTimeIsInRangeX((systime_t)99, (systime_t)100, (systime_t)10);
-    test_assert(b == false, "in range");
-    b = chTimeIsInRangeX((systime_t)9, (systime_t)100, (systime_t)10);
-    test_assert(b == true, "not in range");
-    b = chTimeIsInRangeX((systime_t)10, (systime_t)100, (systime_t)10);
-    test_assert(b == false, "in range");
+    time = chVTGetSystemTimeX();
+    chThdSleepMilliseconds(100);
+    test_assert_time_window(chTimeAddX(time, TIME_MS2I(100)),
+                            chTimeAddX(time, TIME_MS2I(100) + 1),
+                            "out of time window");
   }
-  test_end_step(3);
+
+  /* [2.2.4] The current system time is read then a sleep is performed
+     for 1 second and on exit the system time is verified again.*/
+  test_set_step(4);
+  {
+    time = chVTGetSystemTimeX();
+    chThdSleepSeconds(1);
+    test_assert_time_window(chTimeAddX(time, TIME_S2I(1)),
+                            chTimeAddX(time, TIME_S2I(1) + 1),
+                            "out of time window");
+  }
+
+  /* [2.2.5] Function chThdSleepUntil() is tested with a timeline of
+     "now" + 100 ticks.*/
+  test_set_step(5);
+  {
+    time = chVTGetSystemTimeX();
+    chThdSleepUntil(chTimeAddX(time, 100));
+    test_assert_time_window(chTimeAddX(time, 100),
+                            chTimeAddX(time, 100 + 1),
+                            "out of time window");
+  }
 }
 
 static const testcase_t nil_test_002_002 = {
-  "Time ranges functionality",
+  "Thread Sleep functionality",
   NULL,
   NULL,
   nil_test_002_002_execute
@@ -164,9 +182,9 @@ const testcase_t * const nil_test_sequence_002_array[] = {
 };
 
 /**
- * @brief   Time and Intervals Functionality.
+ * @brief   Threads Functionality.
  */
 const testsequence_t nil_test_sequence_002 = {
-  "Time and Intervals Functionality",
+  "Threads Functionality",
   nil_test_sequence_002_array
 };

@@ -18,7 +18,7 @@
 */
 
 /**
- * @file    rt/src/chsem.c
+ * @file    chsem.c
  * @brief   Semaphores code.
  *
  * @addtogroup semaphores
@@ -107,22 +107,20 @@ void chSemObjectInit(semaphore_t *sp, cnt_t n) {
  * @post    After invoking this function all the threads waiting on the
  *          semaphore, if any, are released and the semaphore counter is set
  *          to the specified, non negative, value.
- * @post    This function does not reschedule so a call to a rescheduling
- *          function must be performed before unlocking the kernel. Note that
- *          interrupt handlers always reschedule on exit so an explicit
- *          reschedule must not be performed in ISRs.
+ * @note    The released threads can recognize they were waked up by a reset
+ *          rather than a signal because the @p chSemWait() will return
+ *          @p MSG_RESET instead of @p MSG_OK.
  *
  * @param[in] sp        pointer to a @p semaphore_t structure
  * @param[in] n         the new value of the semaphore counter. The value must
  *                      be non-negative.
- * @param[in] msg       message to be sent
  *
  * @api
  */
-void chSemResetWithMessage(semaphore_t *sp, cnt_t n, msg_t msg) {
+void chSemReset(semaphore_t *sp, cnt_t n) {
 
   chSysLock();
-  chSemResetWithMessageI(sp, n, msg);
+  chSemResetI(sp, n);
   chSchRescheduleS();
   chSysUnlock();
 }
@@ -136,15 +134,17 @@ void chSemResetWithMessage(semaphore_t *sp, cnt_t n, msg_t msg) {
  *          function must be performed before unlocking the kernel. Note that
  *          interrupt handlers always reschedule on exit so an explicit
  *          reschedule must not be performed in ISRs.
+ * @note    The released threads can recognize they were waked up by a reset
+ *          rather than a signal because the @p chSemWait() will return
+ *          @p MSG_RESET instead of @p MSG_OK.
  *
  * @param[in] sp        pointer to a @p semaphore_t structure
  * @param[in] n         the new value of the semaphore counter. The value must
  *                      be non-negative.
- * @param[in] msg       message to be sent
  *
  * @iclass
  */
-void chSemResetWithMessageI(semaphore_t *sp, cnt_t n, msg_t msg) {
+void chSemResetI(semaphore_t *sp, cnt_t n) {
   cnt_t cnt;
 
   chDbgCheckClassI();
@@ -156,7 +156,7 @@ void chSemResetWithMessageI(semaphore_t *sp, cnt_t n, msg_t msg) {
   cnt = sp->cnt;
   sp->cnt = n;
   while (++cnt <= (cnt_t)0) {
-    chSchReadyI(queue_lifo_remove(&sp->queue))->u.rdymsg = msg;
+    chSchReadyI(queue_lifo_remove(&sp->queue))->u.rdymsg = MSG_RESET;
   }
 }
 

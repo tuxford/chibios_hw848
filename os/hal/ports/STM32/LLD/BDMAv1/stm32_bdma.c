@@ -310,7 +310,6 @@ const stm32_bdma_stream_t *bdmaStreamAllocI(uint32_t id,
   }
   else {
     osalDbgCheck(false);
-    return NULL;
   }
 
   for (i = startid; i <= endid; i++) {

@@ -78,6 +78,14 @@ typedef struct SDCDriver SDCDriver;
  */
 typedef struct {
   /**
+   * @brief   Working area for memory consuming operations.
+   * @note    It is mandatory for detecting MMC cards bigger than 2GB else it
+   *          can be @p NULL.
+   * @note    Memory pointed by this buffer is only used by @p sdcConnect(),
+   *          afterward it can be reused for other purposes.
+   */
+  uint8_t       *scratchpad;
+  /**
    * @brief   Bus width.
    */
   sdcbusmode_t  bus_width;
@@ -124,10 +132,6 @@ struct SDCDriver {
    * @brief Card RCA.
    */
   uint32_t                  rca;
-  /**
-   * @brief   Buffer for internal operations.
-   */
-  uint8_t                   buf[MMCSD_BLOCK_SIZE];
   /* End of the mandatory fields.*/
 };
 

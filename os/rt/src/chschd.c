@@ -18,7 +18,7 @@
 */
 
 /**
- * @file    rt/src/chschd.c
+ * @file    chschd.c
  * @brief   Scheduler code.
  *
  * @addtogroup scheduler

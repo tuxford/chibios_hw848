@@ -22,7 +22,7 @@
  * @{
  */
 
-/* CHTODO: LSEBYP like in F3.*/
+/* TODO: LSEBYP like in F3.*/
 
 #include "hal.h"
 

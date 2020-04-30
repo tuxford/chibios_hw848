@@ -64,8 +64,7 @@ static ICUConfig icucfg = {
   icuperiodcb,
   NULL,
   ICU_CHANNEL_1,
-  0U,
-  0xFFFFFFFFU
+  0
 };
 
 /*

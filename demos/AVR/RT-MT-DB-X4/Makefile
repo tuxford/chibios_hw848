@@ -83,10 +83,7 @@ endif
 PROJECT = ch
 
 # Imported source files and paths
-CHIBIOS  := ../../..
-CONFDIR  := ./cfg
-BUILDDIR := ./build
-DEPDIR   := ./.dep
+CHIBIOS = ../../..
 
 # Licensing files.
 include $(CHIBIOS)/os/license/license.mk
@@ -95,7 +92,7 @@ include $(CHIBIOS)/os/license/license.mk
 include $(CHIBIOS)/os/hal/hal.mk
 include $(CHIBIOS)/os/hal/boards/MT-DB-X4/board.mk
 include $(CHIBIOS)/os/hal/ports/AVR/XMEGA/ATXMEGAxxxA4U/platform.mk
-include $(CHIBIOS)/os/hal/osal/rt-nil/osal.mk
+include $(CHIBIOS)/os/hal/osal/rt/osal.mk
 
 # RTOS files (optional).
 include $(CHIBIOS)/os/rt/rt.mk
@@ -109,7 +106,7 @@ CSRC =  $(ALLCSRC) \
 CPPSRC = $(ALLCPPSRC)
 
 # Header files here.
-INCDIR = $(CONFDIR) $(ALLINC)
+INCDIR =  $(ALLINC)
 
 #
 # Project, sources and paths.

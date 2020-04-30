@@ -49,16 +49,6 @@
  */
 
 /**
- * @defgroup oslib_delegates Delegate Threads
- * @ingroup oslib_synchronization
- */
-
-/**
- * @defgroup oslib_jobs_queues Jobs Queues
- * @ingroup oslib_synchronization
- */
-
-/**
  * @defgroup oslib_memory Memory Management
  * @details Memory Management services.
  * @ingroup oslib
@@ -86,11 +76,6 @@
 
 /**
  * @defgroup oslib_objects_fifos Objects FIFOs
- * @ingroup oslib_complex
- */
-
-/**
- * @defgroup oslib_objchaches Objects Caches
  * @ingroup oslib_complex
  */
 

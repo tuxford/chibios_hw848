@@ -103,9 +103,8 @@ typedef enum {
   CAN_UNINIT = 0,                           /**< Not initialized.           */
   CAN_STOP = 1,                             /**< Stopped.                   */
   CAN_STARTING = 2,                         /**< Starting.                  */
-  CAN_STOPPING = 3,                         /**< Stopping.                  */
-  CAN_READY = 4,                            /**< Ready.                     */
-  CAN_SLEEP = 5                             /**< Sleep state.               */
+  CAN_READY = 3,                            /**< Ready.                     */
+  CAN_SLEEP = 4                             /**< Sleep state.               */
 } canstate_t;
 
 #include "hal_can_lld.h"
@@ -166,7 +165,7 @@ typedef enum {
 }
 
 /**
- * @brief   Wakeup event.
+ * @brief   Error event.
  */
 #define _can_wakeup_isr(canp) {                                             \
   osalSysLockFromISR();                                                     \
@@ -232,8 +231,6 @@ extern "C" {
   bool canTryReceiveI(CANDriver *canp,
                       canmbx_t mailbox,
                       CANRxFrame *crfp);
-  void canTryAbortX(CANDriver *canp,
-                    canmbx_t mailbox);
   msg_t canTransmitTimeout(CANDriver *canp,
                            canmbx_t mailbox,
                            const CANTxFrame *ctfp,
