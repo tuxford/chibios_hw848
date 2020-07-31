@@ -39,7 +39,7 @@
 /**
  * @brief   Stable release flag.
  */
-#define CH_KERNEL_STABLE        0
+#define CH_KERNEL_STABLE        1
 
 /**
  * @name    ChibiOS/RT version identification
@@ -48,7 +48,7 @@
 /**
  * @brief   Kernel version string.
  */
-#define CH_KERNEL_VERSION       "6.2.0"
+#define CH_KERNEL_VERSION       "6.1.2"
 
 /**
  * @brief   Kernel version major number.
@@ -58,12 +58,12 @@
 /**
  * @brief   Kernel version minor number.
  */
-#define CH_KERNEL_MINOR         2
+#define CH_KERNEL_MINOR         1
 
 /**
  * @brief   Kernel version patch number.
  */
-#define CH_KERNEL_PATCH         0
+#define CH_KERNEL_PATCH         2
 /** @} */
 
 /**
@@ -92,20 +92,28 @@
 #include "chlicense.h"
 #include "chrestrictions.h"
 
+/* Early function prototype required by the following headers.*/
+#ifdef __cplusplus
+extern "C" {
+#endif
+  void chSysHalt(const char *reason);
+#ifdef __cplusplus
+}
+#endif
+
 /* Base kernel headers.*/
-#include "chtypes.h"
-#include "chearly.h"
-#include "chalign.h"
+#include "chtypes.h" /* CHTODO: Rename and rework.*/
+#include "chsystypes.h"
 #include "chdebug.h"
 #include "chtime.h"
+#include "chalign.h"
+#include "chcore.h"
 #include "chtrace.h"
-#include "chport.h"
 #include "chtm.h"
 #include "chstats.h"
-#include "chobjects.h"
+#include "chschd.h"
 #include "chsys.h"
 #include "chvt.h"
-#include "chschd.h"
 #include "chthreads.h"
 
 /* Optional subsystems headers.*/

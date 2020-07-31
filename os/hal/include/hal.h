@@ -190,7 +190,7 @@
 /**
  * @brief   Stable release flag.
  */
-#define CH_HAL_STABLE           0
+#define CH_HAL_STABLE           1
 
 /**
  * @name    ChibiOS/HAL version identification
@@ -199,7 +199,7 @@
 /**
  * @brief   HAL version string.
  */
-#define HAL_VERSION             "7.1.0"
+#define HAL_VERSION             "7.1.3"
 
 /**
  * @brief   HAL version major number.
@@ -214,7 +214,7 @@
 /**
  * @brief   HAL version patch number.
  */
-#define CH_HAL_PATCH            0
+#define CH_HAL_PATCH            3
 /** @} */
 
 /**
