@@ -83,9 +83,6 @@
 /* Module local definitions.                                                 */
 /*===========================================================================*/
 
-#if CH_DBG_SYSTEM_STATE_CHECK == TRUE
-#endif
-
 /*===========================================================================*/
 /* Module exported variables.                                                */
 /*===========================================================================*/
@@ -112,11 +109,9 @@
  *
  * @notapi
  */
-void __dbg_check_disable(void) {
-  os_instance_t *oip = currcore;
+void _dbg_check_disable(void) {
 
-  if ((oip->dbg.isr_cnt != (cnt_t)0) ||
-      (oip->dbg.lock_cnt != (cnt_t)0)) {
+  if ((ch.dbg.isr_cnt != (cnt_t)0) || (ch.dbg.lock_cnt != (cnt_t)0)) {
     chSysHalt("SV#1");
   }
 }
@@ -126,11 +121,9 @@ void __dbg_check_disable(void) {
  *
  * @notapi
  */
-void __dbg_check_suspend(void) {
-  os_instance_t *oip = currcore;
+void _dbg_check_suspend(void) {
 
-  if ((oip->dbg.isr_cnt != (cnt_t)0) ||
-      (oip->dbg.lock_cnt != (cnt_t)0)) {
+  if ((ch.dbg.isr_cnt != (cnt_t)0) || (ch.dbg.lock_cnt != (cnt_t)0)) {
     chSysHalt("SV#2");
   }
 }
@@ -140,11 +133,9 @@ void __dbg_check_suspend(void) {
  *
  * @notapi
  */
-void __dbg_check_enable(void) {
-  os_instance_t *oip = currcore;
+void _dbg_check_enable(void) {
 
-  if ((oip->dbg.isr_cnt != (cnt_t)0) ||
-      (oip->dbg.lock_cnt != (cnt_t)0)) {
+  if ((ch.dbg.isr_cnt != (cnt_t)0) || (ch.dbg.lock_cnt != (cnt_t)0)) {
     chSysHalt("SV#3");
   }
 }
@@ -154,14 +145,12 @@ void __dbg_check_enable(void) {
  *
  * @notapi
  */
-void __dbg_check_lock(void) {
-  os_instance_t *oip = currcore;
+void _dbg_check_lock(void) {
 
-  if ((oip->dbg.isr_cnt != (cnt_t)0) ||
-      (oip->dbg.lock_cnt != (cnt_t)0)) {
+  if ((ch.dbg.isr_cnt != (cnt_t)0) || (ch.dbg.lock_cnt != (cnt_t)0)) {
     chSysHalt("SV#4");
   }
-  oip->dbg.lock_cnt = (cnt_t)1;
+  _dbg_enter_lock();
 }
 
 /**
@@ -169,14 +158,12 @@ void __dbg_check_lock(void) {
  *
  * @notapi
  */
-void __dbg_check_unlock(void) {
-  os_instance_t *oip = currcore;
+void _dbg_check_unlock(void) {
 
-  if ((oip->dbg.isr_cnt != (cnt_t)0) ||
-      (oip->dbg.lock_cnt <= (cnt_t)0)) {
+  if ((ch.dbg.isr_cnt != (cnt_t)0) || (ch.dbg.lock_cnt <= (cnt_t)0)) {
     chSysHalt("SV#5");
   }
-  oip->dbg.lock_cnt = (cnt_t)0;
+  _dbg_leave_lock();
 }
 
 /**
@@ -184,14 +171,12 @@ void __dbg_check_unlock(void) {
  *
  * @notapi
  */
-void __dbg_check_lock_from_isr(void) {
-  os_instance_t *oip = currcore;
+void _dbg_check_lock_from_isr(void) {
 
-  if ((oip->dbg.isr_cnt <= (cnt_t)0) ||
-      (oip->dbg.lock_cnt != (cnt_t)0)) {
+  if ((ch.dbg.isr_cnt <= (cnt_t)0) || (ch.dbg.lock_cnt != (cnt_t)0)) {
     chSysHalt("SV#6");
   }
-  oip->dbg.lock_cnt = (cnt_t)1;
+  _dbg_enter_lock();
 }
 
 /**
@@ -199,14 +184,12 @@ void __dbg_check_lock_from_isr(void) {
  *
  * @notapi
  */
-void __dbg_check_unlock_from_isr(void) {
-  os_instance_t *oip = currcore;
+void _dbg_check_unlock_from_isr(void) {
 
-  if ((oip->dbg.isr_cnt <= (cnt_t)0) ||
-      (oip->dbg.lock_cnt <= (cnt_t)0)) {
+  if ((ch.dbg.isr_cnt <= (cnt_t)0) || (ch.dbg.lock_cnt <= (cnt_t)0)) {
     chSysHalt("SV#7");
   }
-  oip->dbg.lock_cnt = (cnt_t)0;
+  _dbg_leave_lock();
 }
 
 /**
@@ -214,15 +197,13 @@ void __dbg_check_unlock_from_isr(void) {
  *
  * @notapi
  */
-void __dbg_check_enter_isr(void) {
-  os_instance_t *oip = currcore;
+void _dbg_check_enter_isr(void) {
 
   port_lock_from_isr();
-  if ((oip->dbg.isr_cnt < (cnt_t)0) ||
-      (oip->dbg.lock_cnt != (cnt_t)0)) {
+  if ((ch.dbg.isr_cnt < (cnt_t)0) || (ch.dbg.lock_cnt != (cnt_t)0)) {
     chSysHalt("SV#8");
   }
-  oip->dbg.isr_cnt++;
+  ch.dbg.isr_cnt++;
   port_unlock_from_isr();
 }
 
@@ -231,15 +212,13 @@ void __dbg_check_enter_isr(void) {
  *
  * @notapi
  */
-void __dbg_check_leave_isr(void) {
-  os_instance_t *oip = currcore;
+void _dbg_check_leave_isr(void) {
 
   port_lock_from_isr();
-  if ((oip->dbg.isr_cnt <= (cnt_t)0) ||
-      (oip->dbg.lock_cnt != (cnt_t)0)) {
+  if ((ch.dbg.isr_cnt <= (cnt_t)0) || (ch.dbg.lock_cnt != (cnt_t)0)) {
     chSysHalt("SV#9");
   }
-  oip->dbg.isr_cnt--;
+  ch.dbg.isr_cnt--;
   port_unlock_from_isr();
 }
 
@@ -252,10 +231,8 @@ void __dbg_check_leave_isr(void) {
  * @api
  */
 void chDbgCheckClassI(void) {
-  os_instance_t *oip = currcore;
 
-  if ((oip->dbg.isr_cnt < (cnt_t)0) ||
-      (oip->dbg.lock_cnt <= (cnt_t)0)) {
+  if ((ch.dbg.isr_cnt < (cnt_t)0) || (ch.dbg.lock_cnt <= (cnt_t)0)) {
     chSysHalt("SV#10");
   }
 }
@@ -269,10 +246,8 @@ void chDbgCheckClassI(void) {
  * @api
  */
 void chDbgCheckClassS(void) {
-  os_instance_t *oip = currcore;
 
-  if ((oip->dbg.isr_cnt != (cnt_t)0) ||
-      (oip->dbg.lock_cnt <= (cnt_t)0)) {
+  if ((ch.dbg.isr_cnt != (cnt_t)0) || (ch.dbg.lock_cnt <= (cnt_t)0)) {
     chSysHalt("SV#11");
   }
 }

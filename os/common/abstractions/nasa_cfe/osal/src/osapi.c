@@ -2023,7 +2023,7 @@ int32 OS_TaskSetPriority(uint32 task_id, uint32 new_priority) {
 #endif
     /* Re-enqueues tp with its new priority on the queue.*/
     ch_sch_prio_insert(ch_queue_dequeue(&tp->hdr.queue),
-                       (ch_queue_t *)tp->u.wtobjp);
+                      (ch_queue_t *)tp->u.wtobjp);
     break;
   case CH_STATE_READY:
 #if CH_DBG_ENABLE_ASSERTS

@@ -99,7 +99,7 @@ struct ch_priority_queue {
  *
  * @param[in] name      the name of the queue variable
  */
-#define __CH_QUEUE_DATA(name) {(ch_queue_t *)&name, (ch_queue_t *)&name}
+#define _CH_QUEUE_DATA(name) {(ch_queue_t *)&name, (ch_queue_t *)&name}
 
 /**
  * @brief   Static queue object initializer.
@@ -109,7 +109,7 @@ struct ch_priority_queue {
  * @param[in] name      the name of the queue variable
  */
 #define CH_QUEUE_DECL(name)                                                 \
-    ch_queue_t name = __CH_QUEUE_DATA(name)
+    ch_queue_t name = _CH_QUEUE_DATA(name)
 
 /*===========================================================================*/
 /* External declarations.                                                    */

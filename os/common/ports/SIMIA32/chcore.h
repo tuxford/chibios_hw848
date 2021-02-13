@@ -223,10 +223,10 @@ struct port_context {
   /*lint -restore*/                                                         \
 }
 
-/**
+ /**
  * @brief   Computes the thread working area global size.
  * @note    There is no need to perform alignments in this macro.
- */
+  */
 #define PORT_WA_SIZE(n) ((sizeof (void *) * 4U) +                           \
                          sizeof (struct port_intctx) +                      \
                          ((size_t)(n)) +                                    \
@@ -242,16 +242,6 @@ struct port_context {
  */
 #define PORT_WORKING_AREA(s, n)                                             \
   stkalign_t s[THD_WORKING_AREA_SIZE(n) / sizeof (stkalign_t)]
-
-/**
- * @brief   Priority level verification macro.
- */
-#define PORT_IRQ_IS_VALID_PRIORITY(n) false
-
-/**
- * @brief   Priority level verification macro.
- */
-#define PORT_IRQ_IS_VALID_KERNEL_PRIORITY(n) false
 
 /**
  * @brief   IRQ prologue code.
@@ -331,9 +321,7 @@ extern "C" {
 /**
  * @brief   Port-related initialization code.
  */
-static inline void port_init(os_instance_t *oip) {
-
-  (void)oip;
+static inline void port_init(void) {
 
   port_irq_sts = (syssts_t)0;
   port_isr_context_flag = false;

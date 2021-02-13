@@ -96,7 +96,7 @@ typedef struct {
  *
  * @param[in] name      the name of the threads queue variable
  */
-#define __THREADS_QUEUE_DATA(name) {__CH_QUEUE_DATA(name)}
+#define _THREADS_QUEUE_DATA(name) {_CH_QUEUE_DATA(name)}
 
 /**
  * @brief   Static threads queue object initializer.
@@ -106,7 +106,7 @@ typedef struct {
  * @param[in] name      the name of the threads queue variable
  */
 #define THREADS_QUEUE_DECL(name)                                            \
-  threads_queue_t name = __THREADS_QUEUE_DATA(name)
+  threads_queue_t name = _THREADS_QUEUE_DATA(name)
 /** @} */
 
 /**
@@ -223,12 +223,9 @@ typedef struct {
 #ifdef __cplusplus
 extern "C" {
 #endif
-   thread_t *__thd_object_init(os_instance_t *oip,
-                               thread_t *tp,
-                               const char *name,
-                               tprio_t prio);
+   thread_t *_thread_init(thread_t *tp, const char *name, tprio_t prio);
 #if CH_DBG_FILL_THREADS == TRUE
-  void __thd_memfill(uint8_t *startp, uint8_t *endp, uint8_t v);
+  void _thread_memfill(uint8_t *startp, uint8_t *endp, uint8_t v);
 #endif
   thread_t *chThdCreateSuspendedI(const thread_descriptor_t *tdp);
   thread_t *chThdCreateSuspended(const thread_descriptor_t *tdp);
@@ -271,13 +268,13 @@ extern "C" {
 /**
  * @brief   Returns a pointer to the current @p thread_t.
  *
- * @return             A pointer to the current thread.
+ * @return              A pointer to the current thread.
  *
  * @xclass
  */
 static inline thread_t *chThdGetSelfX(void) {
 
-  return __sch_get_currthread(currcore);
+  return ch.rlist.current;
 }
 
 /**

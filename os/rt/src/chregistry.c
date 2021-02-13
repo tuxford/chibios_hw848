@@ -135,7 +135,7 @@ thread_t *chRegFirstThread(void) {
   thread_t *tp;
 
   chSysLock();
-  tp = currcore->rlist.newer;
+  tp = ch.rlist.newer;
 #if CH_CFG_USE_DYNAMIC == TRUE
   tp->refs++;
 #endif
@@ -161,7 +161,7 @@ thread_t *chRegNextThread(thread_t *tp) {
   chSysLock();
   ntp = tp->newer;
   /*lint -save -e9087 -e740 [11.3, 1.3] Cast required by list handling.*/
-  if (ntp == (thread_t *)&currcore->rlist) {
+  if (ntp == (thread_t *)&ch.rlist) {
   /*lint -restore*/
     ntp = NULL;
   }

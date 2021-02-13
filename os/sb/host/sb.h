@@ -35,12 +35,12 @@
 /**
  * @brief   ChibiOS/SB identification macro.
  */
-#define __CHIBIOS_SB__
+#define _CHIBIOS_SB_
 
 /**
  * @brief   Stable release flag.
  */
-#define CH_SB_STABLE            0
+#define CH_SB_STABLE            1
 
 /**
  * @name    ChibiOS/SE version identification

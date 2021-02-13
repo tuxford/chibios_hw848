@@ -785,10 +785,6 @@
 #error "Using a wrong mcuconf.h file, STM32L433_MCUCONF not defined"
 #endif
 
-#if defined(STM32L475xx) && !defined(STM32L475_MCUCONF)
-#error "Using a wrong mcuconf.h file, STM32L475_MCUCONF not defined"
-#endif
-
 #if defined(STM32L476xx) && !defined(STM32L476_MCUCONF)
 #error "Using a wrong mcuconf.h file, STM32L476_MCUCONF not defined"
 #endif

@@ -70,8 +70,7 @@
 #define ADC_SMPR_SMP_181P5      6   /**< @brief 194 cycles conversion time. */
 #define ADC_SMPR_SMP_601P5      7   /**< @brief 614 cycles conversion time. */
 #endif
-#if defined(STM32L4XX) || defined(STM32L4XXP) || defined(STM32G4XX) ||      \
-    defined(STM32WBXX)
+#if defined(STM32L4XX) || defined(STM32L4XXP) || defined(STM32G4XX)
 #define ADC_SMPR_SMP_2P5        0   /**< @brief 15 cycles conversion time   */
 #define ADC_SMPR_SMP_6P5        1   /**< @brief 19 cycles conversion time.  */
 #define ADC_SMPR_SMP_12P5       2   /**< @brief 25 cycles conversion time.  */
@@ -98,7 +97,7 @@
 #define ADC_CFGR_RES_6BITS              (3 << 3)
 
 #if defined(STM32F3XX) || defined(STM32L4XX) || defined(STM32L4XXP) ||      \
-    defined(STM32WBXX) || defined(__DOXYGEN__)
+    defined(__DOXYGEN__)
 #define ADC_CFGR_ALIGN_MASK             (1 << 5)
 #define ADC_CFGR_ALIGN_RIGHT            (0 << 5)
 #define ADC_CFGR_ALIGN_LEFT             (1 << 5)
@@ -387,22 +386,6 @@
 #endif
 #endif /* defined(STM32G4XX) */
 
-#if defined(STM32WBXX) || defined(__DOXYGEN__)
-/**
- * @brief   ADC1 clock source and mode.
- */
-#if !defined(STM32_ADC_ADC1_CLOCK_MODE) || defined(__DOXYGEN__)
-#define STM32_ADC_ADC1_CLOCK_MODE           ADC_CCR_CKMODE_AHB_DIV1
-#endif
-
-/**
- * @brief   ADC1 clock prescaler.
- */
-#if !defined(STM32_ADC_ADC1_PRESC) || defined(__DOXYGEN__)
-#define STM32_ADC_ADC1_PRESC                ADC_CCR_PRESC_DIV2
-#endif
-#endif /* defined(STM32WBXX) */
-
 /** @} */
 
 /*===========================================================================*/
@@ -411,12 +394,12 @@
 
 /* Supported devices checks.*/
 #if !defined(STM32F3XX) && !defined(STM32L4XX) && !defined(STM32L4XXP) &&   \
-    !defined(STM32G4XX) && !defined(STM32WBXX)
-#error "ADCv3 only supports F3, L4, L4+, G4 and WB STM32 devices"
+    !defined(STM32G4XX)
+#error "ADCv3 only supports F3, L4, L4+ and G4 STM32 devices"
 #endif
 
 #if defined(STM32L4XX) || defined(STM32L4XXP) || defined(STM32G4XX) ||      \
-    defined(STM32WBXX) || defined(__DOXYGEN__)
+    defined(__DOXYGEN__)
 #define STM32_ADCV3_OVERSAMPLING            TRUE
 #else
 #define STM32_ADCV3_OVERSAMPLING            FALSE
