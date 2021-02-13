@@ -78,7 +78,6 @@
  * @brief   Initializes a thread structure.
  * @note    This is an internal functions, do not use it in application code.
  *
- * @param[in] oip       pointer to the OS instance
  * @param[in] tp        pointer to the thread
  * @param[in] name      thread name
  * @param[in] prio      the priority level for the new thread
@@ -86,42 +85,36 @@
  *
  * @notapi
  */
-thread_t *__thd_object_init(os_instance_t *oip,
-                            thread_t *tp,
-                            const char *name,
-                            tprio_t prio) {
+thread_t *_thread_init(thread_t *tp, const char *name, tprio_t prio) {
 
-  tp->hdr.pqueue.prio   = prio;
-  tp->state             = CH_STATE_WTSTART;
-  tp->flags             = CH_FLAG_MODE_STATIC;
-
-  (void)oip;
-
+  tp->prio      = prio;
+  tp->state     = CH_STATE_WTSTART;
+  tp->flags     = CH_FLAG_MODE_STATIC;
 #if CH_CFG_TIME_QUANTUM > 0
-  tp->ticks             = (tslices_t)CH_CFG_TIME_QUANTUM;
+  tp->ticks     = (tslices_t)CH_CFG_TIME_QUANTUM;
 #endif
 #if CH_CFG_USE_MUTEXES == TRUE
-  tp->realprio          = prio;
-  tp->mtxlist           = NULL;
+  tp->realprio  = prio;
+  tp->mtxlist   = NULL;
 #endif
 #if CH_CFG_USE_EVENTS == TRUE
-  tp->epending          = (eventmask_t)0;
+  tp->epending  = (eventmask_t)0;
 #endif
 #if CH_DBG_THREADS_PROFILING == TRUE
-  tp->time              = (systime_t)0;
+  tp->time      = (systime_t)0;
 #endif
 #if CH_CFG_USE_REGISTRY == TRUE
-  tp->refs              = (trefs_t)1;
-  tp->name              = name;
-  REG_INSERT(oip, tp);
+  tp->refs      = (trefs_t)1;
+  tp->name      = name;
+  REG_INSERT(tp);
 #else
   (void)name;
 #endif
 #if CH_CFG_USE_WAITEXIT == TRUE
-  ch_list_init(&tp->waiting);
+  list_init(&tp->waiting);
 #endif
 #if CH_CFG_USE_MESSAGES == TRUE
-  ch_queue_init(&tp->msgqueue);
+  queue_init(&tp->msgqueue);
 #endif
 #if CH_DBG_STATISTICS == TRUE
   chTMObjectInit(&tp->stats);
@@ -140,7 +133,7 @@ thread_t *__thd_object_init(os_instance_t *oip,
  *
  * @notapi
  */
-void __thd_memfill(uint8_t *startp, uint8_t *endp, uint8_t v) {
+void _thread_memfill(uint8_t *startp, uint8_t *endp, uint8_t v) {
 
   while (startp < endp) {
     *startp++ = v;
@@ -196,7 +189,8 @@ thread_t *chThdCreateSuspendedI(const thread_descriptor_t *tdp) {
   /* Setting up the port-dependent part of the working area.*/
   PORT_SETUP_CONTEXT(tp, tdp->wbase, tp, tdp->funcp, tdp->arg);
 
-  return __thd_object_init(currcore, tp, tdp->name, tdp->prio);
+  /* The driver object is initialized but not started.*/
+  return _thread_init(tp, tdp->name, tdp->prio);
 }
 
 /**
@@ -228,9 +222,9 @@ thread_t *chThdCreateSuspended(const thread_descriptor_t *tdp) {
 #endif
 
 #if CH_DBG_FILL_THREADS == TRUE
-  __thd_memfill((uint8_t *)tdp->wbase,
-                (uint8_t *)tdp->wend,
-                CH_DBG_STACK_FILL_VALUE);
+  _thread_memfill((uint8_t *)tdp->wbase,
+                  (uint8_t *)tdp->wend,
+                  CH_DBG_STACK_FILL_VALUE);
 #endif
 
   chSysLock();
@@ -293,9 +287,9 @@ thread_t *chThdCreate(const thread_descriptor_t *tdp) {
 #endif
 
 #if CH_DBG_FILL_THREADS == TRUE
-  __thd_memfill((uint8_t *)tdp->wbase,
-                (uint8_t *)tdp->wend,
-                CH_DBG_STACK_FILL_VALUE);
+  _thread_memfill((uint8_t *)tdp->wbase,
+                  (uint8_t *)tdp->wend,
+                  CH_DBG_STACK_FILL_VALUE);
 #endif
 
   chSysLock();
@@ -309,7 +303,7 @@ thread_t *chThdCreate(const thread_descriptor_t *tdp) {
 /**
  * @brief   Creates a new thread into a static memory area.
  * @post    The created thread has a reference counter set to one, it is
- *          caller responsibility to call @p chThdRelease() or @p chthdWait()
+ *          caller responsibility to call @p chThdRelease() or @p chThdWait()
  *          in order to release the reference. The thread persists in the
  *          registry until its reference counter reaches zero.
  * @note    A thread can terminate by calling @p chThdExit() or by simply
@@ -343,9 +337,9 @@ thread_t *chThdCreateStatic(void *wsp, size_t size,
 #endif
 
 #if CH_DBG_FILL_THREADS == TRUE
-  __thd_memfill((uint8_t *)wsp,
-                (uint8_t *)wsp + size,
-                CH_DBG_STACK_FILL_VALUE);
+  _thread_memfill((uint8_t *)wsp,
+                  (uint8_t *)wsp + size,
+                  CH_DBG_STACK_FILL_VALUE);
 #endif
 
   chSysLock();
@@ -364,7 +358,7 @@ thread_t *chThdCreateStatic(void *wsp, size_t size,
   /* Setting up the port-dependent part of the working area.*/
   PORT_SETUP_CONTEXT(tp, wsp, tp, pf, arg);
 
-  tp = __thd_object_init(currcore, tp, "noname", prio);
+  tp = _thread_init(tp, "noname", prio);
 
   /* Starting the thread immediately.*/
   chSchWakeupS(tp, MSG_OK);
@@ -505,18 +499,18 @@ void chThdExit(msg_t msg) {
  * @sclass
  */
 void chThdExitS(msg_t msg) {
-  thread_t *currtp = chThdGetSelfX();
+  thread_t *tp = currp;
 
   /* Storing exit message.*/
-  currtp->u.exitcode = msg;
+  tp->u.exitcode = msg;
 
   /* Exit handler hook.*/
   CH_CFG_THREAD_EXIT_HOOK(tp);
 
 #if CH_CFG_USE_WAITEXIT == TRUE
   /* Waking up any waiting thread.*/
-  while (ch_list_notempty(&currtp->waiting)) {
-    (void) chSchReadyI((thread_t *)ch_list_pop(&currtp->waiting));
+  while (list_notempty(&tp->waiting)) {
+    (void) chSchReadyI(list_remove(&tp->waiting));
   }
 #endif
 
@@ -524,13 +518,13 @@ void chThdExitS(msg_t msg) {
   /* Static threads with no references are immediately removed from the
      registry because there is no memory to recover.*/
 #if CH_CFG_USE_DYNAMIC == TRUE
-  if ((currtp->refs == (trefs_t)0) &&
-      ((currtp->flags & CH_FLAG_MODE_MASK) == CH_FLAG_MODE_STATIC)) {
-    REG_REMOVE(currtp);
+  if ((tp->refs == (trefs_t)0) &&
+      ((tp->flags & CH_FLAG_MODE_MASK) == CH_FLAG_MODE_STATIC)) {
+    REG_REMOVE(tp);
   }
 #else
-  if (currtp->refs == (trefs_t)0) {
-    REG_REMOVE(currtp);
+  if (tp->refs == (trefs_t)0) {
+    REG_REMOVE(tp);
   }
 #endif
 #endif
@@ -563,19 +557,18 @@ void chThdExitS(msg_t msg) {
  * @api
  */
 msg_t chThdWait(thread_t *tp) {
-  thread_t *currtp = chThdGetSelfX();
   msg_t msg;
 
   chDbgCheck(tp != NULL);
 
   chSysLock();
-  chDbgAssert(tp != currtp, "waiting self");
+  chDbgAssert(tp != currp, "waiting self");
 #if CH_CFG_USE_REGISTRY == TRUE
   chDbgAssert(tp->refs > (trefs_t)0, "no references");
 #endif
 
   if (tp->state != CH_STATE_FINAL) {
-    ch_list_push(&currtp->hdr.list, &tp->waiting);
+    list_insert(currp, &tp->waiting);
     chSchGoSleepS(CH_STATE_WTEXIT);
   }
   msg = tp->u.exitcode;
@@ -603,22 +596,20 @@ msg_t chThdWait(thread_t *tp) {
  * @api
  */
 tprio_t chThdSetPriority(tprio_t newprio) {
-  thread_t *currtp = chThdGetSelfX();
   tprio_t oldprio;
 
   chDbgCheck(newprio <= HIGHPRIO);
 
   chSysLock();
 #if CH_CFG_USE_MUTEXES == TRUE
-  oldprio = currtp->realprio;
-  if ((currtp->hdr.pqueue.prio == currtp->realprio) ||
-      (newprio > currtp->hdr.pqueue.prio)) {
-    currtp->hdr.pqueue.prio = newprio;
+  oldprio = currp->realprio;
+  if ((currp->prio == currp->realprio) || (newprio > currp->prio)) {
+    currp->prio = newprio;
   }
-  currtp->realprio = newprio;
+  currp->realprio = newprio;
 #else
-  oldprio = currtp->hdr.pqueue.prio;
-  currtp->hdr.pqueue.prio = newprio;
+  oldprio = currp->prio;
+  currp->prio = newprio;
 #endif
   chSchRescheduleS();
   chSysUnlock();
@@ -871,13 +862,12 @@ void chThdResume(thread_reference_t *trp, msg_t msg) {
  * @sclass
  */
 msg_t chThdEnqueueTimeoutS(threads_queue_t *tqp, sysinterval_t timeout) {
-  thread_t *currtp = chThdGetSelfX();
 
   if (TIME_IMMEDIATE == timeout) {
     return MSG_TIMEOUT;
   }
 
-  ch_queue_insert((ch_queue_t *)currtp, &tqp->queue);
+  queue_insert(currp, tqp);
 
   return chSchGoSleepTimeoutS(CH_STATE_QUEUED, timeout);
 }
@@ -893,7 +883,7 @@ msg_t chThdEnqueueTimeoutS(threads_queue_t *tqp, sysinterval_t timeout) {
  */
 void chThdDequeueNextI(threads_queue_t *tqp, msg_t msg) {
 
-  if (ch_queue_notempty(&tqp->queue)) {
+  if (queue_notempty(tqp)) {
     chThdDoDequeueNextI(tqp, msg);
   }
 }
@@ -908,7 +898,7 @@ void chThdDequeueNextI(threads_queue_t *tqp, msg_t msg) {
  */
 void chThdDequeueAllI(threads_queue_t *tqp, msg_t msg) {
 
-  while (ch_queue_notempty(&tqp->queue)) {
+  while (queue_notempty(tqp)) {
     chThdDoDequeueNextI(tqp, msg);
   }
 }

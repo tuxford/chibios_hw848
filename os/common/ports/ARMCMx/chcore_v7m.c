@@ -246,14 +246,8 @@ void PendSV_Handler(void) {
 
 /**
  * @brief   Port-related initialization code.
- *
- * @param[in, out] oip  pointer to the @p os_instance_t structure
- *
- * @notapi
  */
-void port_init(os_instance_t *oip) {
-
-  (void)oip;
+void port_init(void) {
 
   /* Starting in a known IRQ configuration.*/
   port_suspend();
@@ -301,7 +295,7 @@ void port_init(os_instance_t *oip) {
 /**
  * @brief   Setting up MPU region for the current thread.
  */
-void __port_set_region(void) {
+void _port_set_region(void) {
 
   mpuSetRegionAddress(PORT_USE_GUARD_MPU_REGION,
                       chThdGetSelfX()->wabase);
@@ -311,7 +305,7 @@ void __port_set_region(void) {
 /**
  * @brief   Exception exit redirection to _port_switch_from_isr().
  */
-void __port_irq_epilogue(void) {
+void _port_irq_epilogue(void) {
 
   port_lock_from_isr();
   if ((SCB->ICSR & SCB_ICSR_RETTOBASE_Msk) != 0U) {
@@ -379,12 +373,12 @@ void __port_irq_epilogue(void) {
        required or not.*/
     if (chSchIsPreemptionRequired()) {
       /* Preemption is required we need to enforce a context switch.*/
-      ectxp->pc = (uint32_t)__port_switch_from_isr;
+      ectxp->pc = (uint32_t)_port_switch_from_isr;
     }
     else {
       /* Preemption not required, we just need to exit the exception
          atomically.*/
-      ectxp->pc = (uint32_t)__port_exit_from_isr;
+      ectxp->pc = (uint32_t)_port_exit_from_isr;
     }
 
     /* Note, returning without unlocking is intentional, this is done in

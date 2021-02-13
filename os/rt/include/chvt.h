@@ -71,14 +71,10 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+  void _vt_init(void);
   void chVTDoSetI(virtual_timer_t *vtp, sysinterval_t delay,
                   vtfunc_t vtfunc, void *par);
   void chVTDoResetI(virtual_timer_t *vtp);
-  void chVTDoTickI(void);
-#if CH_CFG_USE_TIMESTAMP == TRUE
-  systimestamp_t chVTGetTimeStampI(void);
-  void chVTResetTimeStampI(void);
-#endif
 #ifdef __cplusplus
 }
 #endif
@@ -119,7 +115,7 @@ static inline void chVTObjectInit(virtual_timer_t *vtp) {
 static inline systime_t chVTGetSystemTimeX(void) {
 
 #if CH_CFG_ST_TIMEDELTA == 0
-  return currcore->vtlist.systime;
+  return ch.vtlist.systime;
 #else /* CH_CFG_ST_TIMEDELTA > 0 */
   return port_timer_get_time();
 #endif /* CH_CFG_ST_TIMEDELTA > 0 */
@@ -211,21 +207,19 @@ static inline bool chVTIsSystemTimeWithin(systime_t start, systime_t end) {
  * @iclass
  */
 static inline bool chVTGetTimersStateI(sysinterval_t *timep) {
-  virtual_timers_list_t *vtlp = &currcore->vtlist;
-  delta_list_t *dlp = &vtlp->dlist;
 
   chDbgCheckClassI();
 
-  if (dlp == dlp->next) {
+  if (&ch.vtlist == (virtual_timers_list_t *)ch.vtlist.next) {
     return false;
   }
 
   if (timep != NULL) {
 #if CH_CFG_ST_TIMEDELTA == 0
-    *timep = dlp->next->delta;
+    *timep = ch.vtlist.next->delta;
 #else
-    *timep = (dlp->next->delta + (sysinterval_t)CH_CFG_ST_TIMEDELTA) -
-             chTimeDiffX(vtlp->lasttime, chVTGetSystemTimeX());
+    *timep = (ch.vtlist.next->delta + (sysinterval_t)CH_CFG_ST_TIMEDELTA) -
+             chTimeDiffX(ch.vtlist.lasttime, chVTGetSystemTimeX());
 #endif
   }
 
@@ -362,72 +356,114 @@ static inline void chVTSet(virtual_timer_t *vtp, sysinterval_t delay,
   chSysUnlock();
 }
 
-#if (CH_CFG_USE_TIMESTAMP == TRUE) || defined(__DOXYGEN__)
 /**
- * @brief   Generates a monotonic time stamp.
- * @details This function generates a monotonic time stamp synchronized with
- *          the system time. The time stamp has the same resolution of
- *          system time.
- * @note    There is an assumption, this function must be called at
- *          least once before the system time wraps back to zero or
- *          synchronization is lost. You may use a periodic virtual timer with
- *          a very large interval in order to keep time stamps synchronized
- *          by calling this function.
+ * @brief   Virtual timers ticker.
+ * @note    The system lock is released before entering the callback and
+ *          re-acquired immediately after. It is callback's responsibility
+ *          to acquire the lock if needed. This is done in order to reduce
+ *          interrupts jitter when many timers are in use.
  *
- * @return              The time stamp.
- *
- * @api
+ * @iclass
  */
-static inline systimestamp_t chVTGetTimeStamp(void) {
-  systimestamp_t stamp;
-
-  chSysLock();
-
-  stamp = chVTGetTimeStampI();
-
-  chSysUnlock();
-
-  return stamp;
-}
-
-/**
- * @brief   Resets and re-synchronizes the time stamps monotonic counter.
- *
- * @api
- */
-static inline void chVTResetTimeStamp(void) {
+static inline void chVTDoTickI(void) {
 
   chDbgCheckClassI();
 
-  chSysLock();
-
-  chVTResetTimeStampI();
-
-  chSysUnlock();
-}
-#endif /* CH_CFG_USE_TIMESTAMP == TRUE */
-
-/**
- * @brief   Virtual Timers instance initialization.
- * @note    Internal use only.
- *
- * @param[out] vtlp     pointer to the @p virtual_timers_list_t structure
- *
- * @notapi
- */
-static inline void __vt_object_init(virtual_timers_list_t *vtlp) {
-
-  vtlp->dlist.next  = &vtlp->dlist;
-  vtlp->dlist.prev  = &vtlp->dlist;
-  vtlp->dlist.delta = (sysinterval_t)-1;
 #if CH_CFG_ST_TIMEDELTA == 0
-  vtlp->systime = (systime_t)0;
+  ch.vtlist.systime++;
+  if (&ch.vtlist != (virtual_timers_list_t *)ch.vtlist.next) {
+    /* The list is not empty, processing elements on top.*/
+    --ch.vtlist.next->delta;
+    while (ch.vtlist.next->delta == (sysinterval_t)0) {
+      virtual_timer_t *vtp;
+      vtfunc_t fn;
+
+      vtp = ch.vtlist.next;
+      fn = vtp->func;
+      vtp->func = NULL;
+      vtp->next->prev = (virtual_timer_t *)&ch.vtlist;
+      ch.vtlist.next = vtp->next;
+      chSysUnlockFromISR();
+      fn(vtp->par);
+      chSysLockFromISR();
+    }
+  }
 #else /* CH_CFG_ST_TIMEDELTA > 0 */
-  vtlp->lasttime = (systime_t)0;
-#endif /* CH_CFG_ST_TIMEDELTA > 0 */
-#if CH_CFG_USE_TIMESTAMP == TRUE
-  ch.vtlist.laststamp = (systimestamp_t)chVTGetSystemTimeX();
+  virtual_timer_t *vtp;
+  systime_t now;
+  sysinterval_t delta, nowdelta;
+
+  /* Looping through timers.*/
+  vtp = ch.vtlist.next;
+  while (true) {
+
+    /* Getting the system time as reference.*/
+    now = chVTGetSystemTimeX();
+    nowdelta = chTimeDiffX(ch.vtlist.lasttime, now);
+
+    /* The list scan is limited by the timers header having
+       "ch.vtlist.vt_delta == (sysinterval_t)-1" which is
+       greater than all deltas.*/
+    if (nowdelta < vtp->delta) {
+      break;
+    }
+
+    /* Consuming all timers between "vtp->lasttime" and now.*/
+    do {
+      vtfunc_t fn;
+
+      /* The "last time" becomes this timer's expiration time.*/
+      ch.vtlist.lasttime += vtp->delta;
+      nowdelta -= vtp->delta;
+
+      vtp->next->prev = (virtual_timer_t *)&ch.vtlist;
+      ch.vtlist.next = vtp->next;
+      fn = vtp->func;
+      vtp->func = NULL;
+
+      /* If the list becomes empty then the timer is stopped.*/
+      if (ch.vtlist.next == (virtual_timer_t *)&ch.vtlist) {
+        port_timer_stop_alarm();
+      }
+
+      /* The callback is invoked outside the kernel critical zone.*/
+      chSysUnlockFromISR();
+      fn(vtp->par);
+      chSysLockFromISR();
+
+      /* Next element in the list.*/
+      vtp = ch.vtlist.next;
+    }
+    while (vtp->delta <= nowdelta);
+  }
+
+  /* If the list is empty, nothing else to do.*/
+  if (ch.vtlist.next == (virtual_timer_t *)&ch.vtlist) {
+    return;
+  }
+
+  /* The "unprocessed nowdelta" time slice is added to "last time"
+     and subtracted to next timer's delta.*/
+  ch.vtlist.lasttime += nowdelta;
+  ch.vtlist.next->delta -= nowdelta;
+
+  /* Recalculating the next alarm time.*/
+  delta = vtp->delta - chTimeDiffX(ch.vtlist.lasttime, now);
+  if (delta < (sysinterval_t)CH_CFG_ST_TIMEDELTA) {
+    delta = (sysinterval_t)CH_CFG_ST_TIMEDELTA;
+  }
+#if CH_CFG_INTERVALS_SIZE > CH_CFG_ST_RESOLUTION
+  /* The delta could be too large for the physical timer to handle.*/
+  else if (delta > (sysinterval_t)TIME_MAX_SYSTIME) {
+    delta = (sysinterval_t)TIME_MAX_SYSTIME;
+  }
 #endif
+  port_timer_set_alarm(chTimeAddX(now, delta));
+
+  chDbgAssert(chTimeDiffX(ch.vtlist.lasttime, chVTGetSystemTimeX()) <=
+              chTimeDiffX(ch.vtlist.lasttime, chTimeAddX(now, delta)),
+              "exceeding delta");
+#endif /* CH_CFG_ST_TIMEDELTA > 0 */
 }
 
 #endif /* CHVT_H */

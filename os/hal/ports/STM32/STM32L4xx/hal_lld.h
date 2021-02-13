@@ -785,10 +785,6 @@
 #error "Using a wrong mcuconf.h file, STM32L433_MCUCONF not defined"
 #endif
 
-#if defined(STM32L475xx) && !defined(STM32L475_MCUCONF)
-#error "Using a wrong mcuconf.h file, STM32L475_MCUCONF not defined"
-#endif
-
 #if defined(STM32L476xx) && !defined(STM32L476_MCUCONF)
 #error "Using a wrong mcuconf.h file, STM32L476_MCUCONF not defined"
 #endif
@@ -1179,7 +1175,7 @@
 #if STM32_LSI_ENABLED
 #else /* !STM32_LSI_ENABLED */
 
-  #if HAL_USE_RTC && (STM32_RTCSEL == STM32_RTCSEL_LSI)
+  #if STM32_RTCSEL == STM32_RTCSEL_LSI
     #error "LSI not enabled, required by STM32_RTCSEL"
   #endif
 

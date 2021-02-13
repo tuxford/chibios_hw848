@@ -87,7 +87,6 @@ typedef struct {
 
 /**
  * @name    Threads queues
- * @{
  */
 /**
  * @brief   Data part of a static threads queue object initializer.
@@ -96,7 +95,7 @@ typedef struct {
  *
  * @param[in] name      the name of the threads queue variable
  */
-#define __THREADS_QUEUE_DATA(name) {__CH_QUEUE_DATA(name)}
+#define _THREADS_QUEUE_DATA(name) {(thread_t *)&name, (thread_t *)&name}
 
 /**
  * @brief   Static threads queue object initializer.
@@ -105,13 +104,12 @@ typedef struct {
  *
  * @param[in] name      the name of the threads queue variable
  */
-#define THREADS_QUEUE_DECL(name)                                            \
-  threads_queue_t name = __THREADS_QUEUE_DATA(name)
+#define _THREADS_QUEUE_DECL(name)                                           \
+  threads_queue_t name = _THREADS_QUEUE_DATA(name)
 /** @} */
 
 /**
  * @name    Working Areas
- * @{
  */
 /**
  * @brief   Calculates the total Working Area size.
@@ -154,7 +152,6 @@ typedef struct {
 
 /**
  * @name    Threads abstraction macros
- * @{
  */
 /**
  * @brief   Thread declaration macro.
@@ -223,12 +220,9 @@ typedef struct {
 #ifdef __cplusplus
 extern "C" {
 #endif
-   thread_t *__thd_object_init(os_instance_t *oip,
-                               thread_t *tp,
-                               const char *name,
-                               tprio_t prio);
+   thread_t *_thread_init(thread_t *tp, const char *name, tprio_t prio);
 #if CH_DBG_FILL_THREADS == TRUE
-  void __thd_memfill(uint8_t *startp, uint8_t *endp, uint8_t v);
+  void _thread_memfill(uint8_t *startp, uint8_t *endp, uint8_t v);
 #endif
   thread_t *chThdCreateSuspendedI(const thread_descriptor_t *tdp);
   thread_t *chThdCreateSuspended(const thread_descriptor_t *tdp);
@@ -268,16 +262,16 @@ extern "C" {
 /* Module inline functions.                                                  */
 /*===========================================================================*/
 
-/**
- * @brief   Returns a pointer to the current @p thread_t.
- *
- * @return             A pointer to the current thread.
- *
- * @xclass
- */
+ /**
+  * @brief   Returns a pointer to the current @p thread_t.
+  *
+  * @return             A pointer to the current thread.
+  *
+  * @xclass
+  */
 static inline thread_t *chThdGetSelfX(void) {
 
-  return __sch_get_currthread(currcore);
+  return ch.rlist.current;
 }
 
 /**
@@ -290,7 +284,7 @@ static inline thread_t *chThdGetSelfX(void) {
  */
 static inline tprio_t chThdGetPriorityX(void) {
 
-  return chThdGetSelfX()->hdr.pqueue.prio;
+  return chThdGetSelfX()->prio;
 }
 
 /**
@@ -397,7 +391,7 @@ static inline void chThdSleepS(sysinterval_t ticks) {
  */
 static inline void chThdQueueObjectInit(threads_queue_t *tqp) {
 
-  ch_queue_init(&tqp->queue);
+  queue_init(tqp);
 }
 
 /**
@@ -414,7 +408,7 @@ static inline bool chThdQueueIsEmptyI(threads_queue_t *tqp) {
 
   chDbgCheckClassI();
 
-  return ch_queue_isempty(&tqp->queue);
+  return queue_isempty(tqp);
 }
 
 /**
@@ -431,9 +425,9 @@ static inline bool chThdQueueIsEmptyI(threads_queue_t *tqp) {
 static inline void chThdDoDequeueNextI(threads_queue_t *tqp, msg_t msg) {
   thread_t *tp;
 
-  chDbgAssert(ch_queue_notempty(&tqp->queue), "empty queue");
+  chDbgAssert(queue_notempty(tqp), "empty queue");
 
-  tp = (thread_t *)ch_queue_fifo_remove(&tqp->queue);
+  tp = queue_fifo_remove(tqp);
 
   chDbgAssert(tp->state == CH_STATE_QUEUED, "invalid state");
 

@@ -70,8 +70,7 @@
 #define ADC_SMPR_SMP_181P5      6   /**< @brief 194 cycles conversion time. */
 #define ADC_SMPR_SMP_601P5      7   /**< @brief 614 cycles conversion time. */
 #endif
-#if defined(STM32L4XX) || defined(STM32L4XXP) || defined(STM32G4XX) ||      \
-    defined(STM32WBXX)
+#if defined(STM32L4XX) || defined(STM32L4XXP) || defined(STM32G4XX)
 #define ADC_SMPR_SMP_2P5        0   /**< @brief 15 cycles conversion time   */
 #define ADC_SMPR_SMP_6P5        1   /**< @brief 19 cycles conversion time.  */
 #define ADC_SMPR_SMP_12P5       2   /**< @brief 25 cycles conversion time.  */
@@ -98,7 +97,7 @@
 #define ADC_CFGR_RES_6BITS              (3 << 3)
 
 #if defined(STM32F3XX) || defined(STM32L4XX) || defined(STM32L4XXP) ||      \
-    defined(STM32WBXX) || defined(__DOXYGEN__)
+    defined(__DOXYGEN__)
 #define ADC_CFGR_ALIGN_MASK             (1 << 5)
 #define ADC_CFGR_ALIGN_RIGHT            (0 << 5)
 #define ADC_CFGR_ALIGN_LEFT             (1 << 5)
@@ -387,22 +386,6 @@
 #endif
 #endif /* defined(STM32G4XX) */
 
-#if defined(STM32WBXX) || defined(__DOXYGEN__)
-/**
- * @brief   ADC1 clock source and mode.
- */
-#if !defined(STM32_ADC_ADC1_CLOCK_MODE) || defined(__DOXYGEN__)
-#define STM32_ADC_ADC1_CLOCK_MODE           ADC_CCR_CKMODE_AHB_DIV1
-#endif
-
-/**
- * @brief   ADC1 clock prescaler.
- */
-#if !defined(STM32_ADC_ADC1_PRESC) || defined(__DOXYGEN__)
-#define STM32_ADC_ADC1_PRESC                ADC_CCR_PRESC_DIV2
-#endif
-#endif /* defined(STM32WBXX) */
-
 /** @} */
 
 /*===========================================================================*/
@@ -411,12 +394,12 @@
 
 /* Supported devices checks.*/
 #if !defined(STM32F3XX) && !defined(STM32L4XX) && !defined(STM32L4XXP) &&   \
-    !defined(STM32G4XX) && !defined(STM32WBXX)
-#error "ADCv3 only supports F3, L4, L4+, G4 and WB STM32 devices"
+    !defined(STM32G4XX)
+#error "ADCv3 only supports F3, L4, L4+ and G4 STM32 devices"
 #endif
 
 #if defined(STM32L4XX) || defined(STM32L4XXP) || defined(STM32G4XX) ||      \
-    defined(STM32WBXX) || defined(__DOXYGEN__)
+    defined(__DOXYGEN__)
 #define STM32_ADCV3_OVERSAMPLING            TRUE
 #else
 #define STM32_ADCV3_OVERSAMPLING            FALSE
@@ -868,18 +851,10 @@ typedef enum {
            specified in continuous mode or if the buffer depth is           \
            greater than one.*/                                              \
   uint32_t                  cfgr;                                           \
-  /* ADC CFGR2 register initialization data.*/                              \
+  /* ADC CFGR2 register initialization data.*/                                              \
   uint32_t                  cfgr2;                                          \
   /* ADC TR1 register initialization data.*/                                \
   uint32_t                  tr1;                                            \
-  /* ADC TR2 register initialization data.*/                                \
-  uint32_t                  tr2;                                            \
-  /* ADC TR3 register initialization data.*/                                \
-  uint32_t                  tr3;                                            \
-  /* ADC AWD2CR register initialization data.*/                             \
-  uint32_t                  awd2cr;                                         \
-  /* ADC AWD3CR register initialization data.*/                             \
-  uint32_t                  awd3cr;                                         \
   /* ADC CCR register initialization data.                                  \
      NOTE: Put this field to zero if not using oversampling.*/              \
   uint32_t                  ccr;                                            \
@@ -898,10 +873,6 @@ typedef enum {
   uint32_t                  cfgr;                                           \
   uint32_t                  cfgr2;                                          \
   uint32_t                  tr1;                                            \
-  uint32_t                  tr2;                                            \
-  uint32_t                  tr3;                                            \
-  uint32_t                  awd2cr;                                         \
-  uint32_t                  awd3cr;                                         \
   uint32_t                  smpr[2];                                        \
   uint32_t                  sqr[4]
 #endif /* STM32_ADC_DUAL_MODE == FALSE */
@@ -911,10 +882,6 @@ typedef enum {
 #define adc_lld_configuration_group_fields                                  \
   uint32_t                  cfgr;                                           \
   uint32_t                  tr1;                                            \
-  uint32_t                  tr2;                                            \
-  uint32_t                  tr3;                                            \
-  uint32_t                  awd2cr;                                         \
-  uint32_t                  awd3cr;                                         \
   uint32_t                  ccr;                                            \
   uint32_t                  smpr[2];                                        \
   uint32_t                  sqr[4];                                         \
@@ -924,22 +891,16 @@ typedef enum {
 #define adc_lld_configuration_group_fields                                  \
   uint32_t                  cfgr;                                           \
   uint32_t                  tr1;                                            \
-  uint32_t                  tr2;                                            \
-  uint32_t                  tr3;                                            \
-  uint32_t                  awd2cr;                                         \
-  uint32_t                  awd3cr;                                         \
   uint32_t                  smpr[2];                                        \
   uint32_t                  sqr[4]
 #endif /* STM32_ADC_DUAL_MODE == FALSE */
 #endif /* STM32_ADCV3_OVERSAMPLING == FALSE */
 
 /**
- * @name    Threshold registers initializers
+ * @name    Threshold register initializer
  * @{
  */
 #define ADC_TR(low, high)       (((uint32_t)(high) << 16) | (uint32_t)(low))
-#define ADC_TR_DISABLED         ADC_TR(0U, 0x0FFFU)
-#define ADC_AWDCR_ENABLE(n)     (1U << (n))
 /** @} */
 
 /**
