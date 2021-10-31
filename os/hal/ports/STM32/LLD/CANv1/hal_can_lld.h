@@ -118,6 +118,7 @@
 #if !defined(STM32_CAN_CAN1_IRQ_PRIORITY) || defined(__DOXYGEN__)
 #define STM32_CAN_CAN1_IRQ_PRIORITY         11
 #endif
+/** @} */
 
 /**
  * @brief   CAN2 interrupt priority level setting.
@@ -125,6 +126,7 @@
 #if !defined(STM32_CAN_CAN2_IRQ_PRIORITY) || defined(__DOXYGEN__)
 #define STM32_CAN_CAN2_IRQ_PRIORITY         11
 #endif
+/** @} */
 
 /**
  * @brief   CAN3 interrupt priority level setting.
@@ -187,9 +189,9 @@
 /*===========================================================================*/
 
 /**
- * @brief   Type of a CAN driver.
+ * @brief   Type of a structure representing an CAN driver.
  */
-typedef struct hal_can_driver CANDriver;
+typedef struct CANDriver CANDriver;
 
 /**
  * @brief   Type of a transmission mailbox index.
@@ -303,9 +305,9 @@ typedef struct {
 } CANFilter;
 
 /**
- * @brief   Type of a CAN configuration structure.
+ * @brief   Driver configuration structure.
  */
-typedef struct hal_can_config {
+typedef struct {
   /**
    * @brief   CAN MCR register initialization data.
    * @note    Some bits in this register are enforced by the driver regardless
@@ -323,7 +325,7 @@ typedef struct hal_can_config {
 /**
  * @brief   Structure representing an CAN driver.
  */
-struct hal_can_driver {
+struct CANDriver {
   /**
    * @brief   Driver state.
    */

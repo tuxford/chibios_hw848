@@ -19,7 +19,7 @@
 
 /**
  * @file    sb/host/sb.h
- * @brief   ARM SandBox macros and structures.
+ * @brief   ARM sandbox macros and structures.
  *
  * @addtogroup ARM_SANDBOX
  * @{
@@ -35,12 +35,12 @@
 /**
  * @brief   ChibiOS/SB identification macro.
  */
-#define __CHIBIOS_SB__
+#define _CHIBIOS_SB_
 
 /**
  * @brief   Stable release flag.
  */
-#define CH_SB_STABLE            0
+#define CH_SB_STABLE            1
 
 /**
  * @name    ChibiOS/SE version identification
@@ -49,12 +49,12 @@
 /**
  * @brief   Safety Extensions version string.
  */
-#define CH_SB_VERSION           "2.0.0"
+#define CH_SB_VERSION           "1.0.0"
 
 /**
  * @brief   Safety Extensions version major number.
  */
-#define CH_SB_MAJOR             2
+#define CH_SB_MAJOR             1
 
 /**
  * @brief   Safety Extensions version minor number.
@@ -115,11 +115,6 @@
 
 #if (SB_NUM_REGIONS < 1) || (SB_NUM_REGIONS > 4)
 #error "invalid SB_NUM_REGIONS value"
-#endif
-
-#if (PORT_SWITCHED_REGIONS_NUMBER > 0) &&                                   \
-    (PORT_SWITCHED_REGIONS_NUMBER != SB_NUM_REGIONS)
-#error "SB_NUM_REGIONS not matching PORT_SWITCHED_REGIONS_NUMBER"
 #endif
 
 /*===========================================================================*/

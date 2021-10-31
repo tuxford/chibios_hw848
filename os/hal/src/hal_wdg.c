@@ -63,37 +63,20 @@ void wdgInit(void) {
  *
  * @param[in] wdgp      pointer to the @p WDGDriver object
  * @param[in] config    pointer to the @p WDGConfig object
- * @return              The operation status.
  *
  * @api
  */
-msg_t wdgStart(WDGDriver *wdgp, const WDGConfig *config) {
-  msg_t msg;
+void wdgStart(WDGDriver *wdgp, const WDGConfig *config) {
 
   osalDbgCheck((wdgp != NULL) && (config != NULL));
 
   osalSysLock();
   osalDbgAssert((wdgp->state == WDG_STOP) || (wdgp->state == WDG_READY),
                 "invalid state");
-
   wdgp->config = config;
-
-#if defined(WDG_LLD_ENHANCED_API)
-  msg = wdg_lld_start(wdgp);
-#else
   wdg_lld_start(wdgp);
-  msg = HAL_RET_SUCCESS;
-#endif
-  if (msg == HAL_RET_SUCCESS) {
-    wdgp->state = WDG_READY;
-  }
-  else {
-    wdgp->state = WDG_STOP;
-  }
-
+  wdgp->state = WDG_READY;
   osalSysUnlock();
-
-  return msg;
 }
 
 /**

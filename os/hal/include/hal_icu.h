@@ -222,7 +222,7 @@ extern "C" {
 #endif
   void icuInit(void);
   void icuObjectInit(ICUDriver *icup);
-  msg_t icuStart(ICUDriver *icup, const ICUConfig *config);
+  void icuStart(ICUDriver *icup, const ICUConfig *config);
   void icuStop(ICUDriver *icup);
   void icuStartCapture(ICUDriver *icup);
   bool icuWaitCapture(ICUDriver *icup);

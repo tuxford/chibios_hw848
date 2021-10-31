@@ -98,12 +98,10 @@ void canObjectInit(CANDriver *canp) {
  * @param[in] canp      pointer to the @p CANDriver object
  * @param[in] config    pointer to the @p CANConfig object. Depending on
  *                      the implementation the value can be @p NULL.
- * @return              The operation status.
  *
  * @api
  */
-msg_t canStart(CANDriver *canp, const CANConfig *config) {
-  msg_t msg;
+void canStart(CANDriver *canp, const CANConfig *config) {
 
   osalDbgCheck(canp != NULL);
 
@@ -116,19 +114,11 @@ msg_t canStart(CANDriver *canp, const CANConfig *config) {
 
   /* Low level initialization, could be a slow process and sleeps could
      be performed inside.*/
-#if defined(CAN_LLD_ENHANCED_API)
-  msg = can_lld_start(canp);
-#else
   can_lld_start(canp);
-  msg = HAL_RET_SUCCESS;
-#endif
-  if (msg == HAL_RET_SUCCESS) {
-    canp->state = CAN_READY;
-  }
 
+  /* The driver finally goes into the ready state.*/
+  canp->state = CAN_READY;
   osalSysUnlock();
-
-  return msg;
 }
 
 /**

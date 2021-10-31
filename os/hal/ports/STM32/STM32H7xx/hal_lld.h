@@ -44,11 +44,6 @@
 /*===========================================================================*/
 
 /**
- * @brief   Requires use of SPIv2 driver model.
- */
-#define HAL_LLD_SELECT_SPI_V2           TRUE
-
-/**
  * @name    Platform identification macros
  * @{
  */
@@ -1183,7 +1178,7 @@
  * @brief   LPTIM1 clock source.
  */
 #if !defined(STM32_LPTIM1SEL) || defined(__DOXYGEN__)
-#define STM32_LPTIM1SEL                     STM32_LPTIM1SEL_PCLK1
+#define STM32_LPTIM1SEL                     STM32_LPTIM1_PCLK1
 #endif
 
 /**
@@ -1769,7 +1764,7 @@
 /**
  * @brief   PLL2 DIVP field.
  */
-#if ((STM32_PLL2_DIVP_VALUE >= 1) && (STM32_PLL2_DIVP_VALUE <= 128)) ||     \
+#if ((STM32_PLL2_DIVP_VALUE >= 2) && (STM32_PLL2_DIVP_VALUE <= 128)) ||     \
     defined(__DOXYGEN__)
 #define STM32_PLL2_DIVP             ((STM32_PLL2_DIVP_VALUE - 1U) << 9U)
 #else
@@ -1779,7 +1774,7 @@
 /**
  * @brief   PLL3 DIVP field.
  */
-#if ((STM32_PLL3_DIVP_VALUE >= 1) && (STM32_PLL3_DIVP_VALUE <= 128)) ||     \
+#if ((STM32_PLL3_DIVP_VALUE >= 2) && (STM32_PLL3_DIVP_VALUE <= 128)) ||     \
     defined(__DOXYGEN__)
 #define STM32_PLL3_DIVP             ((STM32_PLL3_DIVP_VALUE - 1U) << 9U)
 #else

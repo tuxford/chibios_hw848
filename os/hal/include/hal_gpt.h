@@ -137,7 +137,7 @@ extern "C" {
 #endif
   void gptInit(void);
   void gptObjectInit(GPTDriver *gptp);
-  msg_t gptStart(GPTDriver *gptp, const GPTConfig *config);
+  void gptStart(GPTDriver *gptp, const GPTConfig *config);
   void gptStop(GPTDriver *gptp);
   void gptStartContinuous(GPTDriver *gptp, gptcnt_t interval);
   void gptStartContinuousI(GPTDriver *gptp, gptcnt_t interval);

@@ -85,37 +85,23 @@ void wspiObjectInit(WSPIDriver *wspip) {
  *
  * @param[in] wspip     pointer to the @p WSPIDriver object
  * @param[in] config    pointer to the @p WSPIConfig object
- * @return              The operation status.
  *
  * @api
  */
-msg_t wspiStart(WSPIDriver *wspip, const WSPIConfig *config) {
-  msg_t msg;
+void wspiStart(WSPIDriver *wspip, const WSPIConfig *config) {
 
   osalDbgCheck((wspip != NULL) && (config != NULL));
 
   osalSysLock();
+
   osalDbgAssert((wspip->state == WSPI_STOP) || (wspip->state == WSPI_READY),
                 "invalid state");
 
   wspip->config = config;
-
-#if defined(WSPI_LLD_ENHANCED_API)
-  msg = wspi_lld_start(wspip);
-#else
   wspi_lld_start(wspip);
-  msg = HAL_RET_SUCCESS;
-#endif
-  if (msg == HAL_RET_SUCCESS) {
-    wspip->state = WSPI_READY;
-  }
-  else {
-    wspip->state = WSPI_STOP;
-  }
+  wspip->state = WSPI_READY;
 
   osalSysUnlock();
-
-  return msg;
 }
 
 /**

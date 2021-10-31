@@ -52,7 +52,6 @@
  * HAL driver system settings.
  */
 #define STM32_NO_INIT                       ${doc.STM32_NO_INIT!"FALSE"}
-#define STM32_CLOCK_DYNAMIC                 ${doc.STM32_CLOCK_DYNAMIC!"FALSE"}
 #define STM32_VOS                           ${doc.STM32_VOS!"STM32_VOS_RANGE1"}
 #define STM32_PWR_BOOST                     ${doc.STM32_PWR_BOOST!"TRUE"}
 #define STM32_PWR_CR2                       ${doc.STM32_PWR_CR2!"(PWR_CR2_PLS_LEV0)"}
@@ -165,10 +164,10 @@
  */
 #define STM32_ADC_DUAL_MODE                 ${doc.STM32_ADC_DUAL_MODE!"FALSE"}
 #define STM32_ADC_COMPACT_SAMPLES           ${doc.STM32_ADC_COMPACT_SAMPLES!"FALSE"}
-#define STM32_ADC_USE_ADC1                  ${doc.STM32_ADC_USE_ADC1!"FALSE"}
-#define STM32_ADC_USE_ADC2                  ${doc.STM32_ADC_USE_ADC2!"FALSE"}
-#define STM32_ADC_USE_ADC3                  ${doc.STM32_ADC_USE_ADC3!"FALSE"}
-#define STM32_ADC_USE_ADC4                  ${doc.STM32_ADC_USE_ADC4!"FALSE"}
+#define STM32_ADC_USE_ADC1                  ${doc.STM32_ADC_USE_ADC1!"TRUE"}
+#define STM32_ADC_USE_ADC2                  ${doc.STM32_ADC_USE_ADC2!"TRUE"}
+#define STM32_ADC_USE_ADC3                  ${doc.STM32_ADC_USE_ADC3!"TRUE"}
+#define STM32_ADC_USE_ADC4                  ${doc.STM32_ADC_USE_ADC4!"TRUE"}
 #define STM32_ADC_ADC1_DMA_STREAM           ${doc.STM32_ADC_ADC1_DMA_STREAM!"STM32_DMA_STREAM_ID_ANY"}
 #define STM32_ADC_ADC2_DMA_STREAM           ${doc.STM32_ADC_ADC2_DMA_STREAM!"STM32_DMA_STREAM_ID_ANY"}
 #define STM32_ADC_ADC3_DMA_STREAM           ${doc.STM32_ADC_ADC3_DMA_STREAM!"STM32_DMA_STREAM_ID_ANY"}
@@ -286,6 +285,7 @@
 /*
  * PWM driver system settings.
  */
+#define STM32_PWM_USE_ADVANCED              ${doc.STM32_PWM_USE_ADVANCED!"FALSE"}
 #define STM32_PWM_USE_TIM1                  ${doc.STM32_PWM_USE_TIM1!"FALSE"}
 #define STM32_PWM_USE_TIM2                  ${doc.STM32_PWM_USE_TIM2!"FALSE"}
 #define STM32_PWM_USE_TIM3                  ${doc.STM32_PWM_USE_TIM3!"FALSE"}
@@ -300,13 +300,6 @@
 /*
  * RTC driver system settings.
  */
-#define STM32_RTC_PRESA_VALUE               ${doc.STM32_RTC_PRESA_VALUE!"32"}
-#define STM32_RTC_PRESS_VALUE               ${doc.STM32_RTC_PRESS_VALUE!"1024"}
-#define STM32_RTC_CR_INIT                   ${doc.STM32_RTC_CR_INIT!"0"}
-#define STM32_TAMP_CR1_INIT                 ${doc.STM32_TAMP_CR1_INIT!"0"}
-#define STM32_TAMP_CR2_INIT                 ${doc.STM32_TAMP_CR2_INIT!"0"}
-#define STM32_TAMP_FLTCR_INIT               ${doc.STM32_TAMP_FLTCR_INIT!"0"}
-#define STM32_TAMP_IER_INIT                 ${doc.STM32_TAMP_IER_INIT!"0"}
 
 /*
  * SDC driver system settings.
@@ -321,16 +314,6 @@
 #define STM32_SERIAL_USE_UART4              ${doc.STM32_SERIAL_USE_UART4!"FALSE"}
 #define STM32_SERIAL_USE_UART5              ${doc.STM32_SERIAL_USE_UART5!"FALSE"}
 #define STM32_SERIAL_USE_LPUART1            ${doc.STM32_SERIAL_USE_LPUART1!"FALSE"}
-
-/*
- * SIO driver system settings.
- */
-#define STM32_SIO_USE_USART1                ${doc.STM32_SIO_USE_USART1!"FALSE"}
-#define STM32_SIO_USE_USART2                ${doc.STM32_SIO_USE_USART2!"FALSE"}
-#define STM32_SIO_USE_USART3                ${doc.STM32_SIO_USE_USART3!"FALSE"}
-#define STM32_SIO_USE_UART4                 ${doc.STM32_SIO_USE_UART4!"FALSE"}
-#define STM32_SIO_USE_UART5                 ${doc.STM32_SIO_USE_UART5!"FALSE"}
-#define STM32_SIO_USE_LPUART1               ${doc.STM32_SIO_USE_LPUART1!"FALSE"}
 
 /*
  * SPI driver system settings.
@@ -411,6 +394,5 @@
  */
 #define STM32_WSPI_USE_QUADSPI1             ${doc.STM32_WSPI_USE_QUADSPI1!"FALSE"}
 #define STM32_WSPI_QUADSPI1_DMA_STREAM      ${doc.STM32_WSPI_QUADSPI1_DMA_STREAM!"STM32_DMA_STREAM_ID(2, 7)"}
-#define STM32_WSPI_QUADSPI1_PRESCALER_VALUE ${doc.STM32_WSPI_QUADSPI1_PRESCALER_VALUE!"1"}
 
 #endif /* MCUCONF_H */

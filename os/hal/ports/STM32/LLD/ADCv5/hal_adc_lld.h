@@ -32,17 +32,6 @@
 /*===========================================================================*/
 
 /**
- * @name    Possible ADC errors mask bits.
- * @{
- */
-#define ADC_ERR_DMAFAILURE      1U  /**< DMA operations failure.            */
-#define ADC_ERR_OVERFLOW        2U  /**< ADC overflow condition.            */
-#define ADC_ERR_AWD1            4U  /**< Watchdog 1 triggered.              */
-#define ADC_ERR_AWD2            8U  /**< Watchdog 2 triggered.              */
-#define ADC_ERR_AWD3            16U /**< Watchdog 3 triggered.              */
-/** @} */
-
-/**
  * @name    Sampling rates
  * @{
  */
@@ -200,8 +189,8 @@
 /*===========================================================================*/
 
 /* Supported devices checks.*/
-#if !defined(STM32G0XX) && !defined(STM32WLXX)
-#error "ADCv5 only supports G0 and WL STM32 devices"
+#if !defined(STM32G0XX)
+#error "ADCv5 only supports G0 STM32 devices"
 #endif
 
 /* Registry checks.*/
@@ -301,9 +290,17 @@ typedef uint16_t adcsample_t;
 typedef uint16_t adc_channels_num_t;
 
 /**
- * @brief   Type of an ADC error mask.
+ * @brief   Possible ADC failure causes.
+ * @note    Error codes are architecture dependent and should not relied
+ *          upon.
  */
-typedef uint32_t adcerror_t;
+typedef enum {
+  ADC_ERR_DMAFAILURE = 0,                   /**< DMA operations failure.    */
+  ADC_ERR_OVERFLOW = 1,                     /**< ADC overflow condition.    */
+  ADC_ERR_AWD1 = 2,                         /**< Analog watchdog 1.         */
+  ADC_ERR_AWD2 = 3,                         /**< Analog watchdog 2.         */
+  ADC_ERR_AWD3 = 4                          /**< Analog watchdog 3.         */
+} adcerror_t;
 
 /*===========================================================================*/
 /* Driver macros.                                                            */
@@ -366,7 +363,7 @@ typedef uint32_t adcerror_t;
  *          Manual.
  * @note    PRESC bits must not be specified and left to zero.
  */
-#define adcSTM32SetCCR(ccr) (ADC1_COMMON->CCR = (ccr))
+#define adcSTM32SetCCR(ccr) (ADC->CCR = (ccr))
 
 /*===========================================================================*/
 /* External declarations.                                                    */

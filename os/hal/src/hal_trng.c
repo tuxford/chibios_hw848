@@ -77,37 +77,20 @@ void trngObjectInit(TRNGDriver *trngp) {
  * @param[in] trngp     pointer to the @p TRNGDriver object
  * @param[in] config    pointer to the @p TRNGConfig object or @p NULL for
  *                      default configuration
- * @return              The operation status.
  *
  * @api
  */
-msg_t trngStart(TRNGDriver *trngp, const TRNGConfig *config) {
-  msg_t msg;
+void trngStart(TRNGDriver *trngp, const TRNGConfig *config) {
 
   osalDbgCheck(trngp != NULL);
 
   osalSysLock();
   osalDbgAssert((trngp->state == TRNG_STOP) || (trngp->state == TRNG_READY),
               "invalid state");
-
   trngp->config = config;
-
-#if defined(TRNG_LLD_ENHANCED_API)
-  msg = trng_lld_start(trngp);
-#else
   trng_lld_start(trngp);
-  msg = HAL_RET_SUCCESS;
-#endif
-  if (msg == HAL_RET_SUCCESS) {
-    trngp->state = TRNG_READY;
-  }
-  else {
-    trngp->state = TRNG_STOP;
-  }
-
+  trngp->state = TRNG_READY;
   osalSysUnlock();
-
-  return msg;
 }
 
 /**

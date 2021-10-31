@@ -383,7 +383,7 @@ extern "C" {
 #endif
   void adcInit(void);
   void adcObjectInit(ADCDriver *adcp);
-  msg_t adcStart(ADCDriver *adcp, const ADCConfig *config);
+  void adcStart(ADCDriver *adcp, const ADCConfig *config);
   void adcStop(ADCDriver *adcp);
   void adcStartConversion(ADCDriver *adcp,
                           const ADCConversionGroup *grpp,

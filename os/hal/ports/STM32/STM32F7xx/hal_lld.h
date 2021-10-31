@@ -48,9 +48,9 @@
 /*===========================================================================*/
 
 /**
- * @brief   Requires use of SPIv2 driver model.
+ * @brief   Defines the support for realtime counters in the HAL.
  */
-#define HAL_LLD_SELECT_SPI_V2           TRUE
+#define HAL_IMPLEMENTS_COUNTERS             TRUE
 
 /**
  * @name    Platform identification macros

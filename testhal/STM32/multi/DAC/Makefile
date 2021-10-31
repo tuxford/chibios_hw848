@@ -20,10 +20,6 @@ all:
 	+@make --no-print-directory -f ./make/stm32l4r5zi_nucleo144.make all
 	@echo ====================================================================
 	@echo
-	@echo === Building for STM32WL55JC_Nucleo64 ==============================
-	+@make --no-print-directory -f ./make/stm32wl55jc_nucleo64.make all
-	@echo ====================================================================
-	@echo
 
 clean:
 	@echo
@@ -34,8 +30,6 @@ clean:
 	+@make --no-print-directory -f ./make/stm32l476_discovery.make clean
 	@echo
 	+@make --no-print-directory -f ./make/stm32l4r5zi_nucleo144.make clean
-	@echo
-	+@make --no-print-directory -f ./make/stm32wl55jc_nucleo64.make clean
 	@echo
 
 #

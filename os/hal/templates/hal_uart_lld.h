@@ -65,7 +65,7 @@ typedef uint32_t uartflags_t;
 /**
  * @brief   Type of structure representing an UART driver.
  */
-typedef struct hal_uart_driver UARTDriver;
+typedef struct UARTDriver UARTDriver;
 
 /**
  * @brief   Generic UART notification callback type.
@@ -97,7 +97,7 @@ typedef void (*uartecb_t)(UARTDriver *uartp, uartflags_t e);
  * @note    Implementations may extend this structure to contain more,
  *          architecture dependent, fields.
  */
-typedef struct hal_uart_config {
+typedef struct {
   /**
    * @brief End of transmission buffer callback.
    */
@@ -126,7 +126,7 @@ typedef struct hal_uart_config {
  * @note    Implementations may extend this structure to contain more,
  *          architecture dependent, fields.
  */
-struct hal_uart_driver {
+struct UARTDriver {
   /**
    * @brief Driver state.
    */

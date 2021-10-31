@@ -19,7 +19,7 @@
 
 /**
  * @file    sb/host/sbhost.c
- * @brief   ARM SandBox host API code.
+ * @brief   ARM sandbox host API code.
  *
  * @addtogroup ARM_SANDBOX_HOSTAPI
  * @{
@@ -918,40 +918,9 @@ static void sb_undef_handler(struct port_extctx *ectxp) {
   ectxp->r0 = SB_ERR_ENOSYS;
 }
 
-static thread_t *sb_msg_wait_timeout_s(sysinterval_t timeout) {
-  thread_t *currtp = chThdGetSelfX();
-  thread_t *tp;
-
-  chDbgCheckClassS();
-
-  /* The sender thread could have timed out in sbSendMessageTimeout() so
-     repeating the wait if it did.*/
-  do {
-    if (!chMsgIsPendingI(currtp)) {
-      if (chSchGoSleepTimeoutS(CH_STATE_WTMSG, timeout) != MSG_OK) {
-        return NULL;
-      }
-    }
-  } while(ch_queue_isempty(&currtp->msgqueue));
-
-  /* Dequeuing the sender thread and returning it.*/
-  tp = threadref(ch_queue_fifo_remove(&currtp->msgqueue));
-  tp->state = CH_STATE_SNDMSG;
-
-  return tp;
-}
-
 /*===========================================================================*/
 /* Module exported functions.                                                */
 /*===========================================================================*/
-
-void __sb_abort(msg_t msg) {
-
-#if CH_CFG_USE_EVENTS == TRUE
-  chEvtBroadcastI(&sb.termination_es);
-#endif
-  chThdExitS(msg);
-}
 
 void sb_api_stdio(struct port_extctx *ectxp) {
 
@@ -986,12 +955,7 @@ void sb_api_stdio(struct port_extctx *ectxp) {
 
 void sb_api_exit(struct port_extctx *ectxp) {
 
-  chSysLock();
-#if CH_CFG_USE_EVENTS == TRUE
-  chEvtBroadcastI(&sb.termination_es);
-#endif
-  chThdExitS((msg_t )ectxp->r0);
-  chSysUnlock();
+  chThdExit((msg_t )ectxp->r0);
 
   /* Cannot get here.*/
   ectxp->r0 = SB_ERR_ENOSYS;
@@ -1028,20 +992,15 @@ void sb_api_wait_message(struct port_extctx *ectxp) {
 #if CH_CFG_USE_MESSAGES == TRUE
   sb_class_t *sbcp = (sb_class_t *)chThdGetSelfX()->ctx.syscall.p;
 
-  chSysLock();
-
   if (sbcp->msg_tp == NULL) {
-    sbcp->msg_tp = sb_msg_wait_timeout_s(TIME_INFINITE);
+    sbcp->msg_tp = chMsgWait();
     ectxp->r0 = (uint32_t)chMsgGet(sbcp->msg_tp);
   }
   else {
-    thread_t *tp = sbcp->msg_tp;
+    chMsgRelease(sbcp->msg_tp, MSG_RESET);
     sbcp->msg_tp = NULL;
-    chMsgReleaseS(tp, MSG_RESET);
     ectxp->r0 = SB_ERR_EBUSY;
   }
-
-  chSysUnlock();
 #else
   ectxp->r0 = SB_ERR_NOT_IMPLEMENTED;
 #endif
@@ -1051,19 +1010,14 @@ void sb_api_reply_message(struct port_extctx *ectxp) {
 #if CH_CFG_USE_MESSAGES == TRUE
   sb_class_t *sbcp = (sb_class_t *)chThdGetSelfX()->ctx.syscall.p;
 
-  chSysLock();
-
   if (sbcp->msg_tp != NULL) {
-    thread_t *tp = sbcp->msg_tp;
+    chMsgRelease(sbcp->msg_tp, (msg_t )ectxp->r0);
     sbcp->msg_tp = NULL;
-    chMsgReleaseS(tp, (msg_t )ectxp->r0);
     ectxp->r0 = SB_ERR_NOERROR;
   }
   else {
     ectxp->r0 = SB_ERR_EBUSY;
   }
-
-  chSysUnlock();
 #else
   ectxp->r0 = SB_ERR_NOT_IMPLEMENTED;
 #endif

@@ -185,7 +185,7 @@ extern "C" {
 #endif
   void sdcInit(void);
   void sdcObjectInit(SDCDriver *sdcp);
-  msg_t sdcStart(SDCDriver *sdcp, const SDCConfig *config);
+  void sdcStart(SDCDriver *sdcp, const SDCConfig *config);
   void sdcStop(SDCDriver *sdcp);
   bool sdcConnect(SDCDriver *sdcp);
   bool sdcDisconnect(SDCDriver *sdcp);

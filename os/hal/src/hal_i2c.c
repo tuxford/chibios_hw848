@@ -87,37 +87,20 @@ void i2cObjectInit(I2CDriver *i2cp) {
  *
  * @param[in] i2cp      pointer to the @p I2CDriver object
  * @param[in] config    pointer to the @p I2CConfig object
- * @return              The operation status.
  *
  * @api
  */
-msg_t i2cStart(I2CDriver *i2cp, const I2CConfig *config) {
-  msg_t msg;
+void i2cStart(I2CDriver *i2cp, const I2CConfig *config) {
 
   osalDbgCheck((i2cp != NULL) && (config != NULL));
-
-  osalSysLock();
   osalDbgAssert((i2cp->state == I2C_STOP) || (i2cp->state == I2C_READY) ||
                 (i2cp->state == I2C_LOCKED), "invalid state");
 
+  osalSysLock();
   i2cp->config = config;
-
-#if defined(I2C_LLD_ENHANCED_API)
-  msg = i2c_lld_start(i2cp);
-#else
   i2c_lld_start(i2cp);
-  msg = HAL_RET_SUCCESS;
-#endif
-  if (msg == HAL_RET_SUCCESS) {
-    i2cp->state = I2C_READY;
-  }
-  else {
-    i2cp->state = I2C_STOP;
-  }
-
+  i2cp->state = I2C_READY;
   osalSysUnlock();
-
-  return msg;
 }
 
 /**

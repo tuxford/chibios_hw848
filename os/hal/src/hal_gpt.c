@@ -76,38 +76,20 @@ void gptObjectInit(GPTDriver *gptp) {
  *
  * @param[in] gptp      pointer to the @p GPTDriver object
  * @param[in] config    pointer to the @p GPTConfig object
- * @return              The operation status.
  *
  * @api
  */
-msg_t gptStart(GPTDriver *gptp, const GPTConfig *config) {
-  msg_t msg;
+void gptStart(GPTDriver *gptp, const GPTConfig *config) {
 
   osalDbgCheck((gptp != NULL) && (config != NULL));
 
   osalSysLock();
-
   osalDbgAssert((gptp->state == GPT_STOP) || (gptp->state == GPT_READY),
               "invalid state");
-
   gptp->config = config;
-
-#if defined(GPT_LLD_ENHANCED_API)
-  msg = gpt_lld_start(gptp);
-#else
   gpt_lld_start(gptp);
-  msg = HAL_RET_SUCCESS;
-#endif
-  if (msg == HAL_RET_SUCCESS) {
-    gptp->state = GPT_READY;
-  }
-  else {
-    gptp->state = GPT_STOP;
-  }
-
+  gptp->state = GPT_READY;
   osalSysUnlock();
-
-  return msg;
 }
 
 /**

@@ -175,7 +175,7 @@ extern "C" {
 #endif
   void sduInit(void);
   void sduObjectInit(SerialUSBDriver *sdup);
-  msg_t sduStart(SerialUSBDriver *sdup, const SerialUSBConfig *config);
+  void sduStart(SerialUSBDriver *sdup, const SerialUSBConfig *config);
   void sduStop(SerialUSBDriver *sdup);
   void sduSuspendHookI(SerialUSBDriver *sdup);
   void sduWakeupHookI(SerialUSBDriver *sdup);

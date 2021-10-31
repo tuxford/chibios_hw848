@@ -1,9 +1,9 @@
-sourceRoot: ../../os/test/ftl/processors/unittest
+sourceRoot: ../../tools/ftl/processors/unittest
 outputRoot: source
 dataRoot: .
 
 freemarkerLinks: {
-    ftllibs: ../../os/test/ftl/libs
+    ftllibs: ../../tools/ftl/libs
 }
 
 data : {

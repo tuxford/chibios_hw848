@@ -473,13 +473,9 @@ void dac_lld_stop(DACDriver *dacp) {
 
 #if STM32_DAC_USE_DAC1_CH1
     if (&DACD1 == dacp) {
-#if defined(DAC_CR_EN2)
       if ((dacp->params->dac->CR & DAC_CR_EN2) == 0U) {
         rccDisableDAC1();
       }
-#else
-      rccDisableDAC1();
-#endif
     }
 #endif
 
@@ -493,13 +489,9 @@ void dac_lld_stop(DACDriver *dacp) {
 
 #if STM32_DAC_USE_DAC2_CH1
     if (&DACD3 == dacp) {
-#if defined(DAC_CR_EN2)
       if ((dacp->params->dac->CR & DAC_CR_EN2) == 0U) {
         rccDisableDAC2();
       }
-#else
-      rccDisableDAC2();
-#endif
     }
 #endif
 
@@ -513,13 +505,9 @@ void dac_lld_stop(DACDriver *dacp) {
 
 #if STM32_DAC_USE_DAC3_CH1
     if (&DACD5 == dacp) {
-#if defined(DAC_CR_EN2)
       if ((dacp->params->dac->CR & DAC_CR_EN2) == 0U) {
         rccDisableDAC3();
       }
-#else
-      rccDisableDAC3();
-#endif
     }
 #endif
 
@@ -533,13 +521,9 @@ void dac_lld_stop(DACDriver *dacp) {
 
 #if STM32_DAC_USE_DAC4_CH1
     if (&DACD7 == dacp) {
-#if defined(DAC_CR_EN2)
       if ((dacp->params->dac->CR & DAC_CR_EN2) == 0U) {
         rccDisableDAC4();
       }
-#else
-      rccDisableDAC4();
-#endif
     }
 #endif
 

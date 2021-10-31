@@ -477,11 +477,6 @@ void usb_lld_start(USBDriver *usbp) {
     /* Clock activation.*/
 #if STM32_USB_USE_USB1
     if (&USBD1 == usbp) {
-
-      osalDbgAssert((STM32_USBCLK >= (48000000U - STM32_USB_48MHZ_DELTA)) &&
-                    (STM32_USBCLK <= (48000000U + STM32_USB_48MHZ_DELTA)),
-                    "invalid clock frequency");
-
       /* USB clock enabled.*/
       rccEnableUSB(true);
       /* Powers up the transceiver while holding the USB in reset state.*/
@@ -759,7 +754,7 @@ void usb_lld_read_setup(USBDriver *usbp, usbep_t ep, uint8_t *buf) {
   udp = USB_GET_DESCRIPTOR(ep);
   pmap = USB_ADDR2PTR(udp->RXADDR0);
   for (n = 0; n < 4; n++) {
-    *(uint16_t *)(void *)buf = (uint16_t)*pmap++;
+    *(uint16_t *)buf = (uint16_t)*pmap++;
     buf += 2;
   }
 }

@@ -561,37 +561,20 @@ void sdcObjectInit(SDCDriver *sdcp) {
  * @param[in] config    pointer to the @p SDCConfig object, can be @p NULL if
  *                      the driver supports a default configuration or
  *                      requires no configuration
- * @return              The operation status.
  *
  * @api
  */
-msg_t sdcStart(SDCDriver *sdcp, const SDCConfig *config) {
-  msg_t msg;
+void sdcStart(SDCDriver *sdcp, const SDCConfig *config) {
 
   osalDbgCheck(sdcp != NULL);
 
   osalSysLock();
   osalDbgAssert((sdcp->state == BLK_STOP) || (sdcp->state == BLK_ACTIVE),
                 "invalid state");
-
   sdcp->config = config;
-
-#if defined(SDC_LLD_ENHANCED_API)
-  msg = sdc_lld_start(sdcp);
-#else
   sdc_lld_start(sdcp);
-  msg = HAL_RET_SUCCESS;
-#endif
-  if (msg == HAL_RET_SUCCESS) {
-    sdcp->state = BLK_ACTIVE;
-  }
-  else {
-    sdcp->state = BLK_STOP;
-  }
-
+  sdcp->state = BLK_ACTIVE;
   osalSysUnlock();
-
-  return msg;
 }
 
 /**

@@ -15,7 +15,7 @@
 */
 
 /**
- * @file    ARMCMx/compilers/IAR/vectors.s
+ * @file    ARMCMx/compilers/IAR/vectors.c
  * @brief   Interrupt vectors for Cortex-Mx devices.
  *
  * @defgroup ARMCMx_IAR_VECTORS Cortex-Mx Interrupt Vectors

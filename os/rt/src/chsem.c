@@ -76,9 +76,9 @@
 /*===========================================================================*/
 
 #if CH_CFG_USE_SEMAPHORES_PRIORITY == TRUE
-#define sem_insert(qp, tp) ch_sch_prio_insert(qp, &tp->hdr.queue)
+#define sem_insert(tp, qp) ch_sch_prio_insert(&tp->hdr.queue, qp)
 #else
-#define sem_insert(qp, tp) ch_queue_insert(qp, &tp->hdr.queue)
+#define sem_insert(tp, qp) ch_queue_insert(&tp->hdr.queue, qp)
 #endif
 
 /*===========================================================================*/
@@ -150,7 +150,7 @@ void chSemResetWithMessageI(semaphore_t *sp, cnt_t n, msg_t msg) {
 
   sp->cnt = n;
   while (ch_queue_notempty(&sp->queue)) {
-    chSchReadyI(threadref(ch_queue_lifo_remove(&sp->queue)))->u.rdymsg = msg;
+    chSchReadyI((thread_t *)ch_queue_lifo_remove(&sp->queue))->u.rdymsg = msg;
   }
 }
 
@@ -197,12 +197,11 @@ msg_t chSemWaitS(semaphore_t *sp) {
               "inconsistent semaphore");
 
   if (--sp->cnt < (cnt_t)0) {
-    thread_t *currtp = chThdGetSelfX();
-    currtp->u.wtsemp = sp;
-    sem_insert(&sp->queue, currtp);
+    currp->u.wtsemp = sp;
+    sem_insert(currp, &sp->queue);
     chSchGoSleepS(CH_STATE_WTSEM);
 
-    return currtp->u.rdymsg;
+    return currp->u.rdymsg;
   }
 
   return MSG_OK;
@@ -265,14 +264,13 @@ msg_t chSemWaitTimeoutS(semaphore_t *sp, sysinterval_t timeout) {
               "inconsistent semaphore");
 
   if (--sp->cnt < (cnt_t)0) {
-    if (unlikely(TIME_IMMEDIATE == timeout)) {
+    if (TIME_IMMEDIATE == timeout) {
       sp->cnt++;
 
       return MSG_TIMEOUT;
     }
-    thread_t *currtp = chThdGetSelfX();
-    currtp->u.wtsemp = sp;
-    sem_insert(&sp->queue, currtp);
+    currp->u.wtsemp = sp;
+    sem_insert(currp, &sp->queue);
 
     return chSchGoSleepTimeoutS(CH_STATE_WTSEM, timeout);
   }
@@ -296,7 +294,7 @@ void chSemSignal(semaphore_t *sp) {
               ((sp->cnt < (cnt_t)0) && ch_queue_notempty(&sp->queue)),
               "inconsistent semaphore");
   if (++sp->cnt <= (cnt_t)0) {
-    chSchWakeupS(threadref(ch_queue_fifo_remove(&sp->queue)), MSG_OK);
+    chSchWakeupS((thread_t *)ch_queue_fifo_remove(&sp->queue), MSG_OK);
   }
   chSysUnlock();
 }
@@ -323,7 +321,7 @@ void chSemSignalI(semaphore_t *sp) {
   if (++sp->cnt <= (cnt_t)0) {
     /* Note, it is done this way in order to allow a tail call on
              chSchReadyI().*/
-    thread_t *tp = threadref(ch_queue_fifo_remove(&sp->queue));
+    thread_t *tp = (thread_t *)ch_queue_fifo_remove(&sp->queue);
     tp->u.rdymsg = MSG_OK;
     (void) chSchReadyI(tp);
   }
@@ -352,7 +350,7 @@ void chSemAddCounterI(semaphore_t *sp, cnt_t n) {
 
   while (n > (cnt_t)0) {
     if (++sp->cnt <= (cnt_t)0) {
-      chSchReadyI(threadref(ch_queue_fifo_remove(&sp->queue)))->u.rdymsg = MSG_OK;
+      chSchReadyI((thread_t *)ch_queue_fifo_remove(&sp->queue))->u.rdymsg = MSG_OK;
     }
     n--;
   }
@@ -384,14 +382,14 @@ msg_t chSemSignalWait(semaphore_t *sps, semaphore_t *spw) {
               ((spw->cnt < (cnt_t)0) && ch_queue_notempty(&spw->queue)),
               "inconsistent semaphore");
   if (++sps->cnt <= (cnt_t)0) {
-    chSchReadyI(threadref(ch_queue_fifo_remove(&sps->queue)))->u.rdymsg = MSG_OK;
+    chSchReadyI((thread_t *)ch_queue_fifo_remove(&sps->queue))->u.rdymsg = MSG_OK;
   }
   if (--spw->cnt < (cnt_t)0) {
-    thread_t *currtp = chThdGetSelfX();
-    sem_insert(&spw->queue, currtp);
-    currtp->u.wtsemp = spw;
+    thread_t *ctp = currp;
+    sem_insert(ctp, &spw->queue);
+    ctp->u.wtsemp = spw;
     chSchGoSleepS(CH_STATE_WTSEM);
-    msg = currtp->u.rdymsg;
+    msg = ctp->u.rdymsg;
   }
   else {
     chSchRescheduleS();

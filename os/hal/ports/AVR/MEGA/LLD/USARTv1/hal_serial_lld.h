@@ -66,7 +66,7 @@
  * @details An instance of this structure must be passed to @p sdStart()
  *          in order to configure and start a serial driver operations.
  */
-typedef struct hal_serial_config {
+typedef struct {
   /**
    * @brief Initialization value for the BRR register.
    */

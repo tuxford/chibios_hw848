@@ -224,7 +224,7 @@ extern "C" {
 #endif
   void cryInit(void);
   void cryObjectInit(CRYDriver *cryp);
-  msg_t cryStart(CRYDriver *cryp, const CRYConfig *config);
+  void cryStart(CRYDriver *cryp, const CRYConfig *config);
   void cryStop(CRYDriver *cryp);
   cryerror_t cryLoadAESTransientKey(CRYDriver *cryp,
                                     size_t size,

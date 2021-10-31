@@ -19,9 +19,9 @@
 
 /**
  * @file    sb/user/sbuser.c
- * @brief   ARM SandBox user API code.
+ * @brief   ARMv7-M sandbox user API code.
  *
- * @addtogroup ARM_SANDBOX_USER_API
+ * @addtogroup ARMV7M_SANDBOX_API
  * @{
  */
 
@@ -39,6 +39,11 @@
 /* Module exported variables.                                                */
 /*===========================================================================*/
 
+/**
+ * @brief   Sandbox API internal state.
+ */
+sbapi_state_t sb;
+
 /*===========================================================================*/
 /* Module local types.                                                       */
 /*===========================================================================*/
@@ -54,5 +59,16 @@
 /*===========================================================================*/
 /* Module exported functions.                                                */
 /*===========================================================================*/
+
+/**
+ * @brief   API layer initialization.
+ * @note    To be called before any other call to the "sb" functions.
+ *
+ * @init
+ */
+void sbApiInit(void) {
+
+  sb.frequency = (time_conv_t)sbGetFrequency();
+}
 
 /** @} */

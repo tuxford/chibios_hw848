@@ -40,7 +40,7 @@
 #define HALCONF_H
 
 #define _CHIBIOS_HAL_CONF_
-#define _CHIBIOS_HAL_CONF_VER_8_0_
+#define _CHIBIOS_HAL_CONF_VER_7_1_
 
 #include "mcuconf.h"
 
@@ -427,26 +427,6 @@
 #endif
 
 /*===========================================================================*/
-/* SIO driver related settings.                                              */
-/*===========================================================================*/
-
-/**
- * @brief   Default bit rate.
- * @details Configuration parameter, this is the baud rate selected for the
- *          default configuration.
- */
-#if !defined(SIO_DEFAULT_BITRATE) || defined(__DOXYGEN__)
-#define SIO_DEFAULT_BITRATE                 ${doc.SIO_DEFAULT_BITRATE!"38400"}
-#endif
-
-/**
- * @brief   Support for thread synchronization API.
- */
-#if !defined(SIO_USE_SYNCHRONIZATION) || defined(__DOXYGEN__)
-#define SIO_USE_SYNCHRONIZATION             ${doc.SIO_USE_SYNCHRONIZATION!"TRUE"}
-#endif
-
-/*===========================================================================*/
 /* SERIAL_USB driver related setting.                                        */
 /*===========================================================================*/
 
@@ -482,10 +462,11 @@
 #endif
 
 /**
- * @brief   Inserts an assertion on function errors before returning.
+ * @brief   Enables circular transfers APIs.
+ * @note    Disabling this option saves both code and data space.
  */
-#if !defined(SPI_USE_ASSERT_ON_ERROR) || defined(__DOXYGEN__)
-#define SPI_USE_ASSERT_ON_ERROR             ${doc.SPI_USE_ASSERT_ON_ERROR!"TRUE"}
+#if !defined(SPI_USE_CIRCULAR) || defined(__DOXYGEN__)
+#define SPI_USE_CIRCULAR                    ${doc.SPI_USE_CIRCULAR!"FALSE"}
 #endif
 
 /**

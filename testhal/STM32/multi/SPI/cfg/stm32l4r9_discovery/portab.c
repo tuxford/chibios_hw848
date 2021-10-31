@@ -35,48 +35,41 @@
 /*===========================================================================*/
 
 void spi_circular_cb(SPIDriver *spip);
-void spi_error_cb(SPIDriver *spip);
 
 /*
  * Circular SPI configuration (30MHz, CPHA=0, CPOL=0, MSb first).
  */
 const SPIConfig c_spicfg = {
-  .circular         = true,
-  .slave            = false,
-  .data_cb          = spi_circular_cb,
-  .error_cb         = spi_error_cb,
-  .ssport           = GPIOB,
-  .sspad            = 12U,
-  .cr1              = SPI_CR1_BR_0,
-  .cr2              = SPI_CR2_DS_2 | SPI_CR2_DS_1 | SPI_CR2_DS_0
+  true,
+  spi_circular_cb,
+  GPIOB,
+  12,
+  0,
+  0
 };
 
 /*
  * Maximum speed SPI configuration (30MHz, CPHA=0, CPOL=0, MSb first).
  */
 const SPIConfig hs_spicfg = {
-  .circular         = false,
-  .slave            = false,
-  .data_cb          = NULL,
-  .error_cb         = spi_error_cb,
-  .ssport           = GPIOB,
-  .sspad            = 12U,
-  .cr1              = SPI_CR1_BR_0,
-  .cr2              = SPI_CR2_DS_2 | SPI_CR2_DS_1 | SPI_CR2_DS_0
+  false,
+  NULL,
+  GPIOB,
+  12,
+  0,
+  0
 };
 
 /*
- * Low speed SPI configuration (937.5kHz, CPHA=0, CPOL=0, MSb first).
+ * Low speed SPI configuration (468.75kHz, CPHA=0, CPOL=0, MSb first).
  */
 const SPIConfig ls_spicfg = {
-  .circular         = false,
-  .slave            = false,
-  .data_cb          = NULL,
-  .error_cb         = spi_error_cb,
-  .ssport           = GPIOB,
-  .sspad            = 12U,
-  .cr1              = SPI_CR1_BR_2 | SPI_CR1_BR_1,
-  .cr2              = SPI_CR2_DS_2 | SPI_CR2_DS_1 | SPI_CR2_DS_0
+  false,
+  NULL,
+  GPIOB,
+  12,
+  SPI_CR1_BR_2 | SPI_CR1_BR_1,
+  0
 };
 
 /*===========================================================================*/
@@ -101,13 +94,13 @@ void portab_setup(void) {
    * SPI2 I/O pins setup.
    */
   palSetPadMode(GPIOB, 13, PAL_MODE_ALTERNATE(5) |
-                           PAL_STM32_OSPEED_HIGHEST);       /* SPI2 SCK.    */
+                           PAL_STM32_OSPEED_HIGH);          /* New SCK.     */
   palSetPadMode(GPIOB, 14, PAL_MODE_ALTERNATE(5) |
-                           PAL_STM32_OSPEED_HIGHEST);       /* SPI2 MISO.   */
+                           PAL_STM32_OSPEED_HIGH);          /* New MISO.    */
   palSetPadMode(GPIOB, 15, PAL_MODE_ALTERNATE(5) |
-                           PAL_STM32_OSPEED_HIGHEST);       /* SPI2 MOSI.   */
+                           PAL_STM32_OSPEED_HIGH);          /* New MOSI.    */
   palSetPadMode(GPIOB, 12, PAL_MODE_OUTPUT_PUSHPULL |
-                           PAL_STM32_OSPEED_HIGHEST);       /* SPI2 CS.     */
+                           PAL_STM32_OSPEED_HIGH);          /* New CS.      */
   palSetPad(GPIOB, 12);
 }
 

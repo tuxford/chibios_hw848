@@ -44,6 +44,7 @@
 
 #define STM32L4xx_MCUCONF
 #define STM32L432_MCUCONF
+#define STM32L433_MCUCONF
 
 /*
  * HAL driver system settings.
@@ -193,6 +194,7 @@
 /*
  * PWM driver system settings.
  */
+#define STM32_PWM_USE_ADVANCED              ${doc.STM32_PWM_USE_ADVANCED!"FALSE"}
 #define STM32_PWM_USE_TIM1                  ${doc.STM32_PWM_USE_TIM1!"FALSE"}
 #define STM32_PWM_USE_TIM2                  ${doc.STM32_PWM_USE_TIM2!"FALSE"}
 #define STM32_PWM_USE_TIM15                 ${doc.STM32_PWM_USE_TIM15!"FALSE"}
@@ -212,13 +214,9 @@
 #define STM32_SERIAL_USE_USART1             ${doc.STM32_SERIAL_USE_USART1!"FALSE"}
 #define STM32_SERIAL_USE_USART2             ${doc.STM32_SERIAL_USE_USART2!"FALSE"}
 #define STM32_SERIAL_USE_LPUART1            ${doc.STM32_SERIAL_USE_LPUART1!"FALSE"}
-
-/*
- * SIO driver system settings.
- */
-#define STM32_SIO_USE_USART1                ${doc.STM32_SIO_USE_USART1!"FALSE"}
-#define STM32_SIO_USE_USART2                ${doc.STM32_SIO_USE_USART2!"FALSE"}
-#define STM32_SIO_USE_LPUART1               ${doc.STM32_SIO_USE_LPUART1!"FALSE"}
+#define STM32_SERIAL_USART1_PRIORITY        ${doc.STM32_SERIAL_USART1_PRIORITY!"12"}
+#define STM32_SERIAL_USART2_PRIORITY        ${doc.STM32_SERIAL_USART2_PRIORITY!"12"}
+#define STM32_SERIAL_LPUART1_PRIORITY       ${doc.STM32_SERIAL_LPUART1_PRIORITY!"12"}
 
 /*
  * SPI driver system settings.

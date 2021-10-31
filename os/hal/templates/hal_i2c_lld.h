@@ -68,29 +68,24 @@ typedef uint16_t i2caddr_t;
 typedef uint32_t i2cflags_t;
 
 /**
- * @brief   I2C driver configuration structure.
+ * @brief   Type of I2C driver configuration structure.
  * @note    Implementations may extend this structure to contain more,
  *          architecture dependent, fields.
  */
-struct hal_i2c_config {
+typedef struct {
   /* End of the mandatory fields.*/
   uint32_t                  dummy;
-};
-
-/**
- * @brief   Type of a structure representing an I2C configuration.
- */
-typedef struct hal_i2c_config I2CConfig;
+} I2CConfig;
 
 /**
  * @brief   Type of a structure representing an I2C driver.
  */
-typedef struct hal_i2c_driver I2CDriver;
+typedef struct I2CDriver I2CDriver;
 
 /**
  * @brief   Structure representing an I2C driver.
  */
-struct hal_i2c_driver {
+struct I2CDriver {
   /**
    * @brief   Driver state.
    */

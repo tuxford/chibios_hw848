@@ -229,9 +229,9 @@ typedef enum {
 typedef uint8_t uartflags_t;
 
 /**
- * @brief   Type of an UART driver.
+ * @brief   Type of structure representing an UART driver.
  */
-typedef struct hal_uart_driver UARTDriver;
+typedef struct UARTDriver UARTDriver;
 
 /**
  * @brief   Generic UART notification callback type.
@@ -259,11 +259,11 @@ typedef void (*uartccb_t)(UARTDriver *uartp, uint16_t c);
 typedef void (*uartecb_t)(UARTDriver *uartp, uartflags_t e);
 
 /**
- * @brief   Type of an UART configuration structure.
+ * @brief   Driver configuration structure.
  * @note    Implementations may extend this structure to contain more,
  *          architecture dependent, fields.
  */
-typedef struct hal_uart_config {
+typedef struct {
   /**
    * @brief End of transmission buffer callback.
    */
@@ -324,7 +324,7 @@ typedef struct hal_uart_config {
  * @note    Implementations may extend this structure to contain more,
  *          architecture dependent, fields.
  */
-struct hal_uart_driver {
+struct UARTDriver {
   /**
    * @brief Driver state.
    */

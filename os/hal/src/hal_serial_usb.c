@@ -237,11 +237,10 @@ void sduObjectInit(SerialUSBDriver *sdup) {
  *
  * @param[in] sdup      pointer to a @p SerialUSBDriver object
  * @param[in] config    the serial over USB driver configuration
- * @return              The operation status.
  *
  * @api
  */
-msg_t sduStart(SerialUSBDriver *sdup, const SerialUSBConfig *config) {
+void sduStart(SerialUSBDriver *sdup, const SerialUSBConfig *config) {
   USBDriver *usbp = config->usbp;
 
   osalDbgCheck(sdup != NULL);
@@ -249,7 +248,6 @@ msg_t sduStart(SerialUSBDriver *sdup, const SerialUSBConfig *config) {
   osalSysLock();
   osalDbgAssert((sdup->state == SDU_STOP) || (sdup->state == SDU_READY),
                 "invalid state");
-
   usbp->in_params[config->bulk_in - 1U]   = sdup;
   usbp->out_params[config->bulk_out - 1U] = sdup;
   if (config->int_in > 0U) {
@@ -257,10 +255,7 @@ msg_t sduStart(SerialUSBDriver *sdup, const SerialUSBConfig *config) {
   }
   sdup->config = config;
   sdup->state = SDU_READY;
-
   osalSysUnlock();
-
-  return HAL_RET_SUCCESS;
 }
 
 /**

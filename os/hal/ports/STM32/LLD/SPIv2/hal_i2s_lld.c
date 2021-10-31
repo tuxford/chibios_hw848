@@ -366,9 +366,6 @@ void i2s_lld_start(I2SDriver *i2sp) {
          the driver is stopped.*/
       i2sp->spi->CR1 = 0;
       i2sp->spi->CR2 = SPI_CR2_RXDMAEN;
-#if STM32_DMA_SUPPORTS_DMAMUX
-      dmaSetRequestSource(i2sp->dmarx, STM32_DMAMUX1_SPI1_RX);
-#endif
 #endif
 #if STM32_I2S_TX_ENABLED(STM32_I2S_SPI1_MODE)
       i2sp->dmatx = dmaStreamAllocI(STM32_I2S_SPI1_TX_DMA_STREAM,
@@ -381,9 +378,6 @@ void i2s_lld_start(I2SDriver *i2sp) {
          the driver is stopped.*/
       i2sp->spi->CR1 = 0;
       i2sp->spi->CR2 = SPI_CR2_TXDMAEN;
-#if STM32_DMA_SUPPORTS_DMAMUX
-      dmaSetRequestSource(i2sp->dmatx, STM32_DMAMUX1_SPI1_TX);
-#endif
 #endif
     }
 #endif
@@ -405,9 +399,6 @@ void i2s_lld_start(I2SDriver *i2sp) {
          the driver is stopped.*/
       i2sp->spi->CR1 = 0;
       i2sp->spi->CR2 = SPI_CR2_RXDMAEN;
-#if STM32_DMA_SUPPORTS_DMAMUX
-      dmaSetRequestSource(i2sp->dmarx, STM32_DMAMUX1_SPI2_RX);
-#endif
 #endif
 #if STM32_I2S_TX_ENABLED(STM32_I2S_SPI2_MODE)
       i2sp->dmatx = dmaStreamAllocI(STM32_I2S_SPI2_TX_DMA_STREAM,
@@ -420,9 +411,6 @@ void i2s_lld_start(I2SDriver *i2sp) {
          the driver is stopped.*/
       i2sp->spi->CR1 = 0;
       i2sp->spi->CR2 = SPI_CR2_TXDMAEN;
-#if STM32_DMA_SUPPORTS_DMAMUX
-      dmaSetRequestSource(i2sp->dmatx, STM32_DMAMUX1_SPI2_TX);
-#endif
 #endif
     }
 #endif

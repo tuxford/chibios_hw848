@@ -89,12 +89,10 @@ void eflObjectInit(EFlashDriver *eflp) {
  * @param[in] config    pointer to a configuration structure.
  *                      If this parameter is set to @p NULL then a default
  *                      configuration is used.
- * @return              The operation status.
  *
  * @api
  */
-msg_t eflStart(EFlashDriver *eflp, const EFlashConfig *config) {
-  msg_t msg;
+void eflStart(EFlashDriver *eflp, const EFlashConfig *config) {
 
   osalDbgCheck(eflp != NULL);
 
@@ -102,25 +100,11 @@ msg_t eflStart(EFlashDriver *eflp, const EFlashConfig *config) {
 
   osalDbgAssert((eflp->state == FLASH_STOP) || (eflp->state == FLASH_READY),
                 "invalid state");
-
   eflp->config = config;
-
-#if defined(EFL_LLD_ENHANCED_API)
-  msg = efl_lld_start(eflp);
-#else
   efl_lld_start(eflp);
-  msg = HAL_RET_SUCCESS;
-#endif
-  if (msg == HAL_RET_SUCCESS) {
-    eflp->state = FLASH_READY;
-  }
-  else {
-    eflp->state = FLASH_STOP;
-  }
+  eflp->state = FLASH_READY;
 
   osalSysUnlock();
-
-  return msg;
 }
 
 /**

@@ -224,7 +224,7 @@ extern "C" {
 #endif
   void canInit(void);
   void canObjectInit(CANDriver *canp);
-  msg_t canStart(CANDriver *canp, const CANConfig *config);
+  void canStart(CANDriver *canp, const CANConfig *config);
   void canStop(CANDriver *canp);
   bool canTryTransmitI(CANDriver *canp,
                        canmbx_t mailbox,
