@@ -31,12 +31,12 @@
  * SPI3(SUBGHZSPI) configuration (12MHz, CPHA=0, CPOL=0, MSb first).
  */
 static const SPIConfig spicfg = {
-  .circular = false,
-  .slave    = false,
-  .data_cb  = NULL,
-  .error_cb = NULL,
-  .cr1      = (SPI_CR1_BR_0),
-  .cr2      = (0U)
+  false,
+  NULL,
+  NULL,
+  0,
+  SPI_CR1_BR_0,
+  0
 };
 
 void radioReset(void) {

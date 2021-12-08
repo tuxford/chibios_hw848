@@ -37,8 +37,6 @@
  * @{
  */
 
-#include <string.h>
-
 #include "ch.h"
 
 #if (CH_CFG_USE_CONDVARS == TRUE) || defined(__DOXYGEN__)
@@ -68,7 +66,7 @@
 /*===========================================================================*/
 
 /**
- * @brief   Initializes a @p condition_variable_t structure.
+ * @brief   Initializes s @p condition_variable_t structure.
  *
  * @param[out] cp       pointer to a @p condition_variable_t structure
  *
@@ -82,35 +80,9 @@ void chCondObjectInit(condition_variable_t *cp) {
 }
 
 /**
- * @brief   Disposes a condition variable.
- * @note    Objects disposing does not involve freeing memory but just
- *          performing checks that make sure that the object is in a
- *          state compatible with operations stop.
- * @note    If the option @p CH_CFG_ENABLE_HARDENING is enabled then the
- *          object is also cleared, attempts to use the object would likely
- *          result in a clean memory access violation because dereferencing
- *          of @p NULL pointers rather than dereferencing previously valid
- *          pointers.
- *
- * @param[in] cp        pointer to a @p condition_variable_t structure
- *
- * @dispose
- */
-void chCondObjectDispose(condition_variable_t *cp) {
-
-  chDbgCheck(cp != NULL);
-  chDbgAssert(ch_queue_isempty(&cp->queue),
-              "object in use");
-
-#if 0 /*CH_CFG_ENABLE_HARDENING == TRUE*/
-  memset((void *)cp, 0, sizeof (condition_variable_t));
-#endif
-}
-
-/**
  * @brief   Signals one thread that is waiting on the condition variable.
  *
- * @param[in] cp        pointer to a @p condition_variable_t structure
+ * @param[in] cp        pointer to the @p condition_variable_t structure
  *
  * @api
  */
@@ -132,7 +104,7 @@ void chCondSignal(condition_variable_t *cp) {
  *          interrupt handlers always reschedule on exit so an explicit
  *          reschedule must not be performed in ISRs.
  *
- * @param[in] cp        pointer to a @p condition_variable_t structure
+ * @param[in] cp        pointer to the @p condition_variable_t structure
  *
  * @iclass
  */
@@ -151,7 +123,7 @@ void chCondSignalI(condition_variable_t *cp) {
 /**
  * @brief   Signals all threads that are waiting on the condition variable.
  *
- * @param[in] cp        pointer to a @p condition_variable_t structure
+ * @param[in] cp        pointer to the @p condition_variable_t structure
  *
  * @api
  */
@@ -170,7 +142,7 @@ void chCondBroadcast(condition_variable_t *cp) {
  *          interrupt handlers always reschedule on exit so an explicit
  *          reschedule must not be performed in ISRs.
  *
- * @param[in] cp        pointer to a @p condition_variable_t structure
+ * @param[in] cp        pointer to the @p condition_variable_t structure
  *
  * @iclass
  */
@@ -194,7 +166,7 @@ void chCondBroadcastI(condition_variable_t *cp) {
  *          is performed atomically.
  * @pre     The invoking thread <b>must</b> have at least one owned mutex.
  *
- * @param[in] cp        pointer to a @p condition_variable_t structure
+ * @param[in] cp        pointer to the @p condition_variable_t structure
  * @return              A message specifying how the invoking thread has been
  *                      released from the condition variable.
  * @retval MSG_OK       if the condition variable has been signaled using
@@ -220,7 +192,7 @@ msg_t chCondWait(condition_variable_t *cp) {
  *          is performed atomically.
  * @pre     The invoking thread <b>must</b> have at least one owned mutex.
  *
- * @param[in] cp        pointer to a @p condition_variable_t structure
+ * @param[in] cp        pointer to the @p condition_variable_t structure
  * @return              A message specifying how the invoking thread has been
  *                      released from the condition variable.
  * @retval MSG_OK       if the condition variable has been signaled using
@@ -265,7 +237,7 @@ msg_t chCondWaitS(condition_variable_t *cp) {
  * @post    Exiting the function because a timeout does not re-acquire the
  *          mutex, the mutex ownership is lost.
  *
- * @param[in] cp        pointer to a @p condition_variable_t structure
+ * @param[in] cp        pointer to the @p condition_variable_t structure
  * @param[in] timeout   the number of ticks before the operation timeouts, the
  *                      special values are handled as follow:
  *                      - @a TIME_INFINITE no timeout.
@@ -303,7 +275,7 @@ msg_t chCondWaitTimeout(condition_variable_t *cp, sysinterval_t timeout) {
  * @post    Exiting the function because a timeout does not re-acquire the
  *          mutex, the mutex ownership is lost.
  *
- * @param[in] cp        pointer to a @p condition_variable_t structure
+ * @param[in] cp        pointer to the @p condition_variable_t structure
  * @param[in] timeout   the number of ticks before the operation timeouts, the
  *                      special values are handled as follow:
  *                      - @a TIME_INFINITE no timeout.

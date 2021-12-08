@@ -32,8 +32,6 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include "ccportab.h"
-
 /**
  * @name    Kernel types
  * @{

@@ -96,7 +96,6 @@ typedef struct {
 extern "C" {
 #endif
   void chTMObjectInit(time_measurement_t *tmp);
-  void chTMObjectDispose(time_measurement_t *tmp);
   NOINLINE void chTMStartMeasurementX(time_measurement_t *tmp);
   NOINLINE void chTMStopMeasurementX(time_measurement_t *tmp);
   NOINLINE void chTMChainMeasurementToX(time_measurement_t *tmp1,

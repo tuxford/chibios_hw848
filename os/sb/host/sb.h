@@ -40,7 +40,7 @@
 /**
  * @brief   Stable release flag.
  */
-#define CH_SB_STABLE            0
+#define CH_SB_STABLE            1
 
 /**
  * @name    ChibiOS/SE version identification
@@ -49,7 +49,7 @@
 /**
  * @brief   Safety Extensions version string.
  */
-#define CH_SB_VERSION           "2.1.0"
+#define CH_SB_VERSION           "2.0.0"
 
 /**
  * @brief   Safety Extensions version major number.
@@ -59,7 +59,7 @@
 /**
  * @brief   Safety Extensions version minor number.
  */
-#define CH_SB_MINOR             1
+#define CH_SB_MINOR             0
 
 /**
  * @brief   Safety Extensions version patch number.
@@ -107,10 +107,6 @@
 
 #if CH_CFG_INTERVALS_SIZE != 32
 #error "SandBox requires CH_CFG_INTERVALS_SIZE == 32"
-#endif
-
-#if CH_CFG_USE_MEMCHECKS == FALSE
-#error "SandBox requires CH_CFG_USE_MEMCHECKS == TRUE"
 #endif
 
 #if PORT_USE_SYSCALL == FALSE

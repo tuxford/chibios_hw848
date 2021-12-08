@@ -30,11 +30,6 @@
 #include "shell_cmd.h"
 #include "chprintf.h"
 
-#if (SHELL_CMD_FILES_ENABLED == TRUE) || defined(__DOXYGEN__)
-#include <fcntl.h>
-#include "vfs.h"
-#endif
-
 #if (SHELL_CMD_TEST_ENABLED == TRUE) || defined(__DOXYGEN__)
 #include "rt_test_root.h"
 #include "oslib_test_root.h"
@@ -135,7 +130,6 @@ static void cmd_systime(BaseSequentialStream *chp, int argc, char *argv[]) {
 #if (SHELL_CMD_MEM_ENABLED == TRUE) || defined(__DOXYGEN__)
 static void cmd_mem(BaseSequentialStream *chp, int argc, char *argv[]) {
   size_t n, total, largest;
-  memory_area_t area;
 
   (void)argv;
   if (argc > 0) {
@@ -143,8 +137,7 @@ static void cmd_mem(BaseSequentialStream *chp, int argc, char *argv[]) {
     return;
   }
   n = chHeapStatus(NULL, &total, &largest);
-  chCoreGetStatusX(&area);
-  chprintf(chp, "core free memory : %u bytes" SHELL_NEWLINE_STR, area.size);
+  chprintf(chp, "core free memory : %u bytes" SHELL_NEWLINE_STR, chCoreGetStatusX());
   chprintf(chp, "heap fragments   : %u" SHELL_NEWLINE_STR, n);
   chprintf(chp, "heap free total  : %u bytes" SHELL_NEWLINE_STR, total);
   chprintf(chp, "heap free largest: %u bytes" SHELL_NEWLINE_STR, largest);
@@ -231,112 +224,6 @@ static void cmd_test(BaseSequentialStream *chp, int argc, char *argv[]) {
 }
 #endif
 
-#if (SHELL_CMD_FILES_ENABLED == TRUE) || defined(__DOXYGEN__)
-static void scan_nodes(BaseSequentialStream *chp,
-                       char *path,
-                       vfs_node_info_t *nip) {
-  msg_t res;
-  vfs_directory_node_c *dirp;
-
-  chprintf(chp, "%s" SHELL_NEWLINE_STR, path);
-  res = vfsOpenDirectory(path, &dirp);
-  if (res == VFS_RET_SUCCESS) {
-    size_t i = strlen(path);
-
-    while (true) {
-      char *fn = nip->name;
-      res = vfsReadDirectoryNext(dirp, nip);
-      if (res != VFS_RET_SUCCESS) {
-        break;
-      }
-
-      fn = nip->name;
-      if (nip->attr & VFS_NODE_ATTR_ISDIR) {
-        strcpy(path + i, fn);
-        strcat(path + i, "/");
-        scan_nodes(chp, path, nip);
-        path[i] = '\0';
-      }
-      else {
-        chprintf(chp, "%s%s" SHELL_NEWLINE_STR, path, fn);
-      }
-    }
-
-    vfsCloseDirectory(dirp);
-  }
-}
-
-static void cmd_tree(BaseSequentialStream *chp, int argc, char *argv[]) {
-  char *pathbuf = NULL;
-  vfs_node_info_t *nip = NULL;
-
-  (void)argv;
-
-  if (argc > 0) {
-    chprintf(chp, "Usage: tree" SHELL_NEWLINE_STR);
-    return;
-  }
-
-  do {
-    pathbuf = (char *)chHeapAlloc(NULL, 1024);
-    nip = (vfs_node_info_t *)chHeapAlloc(NULL, 1024);
-    if ((pathbuf == NULL) || (nip == NULL)) {
-      chprintf(chp, "Out of memory" SHELL_NEWLINE_STR);
-     break;
-    }
-
-    strcpy(pathbuf, "/");
-    scan_nodes(chp, pathbuf, nip);
-  }
-  while (false);
-
-  if (pathbuf != NULL) {
-    chHeapFree((void *)pathbuf);
-  }
-
-  if (nip != NULL) {
-    chHeapFree((void *)nip);
-  }
-}
-
-static void cmd_cat(BaseSequentialStream *chp, int argc, char *argv[]) {
-  char *buf = NULL;
-
-  if (argc != 1) {
-    chprintf(chp, "Usage: cat <filename>" SHELL_NEWLINE_STR);
-    return;
-  }
-
-  do {
-    int fd, n;
-
-    buf= (char *)chHeapAlloc(NULL, 2048);
-    if (buf == NULL) {
-      chprintf(chp, "Out of memory" SHELL_NEWLINE_STR);
-     break;
-    }
-
-    fd = open(argv[0], O_RDONLY);
-    if(fd == -1) {
-      chprintf(chp, "Cannot open file" SHELL_NEWLINE_STR);
-      break;
-    }
-
-    while ((n = read(fd, buf, sizeof (2048))) > 0) {
-      streamWrite(chp, (const uint8_t *)buf, n);
-    }
-    chprintf(chp, SHELL_NEWLINE_STR);
-
-    (void) close(fd);
-  }
-  while (false);
-
-  if (buf != NULL) {
-    chHeapFree((void *)buf);
-  }
-}
-#endif
-
 /*===========================================================================*/
 /* Module exported functions.                                                */
 /*===========================================================================*/
@@ -362,10 +249,6 @@ const ShellCommand shell_local_commands[] = {
 #endif
 #if SHELL_CMD_THREADS_ENABLED == TRUE
   {"threads", cmd_threads},
-#endif
-#if SHELL_CMD_FILES_ENABLED == TRUE
-  {"tree", cmd_tree},
-  {"cat", cmd_cat},
 #endif
 #if SHELL_CMD_TEST_ENABLED == TRUE
   {"test", cmd_test},

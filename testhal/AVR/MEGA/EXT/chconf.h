@@ -63,7 +63,7 @@
  * @note    Allowed values are 16, 32 or 64 bits.
  */
 #if !defined(CH_CFG_ST_RESOLUTION)
-#define CH_CFG_ST_RESOLUTION                32
+#define CH_CFG_ST_RESOLUTION                16
 #endif
 
 /**
@@ -72,7 +72,7 @@
  *          setting also defines the system tick time unit.
  */
 #if !defined(CH_CFG_ST_FREQUENCY)
-#define CH_CFG_ST_FREQUENCY                 10000
+#define CH_CFG_ST_FREQUENCY                 15624
 #endif
 
 /**
@@ -177,7 +177,7 @@
  * @note    The default is @p TRUE.
  */
 #if !defined(CH_CFG_USE_TM)
-#define CH_CFG_USE_TM                       TRUE
+#define CH_CFG_USE_TM                       FALSE
 #endif
 
 /**
@@ -336,7 +336,7 @@
  * @note    Requires @p CH_CFG_USE_HEAP and/or @p CH_CFG_USE_MEMPOOLS.
  */
 #if !defined(CH_CFG_USE_DYNAMIC)
-#define CH_CFG_USE_DYNAMIC                  TRUE
+#define CH_CFG_USE_DYNAMIC                  FALSE
 #endif
 
 /** @} */
@@ -358,16 +358,6 @@
  */
 #if !defined(CH_CFG_USE_MAILBOXES)
 #define CH_CFG_USE_MAILBOXES                TRUE
-#endif
-
-/**
- * @brief   Memory checks APIs.
- * @details If enabled then the memory checks APIs are included in the kernel.
- *
- * @note    The default is @p TRUE.
- */
-#if !defined(CH_CFG_USE_MEMCHECKS)
-#define CH_CFG_USE_MEMCHECKS                TRUE
 #endif
 
 /**
@@ -393,7 +383,7 @@
  * @note    Requires @p CH_CFG_USE_MEMCORE.
  */
 #if !defined(CH_CFG_MEMCORE_SIZE)
-#define CH_CFG_MEMCORE_SIZE                 0
+#define CH_CFG_MEMCORE_SIZE                 128
 #endif
 
 /**
@@ -573,7 +563,7 @@
  * @note    The default is @p FALSE.
  */
 #if !defined(CH_DBG_SYSTEM_STATE_CHECK)
-#define CH_DBG_SYSTEM_STATE_CHECK           TRUE
+#define CH_DBG_SYSTEM_STATE_CHECK           FALSE
 #endif
 
 /**
@@ -584,7 +574,7 @@
  * @note    The default is @p FALSE.
  */
 #if !defined(CH_DBG_ENABLE_CHECKS)
-#define CH_DBG_ENABLE_CHECKS                TRUE
+#define CH_DBG_ENABLE_CHECKS                FALSE
 #endif
 
 /**
@@ -596,7 +586,7 @@
  * @note    The default is @p FALSE.
  */
 #if !defined(CH_DBG_ENABLE_ASSERTS)
-#define CH_DBG_ENABLE_ASSERTS               TRUE
+#define CH_DBG_ENABLE_ASSERTS               FALSE
 #endif
 
 /**

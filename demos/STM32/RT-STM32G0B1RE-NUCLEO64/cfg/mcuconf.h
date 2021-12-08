@@ -78,7 +78,7 @@
 /*
  * Peripherals clocks and sources.
  */
-#define STM32_FDCANSEL                      STM32_USBSEL_HSI48
+#define STM32_FDCANSEL                      STM32_FDCANSEL_PCLK
 #define STM32_USBSEL                        STM32_USBSEL_HSI48
 #define STM32_USART1SEL                     STM32_USART1SEL_SYSCLK
 #define STM32_USART2SEL                     STM32_USART2SEL_SYSCLK
@@ -87,7 +87,7 @@
 #define STM32_LPUART2SEL                    STM32_LPUART2SEL_SYSCLK
 #define STM32_CECSEL                        STM32_CECSEL_HSI16DIV
 #define STM32_I2C1SEL                       STM32_I2C1SEL_PCLK
-#define STM32_I2C2SEL                       STM32_I2C1SEL_PCLK
+#define STM32_I2C2SEL                       STM32_I2C2SEL_PCLK
 #define STM32_I2S1SEL                       STM32_I2S1SEL_SYSCLK
 #define STM32_I2S2SEL                       STM32_I2S2SEL_SYSCLK
 #define STM32_LPTIM1SEL                     STM32_LPTIM1SEL_PCLK

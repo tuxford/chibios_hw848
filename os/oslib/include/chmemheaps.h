@@ -80,31 +80,13 @@ typedef union heap_header heap_header_t;
  * @brief   Memory heap block header.
  */
 union heap_header {
-  /**
-   * @brief   Header for free blocks.
-   */
   struct {
-    /**
-     * @brief   Next block in free list.
-     */
-    heap_header_t       *next;
-    /**
-     * @brief   Size of the area in pages.
-     */
-    size_t              pages;
+    heap_header_t       *next;      /**< @brief Next block in free list.    */
+    size_t              pages;      /**< @brief Size of the area in pages.  */
   } free;
-  /**
-   * @brief   Header for used blocks.
-   */
   struct {
-    /**
-     * @brief   Block owner heap.
-     */
-    memory_heap_t       *heap;
-    /**
-     * @brief   Size of the area in bytes.
-     */
-    size_t              size;
+    memory_heap_t       *heap;      /**< @brief Block owner heap.           */
+    size_t              size;       /**< @brief Size of the area in bytes.  */
   } used;
 };
 
@@ -112,28 +94,13 @@ union heap_header {
  * @brief   Structure describing a memory heap.
  */
 struct memory_heap {
-  /**
-   * @brief   Memory blocks provider for this heap.
-   */
-  memgetfunc2_t         provider;
-  /**
-   * @brief   Memory area for this heap.
-   */
-  memory_area_t         area;
-  /**
-   * @brief   Free blocks list header.
-   */
-  heap_header_t         header;
+  memgetfunc2_t         provider;   /**< @brief Memory blocks provider for
+                                                this heap.                  */
+  heap_header_t         header;     /**< @brief Free blocks list header.    */
 #if (CH_CFG_USE_MUTEXES == TRUE) || defined(__DOXYGEN__)
-  /**
-   * @brief   Heap access mutex.
-   */
-  mutex_t               mtx;
+  mutex_t               mtx;        /**< @brief Heap access mutex.          */
 #else
-  /**
-   * @brief   Heap access fallback semaphore.
-   */
-  semaphore_t           sem;
+  semaphore_t           sem;        /**< @brief Heap access semaphore.      */
 #endif
 };
 
@@ -160,7 +127,6 @@ extern "C" {
   void *chHeapAllocAligned(memory_heap_t *heapp, size_t size, unsigned align);
   void chHeapFree(void *p);
   size_t chHeapStatus(memory_heap_t *heapp, size_t *totalp, size_t *largestp);
-  bool chHeapIntegrityCheck(memory_heap_t *heapp);
 #ifdef __cplusplus
 }
 #endif

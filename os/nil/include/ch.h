@@ -30,8 +30,6 @@
 #ifndef CH_H
 #define CH_H
 
-#include <string.h>
-
 #include "chtypes.h"
 
 /*===========================================================================*/
@@ -46,7 +44,7 @@
 /**
  * @brief   Stable release flag.
  */
-#define CH_KERNEL_STABLE        0
+#define CH_KERNEL_STABLE        1
 
 /**
  * @name    ChibiOS/NIL version identification
@@ -55,7 +53,7 @@
 /**
  * @brief   Kernel version string.
  */
-#define CH_KERNEL_VERSION       "4.2.0"
+#define CH_KERNEL_VERSION       "4.1.1"
 
 /**
  * @brief   Kernel version major number.
@@ -65,12 +63,12 @@
 /**
  * @brief   Kernel version minor number.
  */
-#define CH_KERNEL_MINOR         2
+#define CH_KERNEL_MINOR         1
 
 /**
  * @brief   Kernel version patch number.
  */
-#define CH_KERNEL_PATCH         0
+#define CH_KERNEL_PATCH         1
 /** @} */
 
 /**
@@ -662,13 +660,6 @@ struct nil_os_instance {
  * @{
  */
 /**
- * @brief   Natural data alignment for the current architecture.
- * @note    Represents the required alignment for integer and pointer
- *          data types.
- */
-#define MEM_NATURAL_ALIGN       PORT_NATURAL_ALIGN
-
-/**
  * @brief   Alignment mask constant.
  *
  * @param[in] a         alignment, must be a power of two
@@ -1228,25 +1219,16 @@ struct nil_os_instance {
 /**
  * @brief   Initializes a threads queue object.
  *
- * @param[out] tqp      pointer to a @p threads_queue_t structure
+ * @param[out] tqp      pointer to the threads queue object
  *
  * @init
  */
 #define chThdQueueObjectInit(tqp) ((tqp)->cnt = (cnt_t)0)
 
 /**
- * @brief   Disposes a threads queue.
- *
- * @param[in] tqp       pointer to a @p threads_queue_t structure
- *
- * @dispose
- */
-#define chThdObjectDispose(tqp) ((void) tqp)
-
-/**
  * @brief   Evaluates to @p true if the specified queue is empty.
  *
- * @param[out] tqp      pointer to a @p threads_queue_t structure
+ * @param[out] tqp      pointer to the threads queue object
  * @return              The queue status.
  * @retval false        if the queue is not empty.
  * @retval true         if the queue is empty.

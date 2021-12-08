@@ -187,7 +187,7 @@
  * @note    The default is @p TRUE.
  */
 #if !defined(CH_CFG_USE_TIMESTAMP)
-#define CH_CFG_USE_TIMESTAMP                FALSE
+#define CH_CFG_USE_TIMESTAMP                TRUE
 #endif
 
 /**
@@ -358,16 +358,6 @@
  */
 #if !defined(CH_CFG_USE_MAILBOXES)
 #define CH_CFG_USE_MAILBOXES                TRUE
-#endif
-
-/**
- * @brief   Memory checks APIs.
- * @details If enabled then the memory checks APIs are included in the kernel.
- *
- * @note    The default is @p TRUE.
- */
-#if !defined(CH_CFG_USE_MEMCHECKS)
-#define CH_CFG_USE_MEMCHECKS                TRUE
 #endif
 
 /**

@@ -43,7 +43,7 @@
 /**
  * @brief   Stable release flag.
  */
-#define CH_OSLIB_STABLE         0
+#define CH_OSLIB_STABLE         1
 
 /**
  * @name    ChibiOS/LIB version identification
@@ -52,7 +52,7 @@
 /**
  * @brief   OS Library version string.
  */
-#define CH_OSLIB_VERSION        "1.4.0"
+#define CH_OSLIB_VERSION        "1.3.0"
 
 /**
  * @brief   OS Library version major number.
@@ -62,7 +62,7 @@
 /**
  * @brief   OS Library version minor number.
  */
-#define CH_OSLIB_MINOR          4
+#define CH_OSLIB_MINOR          3
 
 /**
  * @brief   OS Library version patch number.
@@ -86,10 +86,6 @@
 /* Configuration file checks.*/
 #if !defined(CH_CFG_USE_MAILBOXES)
 #error "CH_CFG_USE_MAILBOXES not defined in chconf.h"
-#endif
-
-#if !defined(CH_CFG_USE_MEMCHECKS)
-#error "CH_CFG_USE_MEMCHECKS not defined in chconf.h"
 #endif
 
 #if !defined(CH_CFG_USE_MEMCORE)
@@ -207,10 +203,8 @@
 
 /* Restricted subsystems.*/
 #undef CH_CFG_USE_MAILBOXES
-#undef CH_CFG_USE_MEMCHECKS
 
 #define CH_CFG_USE_MAILBOXES                FALSE
-#define CH_CFG_USE_MEMCHECKS                FALSE
 
 #endif /* CH_CUSTOMER_LIC_OSLIB == FALSE */
 
@@ -231,7 +225,6 @@
 /*===========================================================================*/
 
 /* OS Library headers.*/
-#include "chmemchecks.h"
 #include "chbsem.h"
 #include "chmboxes.h"
 #include "chmemcore.h"

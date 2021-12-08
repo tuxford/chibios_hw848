@@ -217,7 +217,7 @@ int _getpid(void) {
 #ifdef __cplusplus
 extern "C" {
   void __cxa_pure_virtual(void) {
-    osalSysHalt("pure virtual");
+    osalSysHalt("Pure virtual function call.");
   }
 }
 #endif

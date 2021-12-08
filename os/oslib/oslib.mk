@@ -1,4 +1,5 @@
-# List of all the ChibiOS/LIB files.
+# List of all the ChibiOS/LIB files, there is no need to remove the files
+# from this list, you can disable parts of the kernel by editing chlibconf.h.
 ifeq ($(USE_SMART_BUILD),yes)
 
 # Configuration files directory
@@ -12,7 +13,7 @@ endif
 
 CHLIBCONF := $(strip $(shell cat $(CHCONFDIR)/chconf.h | egrep -e "\#define"))
 
-LIBSRC := $(CHIBIOS)/os/oslib/src/chmemchecks.c
+LIBSRC :=
 ifneq ($(findstring CH_CFG_USE_MAILBOXES TRUE,$(CHLIBCONF)),)
 LIBSRC += $(CHIBIOS)/os/oslib/src/chmboxes.c
 endif
@@ -38,8 +39,7 @@ ifneq ($(findstring CH_CFG_USE_FACTORY TRUE,$(CHLIBCONF)),)
 LIBSRC += $(CHIBIOS)/os/oslib/src/chfactory.c
 endif
 else
-LIBSRC := $(CHIBIOS)/os/oslib/src/chmemchecks.c \
-          $(CHIBIOS)/os/oslib/src/chmboxes.c \
+LIBSRC := $(CHIBIOS)/os/oslib/src/chmboxes.c \
           $(CHIBIOS)/os/oslib/src/chmemcore.c \
           $(CHIBIOS)/os/oslib/src/chmemheaps.c \
           $(CHIBIOS)/os/oslib/src/chmempools.c \

@@ -8,10 +8,10 @@
   +--license.txt                - GPL license text.
   +--demos/                     - Demo projects, one directory per platform.
   +--docs/                      - Documentation.
-  |  +--common/                 - Documentation common build resources.
-  |  +--hal/                    - Builders for HAL.
-  |  +--nil/                    - Builders for NIL.
-  |  +--rt/                     - Builders for RT.
+  |  +--build/                  - Documentation builders.
+  |  +--manual/                 - Manuals directory.
+  |  +--quality/                - Reports and metrics.
+  |  +--various/                - Various support files.
   +--ext/                       - External libraries, not part of ChibiOS.
   +--os/                        - ChibiOS components.
   |  +--common/                 - Shared OS modules.
@@ -73,47 +73,46 @@
 *** Releases and Change Log                                               ***
 *****************************************************************************
 
-*** Next ***
-- NEW: Added a chXXXDispose() function to all objects in NIL.
-- NEW: Added a chXXXDispose() function to all objects in RT.
-- NEW: Added VFS-related commands to the shell, disabled by default.
-- NEW: Added a new VFS subsystem (Virtual File System), it allows to assemble
-       trees of files from multiple "File System Drivers" into a single tree
-       and access it as a whole.
-- NEW: Added MEM_NATURAL_ALIGN macro to RT and NIL.
-- NEW: Added static initializer for virtual timers in RT.
-- NEW: Added new function chHeapIntegrityCheck().
+*** 21.11.1 ***
 - NEW: Added EFL driver implementation for STM32G4xx.
-- NEW: Function chCoreGetStatusX() changed to return a memory region object
-       instead of a simple size.
-- NEW: RT and NIL upgraded to support the enhanced OSLIB.
-- NEW: Memory areas/pointers checker functions added to OSLIB.
 - NEW: STM32G0B1 USBv2 driver.
 - NEW: USBv1 driver optimization and removal of a potential race condition
        (not demonstrated).
 - NEW: Added elfAcquireBus()/eflReleaseBus() functions to EFL driver.
-- NEW: Increased stacks size in RT test suite from 128 to 192. added an
-       option to override the stack size by defining THREADS_STACK_SIZE
-       in the makefile.
 - NEW: Added STM32L073RZ-Nucleo64 to USB-CDC "multi" demo. Removed old demo.
 - NEW: Added an STM32 WDG "multi" demo. Removed all old WDG demos.
 - NEW: Added option to copy vectors in RAM on GCC startup for ARMv6-M,
        ARMv7-M and ARMv8-M-ML.
 - NEW: On STM32WBxx added a check on STM32_LSI_ENABLE required by IWDG.
 - NEW: Added SPIv2 support also to STM32WB and STM32WL.
-- FIX: Fixed PWR_CR2_USV not set in STM32L4+ mcuconf.h file (bug #1207)
-       (backported to 21.11.1).
-- FIX: Fixed USB not enabled on STM32F103x6 (bug #1206)
-       (backported to 20.3.5)(backported to 21.11.1).
+- FIX: Fixed PWR_CR2_USV not set in STM32L4+ mcuconf.h file (bug #1207).
+- FIX: Fixed USB not enabled on STM32F103x6 (bug #1206).
 - FIX: Fixed RT test suite build fails when CH_CFG_USE_TIMESTAMP is FALSE
-       (bug #1205)(backported to 21.11.1).
-- FIX: Fixed wrong number of CAN filters for STM32L496/9A6 (bug #1204)
-       (backported to 20.3.5)(backported to 21.11.1).
-- FIX: Fixed DMA stream not disabled in STM32 QUADSPIv1 driver (bug #1203)
-       (backported to 20.3.5)(backported to 21.11.1).
-- FIX: Fixed I2C4 DMA streams for STM32L496 (bug #1202)
-       (backported to 20.3.5)(backported to 21.11.1).
-- FIX: Fixed STM32_SDMMC2_NUMBER on STM32H7 (bug #1201)
-       (backported to 20.3.5)(backported to 21.11.1).
-- FIX: Fixed STM32G0B1 demo application hangs debuggers (bug #1200)
-       (backported to 21.11.1).
+       (bug #1205).
+- FIX: Fixed wrong number of CAN filters for STM32L496/9A6 (bug #1204).
+- FIX: Fixed DMA stream not disabled in STM32 QUADSPIv1 driver (bug #1203).
+- FIX: Fixed I2C4 DMA streams for STM32L496 (bug #1202).
+- FIX: Fixed STM32_SDMMC2_NUMBER on STM32H7 (bug #1201).
+- FIX: Fixed STM32G0B1 demo application hangs debuggers (bug #1200).
+
+*** 21.11.0 ***
+- NEW: STM32 ADCv2 now supports return code on start function.
+- NEW: Integrated FatFS with lwIP HTTPD, now it is possible to serve files
+       using HTTP from a storage device.
+- NEW: Updated FatFS to version 0.14b.
+- NEW: SPIv2 driver has been implemented on: STM32F0, STM32F1, STM32F3,
+       STM32F4, STM32F7, STM32G0, STM32G4, STM32L0, STM32L1, STM32L4,
+       STM32L4+, STM32H7.
+- NEW: New SPIv2 driver model, it is compatible with the previous SPI driver
+       and introduces: better runtime errors handling, slave mode,
+       data synchronization function, various other improvements.
+- NEW: Added an alternate port for ARMv7-M, it uses less RAM and it is
+       faster at interrupt processing, it is slightly slower at
+       thread-to-thread context switch so it is not a full replacement.
+- NEW: Now all xxxStart() functions in HAL are able to report a driver
+       activation error.
+- NEW: Support for STM32G031, STM32G041, STM32G0B1, STM32G0C1.
+- NEW: Made STM32H7 non-cacheable memory option also shareable.
+- NEW: EFL driver and demo for STM32F3xx.
+- NEW: New unit test subsystem under /os/test. Now it is officially
+       ChibiOS/TEST.
